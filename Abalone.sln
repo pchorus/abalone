@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Abalone", "Abalone\Abalone.vcproj", "{BD9634F8-195A-4034-9734-A236958E7F59}"
+	ProjectSection(ProjectDependencies) = postProject
+		{780DD00B-C8F0-46FC-A74B-EFD30431E901} = {780DD00B-C8F0-46FC-A74B-EFD30431E901}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AbaloneBase", "AbaloneBase\AbaloneBase.vcproj", "{780DD00B-C8F0-46FC-A74B-EFD30431E901}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD9634F8-195A-4034-9734-A236958E7F59}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BD9634F8-195A-4034-9734-A236958E7F59}.Debug|Win32.Build.0 = Debug|Win32
+		{BD9634F8-195A-4034-9734-A236958E7F59}.Release|Win32.ActiveCfg = Release|Win32
+		{BD9634F8-195A-4034-9734-A236958E7F59}.Release|Win32.Build.0 = Release|Win32
+		{780DD00B-C8F0-46FC-A74B-EFD30431E901}.Debug|Win32.ActiveCfg = Debug|Win32
+		{780DD00B-C8F0-46FC-A74B-EFD30431E901}.Debug|Win32.Build.0 = Debug|Win32
+		{780DD00B-C8F0-46FC-A74B-EFD30431E901}.Release|Win32.ActiveCfg = Release|Win32
+		{780DD00B-C8F0-46FC-A74B-EFD30431E901}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
