@@ -37,15 +37,21 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
   afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+  afx_msg void OnNewGame();
+  afx_msg void OnUpdateNewGame(CCmdUI *pCmdUI);
 	DECLARE_MESSAGE_MAP()
 
   // Spielfeld malen
   void DrawBoard();
+  void DrawBalls();
   void DrawBall(long x, long y, BallColor color);
 
 private:
   CRect GetBoardRect() const;
   int GetBoardRadius() const;
+  void SetBallsStandardFormation();
+  void SetBallsBelgianDaisyFormation();
+
   // the GameManager
   GameManager* myGameManager;
 };

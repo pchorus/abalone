@@ -3,6 +3,7 @@
 #include "Player.h"
 
 Player::Player()
+: myName("")
 {
 }
 

@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "Abalone.h"
 #include "AbaloneDlg.h"
+#include "NewGameDlg.h"
 
 #include <math.h>
 
@@ -70,6 +71,8 @@ BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
   ON_WM_LBUTTONDOWN()
 //}}AFX_MSG_MAP
+ON_COMMAND(ID_NEWGAME, &CAbaloneDlg::OnNewGame)
+ON_UPDATE_COMMAND_UI(ID_NEWGAME, &CAbaloneDlg::OnUpdateNewGame)
 END_MESSAGE_MAP()
 
 
@@ -337,16 +340,17 @@ void CAbaloneDlg::DrawBoard()
     pDC->LineTo(rightPoint);
   }
 
-  DrawBall(0, 3, BALL_COLOR_WHITE);
-  myGameManager->GetGameBoard()->GetBoardField(0, 3)->SetBall(BoardField.WHITE_BALL);
-  DrawBall(5, 3, BALL_COLOR_BLACK);
-  myGameManager->GetGameBoard()->GetBoardField(5, 3)->SetBall(BoardField.BLACK_BALL);
-  DrawBall(5, 4, BALL_COLOR_WHITE);
-  myGameManager->GetGameBoard()->GetBoardField(5, 4)->SetBall(BoardField.WHITE_BALL);
-  DrawBall(4, 4, BALL_COLOR_WHITE);
-  myGameManager->GetGameBoard()->GetBoardField(4, 4)->SetBall(BoardField.WHITE_BALL);
-  DrawBall(4, 3, BALL_COLOR_WHITE);
-  myGameManager->GetGameBoard()->GetBoardField(4, 3)->SetBall(BoardField.WHITE_BALL);
+  DrawBalls();
+//   DrawBall(0, 3, BALL_COLOR_WHITE);
+//   myGameManager->GetGameBoard()->GetBoardField(0, 3)->SetBall(BoardField::WHITE_BALL);
+//   DrawBall(5, 3, BALL_COLOR_BLACK);
+//   myGameManager->GetGameBoard()->GetBoardField(5, 3)->SetBall(BoardField::BLACK_BALL);
+//   DrawBall(5, 4, BALL_COLOR_WHITE);
+//   myGameManager->GetGameBoard()->GetBoardField(5, 4)->SetBall(BoardField::WHITE_BALL);
+//   DrawBall(4, 4, BALL_COLOR_WHITE);
+//   myGameManager->GetGameBoard()->GetBoardField(4, 4)->SetBall(BoardField::WHITE_BALL);
+//   DrawBall(4, 3, BALL_COLOR_WHITE);
+//   myGameManager->GetGameBoard()->GetBoardField(4, 3)->SetBall(BoardField::WHITE_BALL);
 
   pDC->SelectObject(oldBrush);
 }
@@ -404,41 +408,153 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
     GameBoard* gameBoard = myGameManager->GetGameBoard();
     BoardField* field(0);
     CPoint fieldPoint;
-    int ballRadius = static_cast<int>(GetBoardRadius() / 4 * 0.45);
+    double ballRadius = GetBoardRadius() / 4 * 0.45;
 
     for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
       for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-        field = gameBoard->GetBoardField(x, y);
-        fieldPoint = field->GetCoordinates();
+        if (gameBoard->GetBoardFieldExist(x, y)) {
+          field = gameBoard->GetBoardField(x, y);
+          fieldPoint = field->GetCoordinates();
 
-        // TODO: checking the rectangle, not the circle
-        if (abs(fieldPoint.x - point.x) < ballRadius
-          && abs(fieldPoint.y - point.y) < ballRadius
-          && field->GetBall() != BoardField::NO_BALL)
-        {
-          if (field->GetBall() == BoardField::WHITE_BALL) {
-            if (!field->IsSelected()) {
-              DrawBall(x, y, BALL_COLOR_WHITE_SELECTED);
-              field->SetIsSelected(true);
-            }
-            else {
-              DrawBall(x, y, BALL_COLOR_WHITE);
-              field->SetIsSelected(false);
-            }
+          if (pow(double(point.x - fieldPoint.x), 2) + pow(double(point.y - fieldPoint.y), 2) < pow(ballRadius, 2) && field->GetBall() != BoardField::NO_BALL)
+          {
+            if (field->GetBall() == BoardField::WHITE_BALL) {
+              if (!field->IsSelected()) {
+                DrawBall(x, y, BALL_COLOR_WHITE_SELECTED);
+                field->SetIsSelected(true);
+              }
+              else {
+                DrawBall(x, y, BALL_COLOR_WHITE);
+                field->SetIsSelected(false);
+              }
 
-          }
-          else if (field->GetBall() == BoardField::BLACK_BALL) {
-            if (!field->IsSelected()) {
-              DrawBall(x, y, BALL_COLOR_BLACK_SELECTED);
-              field->SetIsSelected(true);
             }
-            else {
-              DrawBall(x, y, BALL_COLOR_BLACK);
-              field->SetIsSelected(false);
+            else if (field->GetBall() == BoardField::BLACK_BALL) {
+              if (!field->IsSelected()) {
+                DrawBall(x, y, BALL_COLOR_BLACK_SELECTED);
+                field->SetIsSelected(true);
+              }
+              else {
+                DrawBall(x, y, BALL_COLOR_BLACK);
+                field->SetIsSelected(false);
+              }
             }
           }
         }
       }
     }
   }
+}
+
+void CAbaloneDlg::OnNewGame()
+{
+  NewGameDlg newGameDlg;
+
+  if (newGameDlg.DoModal() == IDOK) {
+    // new game starts
+    GameBoard* gameBoard = myGameManager->GetGameBoard();
+
+    gameBoard->Reset();
+
+    if (newGameDlg.GetStartFormationStr() == START_FORMATION_STR_STANDARD) {
+      SetBallsStandardFormation();
+    }
+    else if (newGameDlg.GetStartFormationStr() == START_FORMATION_STR_BELGIAN_DAISY) {
+      SetBallsBelgianDaisyFormation();
+    }
+
+    InvalidateRect(GetBoardRect());
+    // TODO: now start the game
+  }
+}
+
+void CAbaloneDlg::OnUpdateNewGame(CCmdUI *pCmdUI)
+{
+  pCmdUI->Enable();
+}
+
+void CAbaloneDlg::DrawBalls()
+{
+  GameBoard* gameBoard = myGameManager->GetGameBoard();
+  BoardField* field = 0;
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      if (gameBoard->GetBoardFieldExist(x, y)) {
+        field = gameBoard->GetBoardField(x, y);
+        if (field->GetBall() == BoardField::BLACK_BALL) {
+          DrawBall(x, y, field->IsSelected() ? BALL_COLOR_BLACK_SELECTED : BALL_COLOR_BLACK);
+        }
+        else if (field->GetBall() == BoardField::WHITE_BALL) {
+          DrawBall(x, y, field->IsSelected() ? BALL_COLOR_WHITE_SELECTED : BALL_COLOR_WHITE);
+        }
+      }
+    }
+  }
+}
+
+void CAbaloneDlg::SetBallsStandardFormation()
+{
+  GameBoard* gameBoard = myGameManager->GetGameBoard();
+
+  // set balls in the standard formation
+  // white balls
+  for (int x = 0; x < 6; ++x) {
+    for (int y = 0; y < 2; ++y) {
+      if (gameBoard->GetBoardFieldExist(x, y)) {
+        gameBoard->GetBoardField(x, y)->SetBall(BoardField::BLACK_BALL);
+      }
+    }
+  }
+  gameBoard->GetBoardField(2, 2)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(3, 2)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(4, 2)->SetBall(BoardField::BLACK_BALL);
+
+  // black balls
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = BOARD_FIELDS_ROW-1; y > BOARD_FIELDS_ROW-3; --y) {
+      if (gameBoard->GetBoardFieldExist(x, y)) {
+        gameBoard->GetBoardField(x, y)->SetBall(BoardField::WHITE_BALL);
+      }
+    }
+  }
+  gameBoard->GetBoardField(4, 6)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(5, 6)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(6, 6)->SetBall(BoardField::WHITE_BALL);
+}
+
+void CAbaloneDlg::SetBallsBelgianDaisyFormation()
+{
+  GameBoard* gameBoard = myGameManager->GetGameBoard();
+  gameBoard->GetBoardField(0, 0)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(0, 1)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(1, 0)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(1, 1)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(1, 2)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(2, 1)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(2, 2)->SetBall(BoardField::BLACK_BALL);
+
+  gameBoard->GetBoardField(3, 0)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(3, 1)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(4, 0)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(4, 1)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(4, 2)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(5, 1)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(5, 2)->SetBall(BoardField::WHITE_BALL);
+
+  gameBoard->GetBoardField(3, 6)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(3, 7)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(4, 6)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(4, 7)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(4, 8)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(5, 7)->SetBall(BoardField::WHITE_BALL);
+  gameBoard->GetBoardField(5, 8)->SetBall(BoardField::WHITE_BALL);
+
+  gameBoard->GetBoardField(6, 6)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(6, 7)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(7, 6)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(7, 7)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(7, 8)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(8, 7)->SetBall(BoardField::BLACK_BALL);
+  gameBoard->GetBoardField(8, 8)->SetBall(BoardField::BLACK_BALL);
 }

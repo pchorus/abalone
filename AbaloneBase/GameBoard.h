@@ -22,11 +22,12 @@ public:
 
   // getter and setter
   BoardField* GetBoardField(int x, int y) const;
-
-private:
   // Tests whether the BoardField with coordinates x and y exists or not
   bool GetBoardFieldExist(int x, int y) const;
+  // Resets all BoardFields to initial state
+  void Reset();
 
+private:
   // the BoardFields
   BoardField* myFieldPoints[BOARD_FIELDS_ROW][BOARD_FIELDS_COLUMN];
 };

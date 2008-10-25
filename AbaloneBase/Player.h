@@ -19,4 +19,7 @@ public:
 
   // getter and setter
   virtual PlayerType GetPlayerType() const = 0;
+
+private:
+  CString myName;
 };

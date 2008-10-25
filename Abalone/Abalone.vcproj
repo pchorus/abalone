@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGameDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -230,6 +234,10 @@
 			</File>
 			<File
 				RelativePath=".\AbaloneDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGameDlg.h"
 				>
 			</File>
 			<File
