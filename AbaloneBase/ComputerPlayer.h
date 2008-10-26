@@ -10,12 +10,12 @@
 
 #include "Player.h"
 
-class ABALONE_BASE_DLLINTERFACE HumanPlayer : public Player {
+class ABALONE_BASE_DLLINTERFACE ComputerPlayer : public Player {
 
 public:
   // constructor / destructor
-  HumanPlayer(const CString& name);
-  virtual ~HumanPlayer();
+  ComputerPlayer(const CString& name);
+  virtual ~ComputerPlayer();
 
   // getter and setter
   virtual PlayerType GetType() const;

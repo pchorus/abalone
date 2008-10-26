@@ -14,12 +14,18 @@ public:
   enum PlayerType { PLAYER_TYPE_NONE, PLAYER_TYPE_HUMAN, PLAYER_TYPE_COMPUTER };
 
   // contructor / destructor
-  Player();
+  Player(const CString& name);
   virtual ~Player();
 
   // getter and setter
-  virtual PlayerType GetPlayerType() const = 0;
+  virtual PlayerType GetType() const = 0;
+  CString GetName() const;
 
 private:
   CString myName;
 };
+
+inline CString Player::GetName() const
+{
+  return myName;
+}

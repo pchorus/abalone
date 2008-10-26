@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by Abalone.rc
 //
-#define IDOK2                           2
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
@@ -22,6 +21,9 @@
 #define IDC_RADIO_COMPUTER_PLAYER2      1010
 #define IDC_COMBO_START_FORMATION       1012
 #define IDC_STATIC_START_FORMATION      1013
+#define IDC_EDIT_NAME_PLAYER1           1014
+#define IDC_EDIT_NAME_PLAYER2           1015
+#define IDC_STATIC_PLAYERS_TURN         1016
 #define ID_NEU_NEWGAME                  32771
 #define ID_NEWGAME                      32772
 #define ID_NEW_CLOSE                    32773
@@ -33,7 +35,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

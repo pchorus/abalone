@@ -2,7 +2,8 @@
 
 #include "HumanPlayer.h"
 
-HumanPlayer::HumanPlayer()
+HumanPlayer::HumanPlayer(const CString& name)
+: Player(name)
 {
 }
 
@@ -10,7 +11,7 @@ HumanPlayer::~HumanPlayer()
 {
 }
 
-Player::PlayerType HumanPlayer::GetPlayerType() const
+Player::PlayerType HumanPlayer::GetType() const
 {
   return PLAYER_TYPE_HUMAN;
 }

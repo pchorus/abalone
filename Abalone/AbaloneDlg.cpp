@@ -62,7 +62,12 @@ CAbaloneDlg::CAbaloneDlg(CWnd* pParent /*=NULL*/)
 
 void CAbaloneDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+  CDialog::DoDataExchange(pDX);
+  DDX_Control(pDX, IDC_EDIT_NAME_PLAYER1, myEditNamePlayer1);
+  DDX_Control(pDX, IDC_EDIT_NAME_PLAYER2, myEditNamePlayer2);
+  DDX_Control(pDX, IDC_STATIC_PLAYER1, myStaticNamePlayer1);
+  DDX_Control(pDX, IDC_STATIC_PLAYER2, myStaticNamePlayer2);
+  DDX_Control(pDX, IDC_STATIC_PLAYERS_TURN, myStaticPlayersTurn);
 }
 
 BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
@@ -105,7 +110,7 @@ BOOL CAbaloneDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
-	// TODO: Hier zusätzliche Initialisierung einfügen
+	myStaticPlayersTurn.SetWindowText("");
 
 	return TRUE;  // Geben Sie TRUE zurück, außer ein Steuerelement soll den Fokus erhalten
 }
@@ -150,6 +155,9 @@ void CAbaloneDlg::OnPaint()
 	{
 		CDialog::OnPaint();
     DrawBoard();
+    if (myGameManager->IsGameStarted()) {
+      DrawBallsAsidePlayerNames();
+    }
 	}
 }
 
@@ -341,16 +349,6 @@ void CAbaloneDlg::DrawBoard()
   }
 
   DrawBalls();
-//   DrawBall(0, 3, BALL_COLOR_WHITE);
-//   myGameManager->GetGameBoard()->GetBoardField(0, 3)->SetBall(BoardField::WHITE_BALL);
-//   DrawBall(5, 3, BALL_COLOR_BLACK);
-//   myGameManager->GetGameBoard()->GetBoardField(5, 3)->SetBall(BoardField::BLACK_BALL);
-//   DrawBall(5, 4, BALL_COLOR_WHITE);
-//   myGameManager->GetGameBoard()->GetBoardField(5, 4)->SetBall(BoardField::WHITE_BALL);
-//   DrawBall(4, 4, BALL_COLOR_WHITE);
-//   myGameManager->GetGameBoard()->GetBoardField(4, 4)->SetBall(BoardField::WHITE_BALL);
-//   DrawBall(4, 3, BALL_COLOR_WHITE);
-//   myGameManager->GetGameBoard()->GetBoardField(4, 3)->SetBall(BoardField::WHITE_BALL);
 
   pDC->SelectObject(oldBrush);
 }
@@ -360,6 +358,13 @@ void CAbaloneDlg::DrawBall(long x, long y, BallColor color)
   CDC* pDC = GetDC();
   GameBoard* gameBoard = myGameManager->GetGameBoard();
   CPoint p = gameBoard->GetBoardField(x, y)->GetCoordinates();
+
+  DrawBall(p, color);
+}
+
+void CAbaloneDlg::DrawBall(CPoint point, BallColor color, int radius)
+{
+  CDC* pDC = GetDC();
 
   COLORREF colref(RGB(0, 0, 0));
   if (color == BALL_COLOR_WHITE) {
@@ -376,10 +381,10 @@ void CAbaloneDlg::DrawBall(long x, long y, BallColor color)
   CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
   CBrush* oldBrush = pDC->SelectObject(&brush);
   CPen* oldPen = pDC->SelectObject(&pen);
-  
-  int ballRadius = static_cast<int>(GetBoardRadius() / 4 * 0.45);
 
-  pDC->Ellipse(p.x - ballRadius, p.y - ballRadius, p.x + ballRadius, p.y + ballRadius);
+  int ballRadius = radius == -1 ? static_cast<int>(GetBoardRadius() / 4 * 0.45) : radius;
+
+  pDC->Ellipse(point.x - ballRadius, point.y - ballRadius, point.x + ballRadius, point.y + ballRadius);
 
   pDC->SelectObject(oldBrush);
   pDC->SelectObject(oldPen);
@@ -402,7 +407,7 @@ CRect CAbaloneDlg::GetBoardRect() const
 
 void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
-  if (myGameManager->GetPlayerForNextTurn()->GetPlayerType() == Player::PLAYER_TYPE_HUMAN) {
+  if (myGameManager->IsGameStarted() && myGameManager->GetPlayerForNextTurn()->GetType() == Player::PLAYER_TYPE_HUMAN) {
     // only react on the mouse click if it is a human player's turn
 
     GameBoard* gameBoard = myGameManager->GetGameBoard();
@@ -448,7 +453,7 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CAbaloneDlg::OnNewGame()
 {
-  NewGameDlg newGameDlg;
+  NewGameDlg newGameDlg(myGameManager, this);
 
   if (newGameDlg.DoModal() == IDOK) {
     // new game starts
@@ -463,8 +468,31 @@ void CAbaloneDlg::OnNewGame()
       SetBallsBelgianDaisyFormation();
     }
 
-    InvalidateRect(GetBoardRect());
     // TODO: now start the game
+
+    // Initialize the controls
+    CString namePlayer = "Player 1";
+    if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER) {
+      namePlayer += " (Computer)";
+    }
+    namePlayer += ":";
+    myStaticNamePlayer1.SetWindowText(namePlayer);
+
+    namePlayer = "Player 2";
+    if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER) {
+      namePlayer += " (Computer)";
+    }
+    namePlayer += ":";
+    myStaticNamePlayer2.SetWindowText(namePlayer);
+
+    myEditNamePlayer1.SetWindowText(myGameManager->GetPlayer1()->GetName());
+    myEditNamePlayer2.SetWindowText(myGameManager->GetPlayer2()->GetName());
+
+    myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayer1()->GetName() + "'s turn!");
+
+    myGameManager->SetGameStarted(true);
+    Invalidate();
+
   }
 }
 
@@ -491,6 +519,50 @@ void CAbaloneDlg::DrawBalls()
       }
     }
   }
+}
+
+void CAbaloneDlg::DrawBallsAsidePlayerNames()
+{
+  CRect topHlp;
+  CRect bottomHlp;
+
+  // player 1
+  myStaticNamePlayer1.GetWindowRect(&topHlp);
+  myEditNamePlayer1.GetWindowRect(&bottomHlp);
+  ScreenToClient(&topHlp);
+  ScreenToClient(&bottomHlp);
+
+  CPoint point;
+  int radius = (bottomHlp.bottom - topHlp.top - 10) / 2;
+
+  point.x = topHlp.left - radius - 20;
+  point. y = (bottomHlp.bottom + topHlp.top) / 2;
+  DrawBall(point, BALL_COLOR_BLACK, radius);
+
+  // player 2
+  myStaticNamePlayer2.GetWindowRect(&topHlp);
+  myEditNamePlayer2.GetWindowRect(&bottomHlp);
+  ScreenToClient(&topHlp);
+  ScreenToClient(&bottomHlp);
+  point.x = topHlp.left - radius - 20;
+  point. y = (bottomHlp.bottom + topHlp.top) / 2;
+  DrawBall(point, BALL_COLOR_WHITE, radius);
+
+  // current player
+  myStaticPlayersTurn.GetWindowRect(&topHlp);
+  ScreenToClient(&topHlp);
+  point.x = topHlp.left - radius - 20;
+  point. y = (topHlp.bottom + topHlp.top) / 2;
+
+  BallColor color;
+  if (myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()) {
+    color = BALL_COLOR_BLACK;
+  }
+  else {
+    color = BALL_COLOR_WHITE;
+  }
+
+  DrawBall(point, color, radius);
 }
 
 void CAbaloneDlg::SetBallsStandardFormation()

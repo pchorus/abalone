@@ -5,15 +5,17 @@
 #include "Abalone.h"
 #include "NewGameDlg.h"
 
+#include "AbaloneBase/GameManager.h"
+
 
 // NewGameDlg-Dialogfeld
 
 IMPLEMENT_DYNAMIC(NewGameDlg, CDialog)
 
-NewGameDlg::NewGameDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(NewGameDlg::IDD, pParent)
+NewGameDlg::NewGameDlg(GameManager* gameManager, CWnd* pParent /*=NULL*/)
+: CDialog(NewGameDlg::IDD, pParent)
+, myGameManager(gameManager)
 {
-
 }
 
 NewGameDlg::~NewGameDlg()
@@ -43,6 +45,7 @@ BOOL NewGameDlg::OnInitDialog()
 
   myStartFormationComboBox.SetCurSel(myStartFormationComboBox.FindString(-1, START_FORMATION_STR_STANDARD));
   myStartFormationStr = START_FORMATION_STR_STANDARD;
+
   return ret;
 }
 
@@ -51,4 +54,27 @@ BOOL NewGameDlg::OnInitDialog()
 void NewGameDlg::OnSelchangeComboStartFormation()
 {
   myStartFormationComboBox.GetLBText(myStartFormationComboBox.GetCurSel(), myStartFormationStr);
+}
+
+void NewGameDlg::OnOK()
+{
+  // initialize the players
+  CString namePlayer1;
+  CString namePlayer2;
+
+  GetDlgItem(IDC_EDIT_NAME1)->GetWindowText(namePlayer1);
+  GetDlgItem(IDC_EDIT_NAME2)->GetWindowText(namePlayer2);
+
+  int typePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_PLAYER1);
+  int typePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_PLAYER2);
+
+  myGameManager->SetPlayers(
+    namePlayer1,
+    typePlayer1 == IDC_RADIO_HUMAN_PLAYER1 ? Player::PLAYER_TYPE_HUMAN : Player::PLAYER_TYPE_COMPUTER,
+    namePlayer2,
+    typePlayer2 == IDC_RADIO_HUMAN_PLAYER2 ? Player::PLAYER_TYPE_HUMAN : Player::PLAYER_TYPE_COMPUTER
+    );
+
+
+  CDialog::OnOK();
 }

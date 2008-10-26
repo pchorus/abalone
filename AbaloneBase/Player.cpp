@@ -2,8 +2,8 @@
 
 #include "Player.h"
 
-Player::Player()
-: myName("")
+Player::Player(const CString& name)
+: myName(name)
 {
 }
 

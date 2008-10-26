@@ -163,6 +163,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ComputerPlayer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GameBoard.cpp"
 				>
 			</File>
@@ -190,6 +194,10 @@
 			</File>
 			<File
 				RelativePath=".\BoardField.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ComputerPlayer.h"
 				>
 			</File>
 			<File

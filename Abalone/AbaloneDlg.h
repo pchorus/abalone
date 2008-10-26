@@ -4,6 +4,7 @@
 #pragma once
 
 #include "AbaloneBase/BoardField.h"
+#include "afxwin.h"
 
 class GameManager;
 
@@ -44,7 +45,12 @@ protected:
   // Spielfeld malen
   void DrawBoard();
   void DrawBalls();
+  // draws a ball on the gameboard with x and y as board coordinates
   void DrawBall(long x, long y, BallColor color);
+  // draws a ball at the point in the ClientRect, radius for the balls on the board
+  // is calculated, otherwise you can assign a radius in the parameter
+  void DrawBall(CPoint point, BallColor color, int radius = -1);
+  void DrawBallsAsidePlayerNames();
 
 private:
   CRect GetBoardRect() const;
@@ -54,6 +60,13 @@ private:
 
   // the GameManager
   GameManager* myGameManager;
+
+  // Controls
+  CStatic myStaticNamePlayer1;
+  CStatic myStaticNamePlayer2;
+  CEdit myEditNamePlayer1;
+  CEdit myEditNamePlayer2;
+  CStatic myStaticPlayersTurn;
 };
 
 inline int CAbaloneDlg::GetBoardRadius() const
