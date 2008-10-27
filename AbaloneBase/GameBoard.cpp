@@ -7,7 +7,7 @@ GameBoard::GameBoard()
   
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-      myFieldPoints[x][y] = new BoardField;
+      myFieldPoints[x][y] = new BoardField(x, y);
     }
   }
 }
@@ -30,6 +30,11 @@ bool GameBoard::GetBoardFieldExist(int x, int y) const
   }
 
   return ret;
+}
+
+bool GameBoard::GetBoardFieldExist(CPoint point) const
+{
+  return GetBoardFieldExist(point.x, point.y);
 }
 
 void GameBoard::Reset()

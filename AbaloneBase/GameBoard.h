@@ -22,8 +22,10 @@ public:
 
   // getter and setter
   BoardField* GetBoardField(int x, int y) const;
+  BoardField* GetBoardField(CPoint point) const;
   // Tests whether the BoardField with coordinates x and y exists or not
   bool GetBoardFieldExist(int x, int y) const;
+  bool GetBoardFieldExist(CPoint point) const;
   // Resets all BoardFields to initial state
   void Reset();
 
@@ -36,4 +38,10 @@ inline BoardField* GameBoard::GetBoardField(int x, int y) const
 {
   ASSERT(GetBoardFieldExist(x, y));
   return myFieldPoints[x][y];
+}
+
+inline BoardField* GameBoard::GetBoardField(CPoint point) const
+{
+  ASSERT(GetBoardFieldExist(point.x, point.y));
+  return myFieldPoints[point.x][point.y];
 }

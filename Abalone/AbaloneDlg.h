@@ -40,6 +40,12 @@ protected:
   afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
   afx_msg void OnNewGame();
   afx_msg void OnUpdateNewGame(CCmdUI *pCmdUI);
+  afx_msg void OnBtnMoveUpLeft();
+  afx_msg void OnBtnMoveUpRight();
+  afx_msg void OnBtnMoveLeft();
+  afx_msg void OnBtnMoveRight();
+  afx_msg void OnBtnMoveDownLeft();
+  afx_msg void OnBtnMoveDownRight();
 	DECLARE_MESSAGE_MAP()
 
   // Spielfeld malen
@@ -51,12 +57,19 @@ protected:
   // is calculated, otherwise you can assign a radius in the parameter
   void DrawBall(CPoint point, BallColor color, int radius = -1);
   void DrawBallsAsidePlayerNames();
+  // enable/disable direction buttons
+  void EnableDirectionButtons();
+  // disable direction buttons
+  void DisableDirectionButtons();
 
 private:
   CRect GetBoardRect() const;
   int GetBoardRadius() const;
   void SetBallsStandardFormation();
   void SetBallsBelgianDaisyFormation();
+
+  // must be called after a player finished his turn
+  void TurnIsOver();
 
   // the GameManager
   GameManager* myGameManager;
@@ -67,6 +80,12 @@ private:
   CEdit myEditNamePlayer1;
   CEdit myEditNamePlayer2;
   CStatic myStaticPlayersTurn;
+  CButton myBtnMoveUpLeft;
+  CButton myBtnMoveUpRight;
+  CButton myBtnMoveLeft;
+  CButton myBtnMoveRight;
+  CButton myBtnMoveDownLeft;
+  CButton myBtnMoveDownRight;
 };
 
 inline int CAbaloneDlg::GetBoardRadius() const

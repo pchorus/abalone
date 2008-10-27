@@ -14,36 +14,59 @@ public:
 
   // constructor / destructor
   BoardField();
+  BoardField(int fieldX, int fieldY);
   ~BoardField();
 
-  CPoint GetCoordinates() const;
-  void SetCoordinates(CPoint point);
-  void SetCoordinates(int x, int y);
+  CPoint GetGUICoordinates() const;
+  void SetGUICoordinates(CPoint point);
+  void SetGUICoordinates(int x, int y);
+  CPoint GetFieldCoordinates() const;
+  void SetFieldCoordinates(CPoint point);
+  void SetFieldCoordinates(int x, int y);
+
   Ball GetBall() const;
   void SetBall(Ball ball);
   bool IsSelected() const;
   void SetIsSelected(bool isSelected);
 
 private:
-  CPoint myCoordinates;
+  // GUICoordinates in the framewindow
+  CPoint myGUICoordinates;
+  CPoint myFieldCoordinates;
   Ball myBall;
   bool myIsSelected;
 };
 
-inline CPoint BoardField::GetCoordinates() const
+inline CPoint BoardField::GetGUICoordinates() const
 {
-  return myCoordinates;
+  return myGUICoordinates;
 }
 
-inline void BoardField::SetCoordinates(CPoint point)
+inline void BoardField::SetGUICoordinates(CPoint point)
 {
-  myCoordinates = point;
+  myGUICoordinates = point;
 }
 
-inline void BoardField::SetCoordinates(int x, int y)
+inline void BoardField::SetGUICoordinates(int x, int y)
 {
-  myCoordinates.x = x;
-  myCoordinates.y = y;
+  myGUICoordinates.x = x;
+  myGUICoordinates.y = y;
+}
+
+inline CPoint BoardField::GetFieldCoordinates() const
+{
+  return myFieldCoordinates;
+}
+
+inline void BoardField::SetFieldCoordinates(CPoint point)
+{
+  myFieldCoordinates = point;
+}
+
+inline void BoardField::SetFieldCoordinates(int x, int y)
+{
+  myFieldCoordinates.x = x;
+  myFieldCoordinates.y = y;
 }
 
 inline BoardField::Ball BoardField::GetBall() const

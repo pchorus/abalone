@@ -68,6 +68,12 @@ void CAbaloneDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Control(pDX, IDC_STATIC_PLAYER1, myStaticNamePlayer1);
   DDX_Control(pDX, IDC_STATIC_PLAYER2, myStaticNamePlayer2);
   DDX_Control(pDX, IDC_STATIC_PLAYERS_TURN, myStaticPlayersTurn);
+  DDX_Control(pDX, IDC_BTN_MOVE_UPLEFT, myBtnMoveUpLeft);
+  DDX_Control(pDX, IDC_BTN_MOVE_UPRIGHT, myBtnMoveUpRight);
+  DDX_Control(pDX, IDC_BTN_MOVE_LEFT, myBtnMoveLeft);
+  DDX_Control(pDX, IDC_BTN_MOVE_RIGHT, myBtnMoveRight);
+  DDX_Control(pDX, IDC_BTN_MOVE_DOWNLEFT, myBtnMoveDownLeft);
+  DDX_Control(pDX, IDC_BTN_MOVE_DOWNRIGHT, myBtnMoveDownRight);
 }
 
 BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
@@ -75,9 +81,14 @@ BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
   ON_WM_LBUTTONDOWN()
-//}}AFX_MSG_MAP
-ON_COMMAND(ID_NEWGAME, &CAbaloneDlg::OnNewGame)
-ON_UPDATE_COMMAND_UI(ID_NEWGAME, &CAbaloneDlg::OnUpdateNewGame)
+  ON_COMMAND(ID_NEWGAME, &CAbaloneDlg::OnNewGame)
+  ON_UPDATE_COMMAND_UI(ID_NEWGAME, &CAbaloneDlg::OnUpdateNewGame)
+  ON_BN_CLICKED(IDC_BTN_MOVE_UPLEFT, &CAbaloneDlg::OnBtnMoveUpLeft)
+  ON_BN_CLICKED(IDC_BTN_MOVE_UPRIGHT, &CAbaloneDlg::OnBtnMoveUpRight)
+  ON_BN_CLICKED(IDC_BTN_MOVE_LEFT, &CAbaloneDlg::OnBtnMoveLeft)
+  ON_BN_CLICKED(IDC_BTN_MOVE_RIGHT, &CAbaloneDlg::OnBtnMoveRight)
+  ON_BN_CLICKED(IDC_BTN_MOVE_DOWNLEFT, &CAbaloneDlg::OnBtnMoveDownLeft)
+  ON_BN_CLICKED(IDC_BTN_MOVE_DOWNRIGHT, &CAbaloneDlg::OnBtnMoveDownRight)
 END_MESSAGE_MAP()
 
 
@@ -111,6 +122,7 @@ BOOL CAbaloneDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
 	myStaticPlayersTurn.SetWindowText("");
+  DisableDirectionButtons();
 
 	return TRUE;  // Geben Sie TRUE zurück, außer ein Steuerelement soll den Fokus erhalten
 }
@@ -226,7 +238,7 @@ void CAbaloneDlg::DrawBoard()
   // Punkte berechnen
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = bottomLeft.x + i * radius / 4;
-    gameBoard->GetBoardField(i, 0)->SetCoordinates(currentPoint);
+    gameBoard->GetBoardField(i, 0)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
   }
@@ -238,7 +250,7 @@ void CAbaloneDlg::DrawBoard()
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = bottomRight.x + i * radius / 8;
     currentPoint.y = bottomRight.y - i * triangleHeight / 4;
-    gameBoard->GetBoardField(i+4, i)->SetCoordinates(currentPoint);
+    gameBoard->GetBoardField(i+4, i)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
   }
@@ -250,7 +262,7 @@ void CAbaloneDlg::DrawBoard()
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = middleRight.x - i * radius / 8;
     currentPoint.y = middleRight.y - i * triangleHeight / 4;
-    gameBoard->GetBoardField(8, i+4)->SetCoordinates(currentPoint);
+    gameBoard->GetBoardField(8, i+4)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
   }
@@ -261,7 +273,7 @@ void CAbaloneDlg::DrawBoard()
   currentPoint.y = topLeft.y;
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = topLeft.x + i * radius / 4;
-    gameBoard->GetBoardField(4+i, 8)->SetCoordinates(currentPoint);
+    gameBoard->GetBoardField(4+i, 8)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
   }
@@ -272,7 +284,7 @@ void CAbaloneDlg::DrawBoard()
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = middleLeft.x + i * radius / 8;
     currentPoint.y = middleLeft.y - i * triangleHeight / 4;
-    gameBoard->GetBoardField(i, 4+i)->SetCoordinates(currentPoint);
+    gameBoard->GetBoardField(i, 4+i)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
   }
@@ -283,7 +295,7 @@ void CAbaloneDlg::DrawBoard()
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = bottomLeft.x - i * radius / 8;
     currentPoint.y = bottomLeft.y - i * triangleHeight / 4;
-    gameBoard->GetBoardField(0, i)->SetCoordinates(currentPoint);
+    gameBoard->GetBoardField(0, i)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
   }
@@ -297,8 +309,8 @@ void CAbaloneDlg::DrawBoard()
     xLeft = y < 4 ? 0 : y - 4;
     xRight = y < 4 ? 4 + y : 8;
     
-    leftPoint = gameBoard->GetBoardField(xLeft, y)->GetCoordinates();
-    rightPoint = gameBoard->GetBoardField(xRight, y)->GetCoordinates();
+    leftPoint = gameBoard->GetBoardField(xLeft, y)->GetGUICoordinates();
+    rightPoint = gameBoard->GetBoardField(xRight, y)->GetGUICoordinates();
     pDC->MoveTo(leftPoint);
     pDC->LineTo(rightPoint);
 
@@ -307,7 +319,7 @@ void CAbaloneDlg::DrawBoard()
 
     for (int x = xLeft; x < xRight; ++x) {
       currentPoint.x = leftPoint.x + (x - xLeft) * (rightPoint.x - leftPoint.x) / (xRight - xLeft);
-      gameBoard->GetBoardField(x, y)->SetCoordinates(currentPoint);
+      gameBoard->GetBoardField(x, y)->SetGUICoordinates(currentPoint);
       pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
         currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
 
@@ -321,8 +333,8 @@ void CAbaloneDlg::DrawBoard()
     yTop = x < 4 ? 4 + x : 8;
     yBottom = x < 4 ? 0 : x - 4;
     
-    leftPoint = gameBoard->GetBoardField(x, yTop)->GetCoordinates();
-    rightPoint = gameBoard->GetBoardField(x, yBottom)->GetCoordinates();
+    leftPoint = gameBoard->GetBoardField(x, yTop)->GetGUICoordinates();
+    rightPoint = gameBoard->GetBoardField(x, yBottom)->GetGUICoordinates();
     pDC->MoveTo(leftPoint);
     pDC->LineTo(rightPoint);
   }
@@ -332,8 +344,8 @@ void CAbaloneDlg::DrawBoard()
     yTop = 8 - x;
     yBottom = 0;
     
-    leftPoint = gameBoard->GetBoardField(x, yBottom)->GetCoordinates();
-    rightPoint = gameBoard->GetBoardField(8, yTop)->GetCoordinates();
+    leftPoint = gameBoard->GetBoardField(x, yBottom)->GetGUICoordinates();
+    rightPoint = gameBoard->GetBoardField(8, yTop)->GetGUICoordinates();
     pDC->MoveTo(leftPoint);
     pDC->LineTo(rightPoint);
   }
@@ -342,8 +354,8 @@ void CAbaloneDlg::DrawBoard()
     xLeft = 0;
     xRight = 8 - y;
     
-    leftPoint = gameBoard->GetBoardField(xLeft, y)->GetCoordinates();
-    rightPoint = gameBoard->GetBoardField(xRight, 8)->GetCoordinates();
+    leftPoint = gameBoard->GetBoardField(xLeft, y)->GetGUICoordinates();
+    rightPoint = gameBoard->GetBoardField(xRight, 8)->GetGUICoordinates();
     pDC->MoveTo(leftPoint);
     pDC->LineTo(rightPoint);
   }
@@ -357,7 +369,7 @@ void CAbaloneDlg::DrawBall(long x, long y, BallColor color)
 {
   CDC* pDC = GetDC();
   GameBoard* gameBoard = myGameManager->GetGameBoard();
-  CPoint p = gameBoard->GetBoardField(x, y)->GetCoordinates();
+  CPoint p = gameBoard->GetBoardField(x, y)->GetGUICoordinates();
 
   DrawBall(p, color);
 }
@@ -414,40 +426,49 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
     BoardField* field(0);
     CPoint fieldPoint;
     double ballRadius = GetBoardRadius() / 4 * 0.45;
+    BoardField::Ball nextTurnsBallColor = myGameManager->IsFirstPlayersTurn() ? BoardField::BLACK_BALL : BoardField::WHITE_BALL;
 
     for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
       for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
         if (gameBoard->GetBoardFieldExist(x, y)) {
           field = gameBoard->GetBoardField(x, y);
-          fieldPoint = field->GetCoordinates();
+          fieldPoint = field->GetGUICoordinates();
 
           if (pow(double(point.x - fieldPoint.x), 2) + pow(double(point.y - fieldPoint.y), 2) < pow(ballRadius, 2) && field->GetBall() != BoardField::NO_BALL)
           {
-            if (field->GetBall() == BoardField::WHITE_BALL) {
+            if (field->GetBall() == BoardField::WHITE_BALL && nextTurnsBallColor == BoardField::WHITE_BALL) {
               if (!field->IsSelected()) {
+                if (!myGameManager->CanSelectBall(field)) {
+                  myGameManager->ClearSelectedBalls();
+                }
                 DrawBall(x, y, BALL_COLOR_WHITE_SELECTED);
-                field->SetIsSelected(true);
+                myGameManager->AddSelectedBall(field);
               }
               else {
                 DrawBall(x, y, BALL_COLOR_WHITE);
-                field->SetIsSelected(false);
+                myGameManager->RemoveSelectedBall(field);
               }
 
             }
-            else if (field->GetBall() == BoardField::BLACK_BALL) {
+            else if (field->GetBall() == BoardField::BLACK_BALL && nextTurnsBallColor == BoardField::BLACK_BALL) {
               if (!field->IsSelected()) {
+                if (!myGameManager->CanSelectBall(field)) {
+                  myGameManager->ClearSelectedBalls();
+                }
                 DrawBall(x, y, BALL_COLOR_BLACK_SELECTED);
-                field->SetIsSelected(true);
+                myGameManager->AddSelectedBall(field);
               }
               else {
                 DrawBall(x, y, BALL_COLOR_BLACK);
-                field->SetIsSelected(false);
+                myGameManager->RemoveSelectedBall(field);
               }
             }
           }
         }
       }
     }
+    EnableDirectionButtons();
+    Invalidate();
   }
 }
 
@@ -492,7 +513,6 @@ void CAbaloneDlg::OnNewGame()
 
     myGameManager->SetGameStarted(true);
     Invalidate();
-
   }
 }
 
@@ -565,6 +585,26 @@ void CAbaloneDlg::DrawBallsAsidePlayerNames()
   DrawBall(point, color, radius);
 }
 
+void CAbaloneDlg::EnableDirectionButtons()
+{
+  myBtnMoveUpLeft.EnableWindow(myGameManager->IsPossibleDirection(UPLEFT));
+  myBtnMoveUpRight.EnableWindow(myGameManager->IsPossibleDirection(UPRIGHT));
+  myBtnMoveLeft.EnableWindow(myGameManager->IsPossibleDirection(LEFT));
+  myBtnMoveRight.EnableWindow(myGameManager->IsPossibleDirection(RIGHT));
+  myBtnMoveDownLeft.EnableWindow(myGameManager->IsPossibleDirection(DOWNLEFT));
+  myBtnMoveDownRight.EnableWindow(myGameManager->IsPossibleDirection(DOWNRIGHT));
+}
+
+void CAbaloneDlg::DisableDirectionButtons()
+{
+  myBtnMoveUpLeft.EnableWindow(FALSE);
+  myBtnMoveUpRight.EnableWindow(FALSE);
+  myBtnMoveLeft.EnableWindow(FALSE);
+  myBtnMoveRight.EnableWindow(FALSE);
+  myBtnMoveDownLeft.EnableWindow(FALSE);
+  myBtnMoveDownRight.EnableWindow(FALSE);
+}
+
 void CAbaloneDlg::SetBallsStandardFormation()
 {
   GameBoard* gameBoard = myGameManager->GetGameBoard();
@@ -629,4 +669,47 @@ void CAbaloneDlg::SetBallsBelgianDaisyFormation()
   gameBoard->GetBoardField(7, 8)->SetBall(BoardField::BLACK_BALL);
   gameBoard->GetBoardField(8, 7)->SetBall(BoardField::BLACK_BALL);
   gameBoard->GetBoardField(8, 8)->SetBall(BoardField::BLACK_BALL);
+}
+
+void CAbaloneDlg::OnBtnMoveUpLeft()
+{
+  myGameManager->MoveBallsInDirection(UPLEFT);
+  TurnIsOver();
+}
+
+void CAbaloneDlg::OnBtnMoveUpRight()
+{
+  myGameManager->MoveBallsInDirection(UPRIGHT);
+  TurnIsOver();
+}
+
+void CAbaloneDlg::OnBtnMoveLeft()
+{
+  myGameManager->MoveBallsInDirection(LEFT);
+  TurnIsOver();
+}
+
+void CAbaloneDlg::OnBtnMoveRight()
+{
+  myGameManager->MoveBallsInDirection(RIGHT);
+  TurnIsOver();
+}
+
+void CAbaloneDlg::OnBtnMoveDownLeft()
+{
+  myGameManager->MoveBallsInDirection(DOWNLEFT);
+  TurnIsOver();
+}
+
+void CAbaloneDlg::OnBtnMoveDownRight()
+{
+  myGameManager->MoveBallsInDirection(DOWNRIGHT);
+  TurnIsOver();
+}
+
+void CAbaloneDlg::TurnIsOver()
+{
+  EnableDirectionButtons();
+  myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayerForNextTurn()->GetName() + "'s turn!");
+  Invalidate();
 }

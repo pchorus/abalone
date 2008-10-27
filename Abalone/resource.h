@@ -24,6 +24,13 @@
 #define IDC_EDIT_NAME_PLAYER1           1014
 #define IDC_EDIT_NAME_PLAYER2           1015
 #define IDC_STATIC_PLAYERS_TURN         1016
+#define IDC_BTN_MOVE_LEFT               1017
+#define IDC_BTN_MOVE_RIGHT              1018
+#define IDC_BTN_MOVE_UPLEFT             1019
+#define IDC_BTN_MOVE_UPRIGHT            1020
+#define IDC_BTN_MOVE_DOWNLEFT           1021
+#define IDC_BTN_MOVE_DOWNLEFT2          1022
+#define IDC_BTN_MOVE_DOWNRIGHT          1022
 #define ID_NEU_NEWGAME                  32771
 #define ID_NEWGAME                      32772
 #define ID_NEW_CLOSE                    32773
@@ -35,7 +42,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1017
+#define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
