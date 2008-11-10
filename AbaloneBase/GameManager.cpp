@@ -14,6 +14,8 @@ GameManager::GameManager()
 , myPlayer1(0)
 , myPlayer2(0)
 , myNextTurn(0)
+, myLostBallsPlayer1(0)
+, myLostBallsPlayer2(0)
 {
 }
 
@@ -108,6 +110,17 @@ bool GameManager::CanSelectBall(BoardField* field) const
   return ret;
 }
 
+bool GameManager::CanDeselectBall(BoardField* field) const
+{
+  bool ret = true;
+
+  if (mySelectedBalls.size() == 3 && *(++mySelectedBalls.begin()) == field) {
+    // the middle ball can't be deselect
+    ret = false;
+  }
+  return ret;
+}
+
 void GameManager::AddSelectedBall(BoardField* field)
 {
   mySelectedBalls.push_back(field);
@@ -135,22 +148,6 @@ void GameManager::ClearSelectedBalls()
   }
 
   mySelectedBalls.clear();
-}
-
-void GameManager::MoveBallsInDirection(Direction direction)
-{
-  // TODO: implement
-  switch (direction) {
-  case UPLEFT:      MoveBallsUpLeft();      break;
-  case UPRIGHT:     MoveBallsUpRight();     break;
-  case LEFT:        MoveBallsLeft();        break;
-  case RIGHT:       MoveBallsRight();       break;
-  case DOWNLEFT:    MoveBallsDownLeft();    break;
-  case DOWNRIGHT:   MoveBallsDownRight();   break;
-  }
-  
-  mySelectedBalls.clear();
-  TurnIsOver();
 }
 
 BOOL GameManager::IsPossibleDirection(Direction direction) const
@@ -252,75 +249,93 @@ BOOL GameManager::IsPossibleDirection(Direction direction) const
   return ret;
 }
 
-void GameManager::MoveBallsUpLeft()
+void GameManager::MoveBallsInDirection(Direction direction)
 {
   BoardField* field = 0;
   BoardField* newField = 0;
   CPoint coord;
   CPoint hlpCoord;
 
+  BoardField* selectedField1 = 0;
+  BoardField* selectedField2 = 0;
+  BoardField* selectedField3 = 0;
+  BoardField* opponentField1 = 0;
+  BoardField* opponentField2 = 0;
+  BoardField* opponentField3 = 0;
+
+  BoardField::Ball opponentBall = BoardField::NO_BALL;
+
+  GetSelectedAndOpponentFields(direction, selectedField1, selectedField2, selectedField3,
+                               opponentField1, opponentField2, opponentField3);
+  opponentBall = BoardField::BLACK_BALL;
+  if (selectedField1->GetBall() == BoardField::BLACK_BALL) {
+    opponentBall = BoardField::WHITE_BALL;
+  }
+
   // first, opponent balls are moved
-  if (mySelectedBalls.size() >= 3 && GetAxisOfSelectedBalls() == UPPERLEFT_TO_DOWNRIGHT) {
-    field = *mySelectedBalls.begin();
-    coord = field->GetFieldCoordinates();
-    hlpCoord = coord;
-    hlpCoord.y += 1;
-    coord.y += 2;
-
-    if (GetGameBoard()->GetBoardField(coord)->GetBall() != BoardField::NO_BALL
-      && GetGameBoard()->GetBoardField(hlpCoord)->GetBall() != BoardField::NO_BALL)
-    {
-      hlpCoord = coord;
-      hlpCoord.y += 1;
-      GetGameBoard()->GetBoardField(hlpCoord)->SetBall(GetGameBoard()->GetBoardField(coord)->GetBall());
+  if (opponentField1 && opponentField1->GetBall() == opponentBall) {
+    if (opponentField2 && opponentField2->GetBall() == opponentBall) {
+      if (opponentField3 && opponentField3->GetBall() == opponentBall) {
+        if (GetGameBoard()->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(opponentField3->GetFieldCoordinates(), direction))) {
+          GetGameBoard()->GetBoardField(GetNextFieldCoordinatesInDirection(opponentField3->GetFieldCoordinates(), direction))
+            ->SetBall(opponentField3->GetBall());
+          opponentField3->SetBall(BoardField::NO_BALL);
+          opponentField3->SetIsSelected(false);
+        }
+        else {
+          AddLostBall(opponentBall);
+        }
+      }
+      if (GetGameBoard()->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(opponentField2->GetFieldCoordinates(), direction))) {
+        GetGameBoard()->GetBoardField(GetNextFieldCoordinatesInDirection(opponentField2->GetFieldCoordinates(), direction))
+          ->SetBall(opponentField2->GetBall());
+        opponentField2->SetBall(BoardField::NO_BALL);
+        opponentField2->SetIsSelected(false);
+      }
+      else {
+        AddLostBall(opponentBall);
+      }
+    }
+    if (GetGameBoard()->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(opponentField1->GetFieldCoordinates(), direction))) {
+      GetGameBoard()->GetBoardField(GetNextFieldCoordinatesInDirection(opponentField1->GetFieldCoordinates(), direction))
+        ->SetBall(opponentField1->GetBall());
+      opponentField1->SetBall(BoardField::NO_BALL);
+      opponentField1->SetIsSelected(false);
+    }
+    else {
+      AddLostBall(opponentBall);
     }
   }
 
-  if (mySelectedBalls.size() >= 2 && GetAxisOfSelectedBalls() == UPPERLEFT_TO_DOWNRIGHT) {
-    field = *mySelectedBalls.begin();
-    coord = field->GetFieldCoordinates();
-    coord.y += 1;
-
-    if (GetGameBoard()->GetBoardField(coord)->GetBall() != BoardField::NO_BALL) {
-      hlpCoord = coord;
-      hlpCoord.y += 1;
-      GetGameBoard()->GetBoardField(hlpCoord)->SetBall(GetGameBoard()->GetBoardField(coord)->GetBall());
-    }
-
-  }
   std::vector<BoardField*>::iterator i;
-  for (i = mySelectedBalls.begin(); i != mySelectedBalls.end(); ++i) {
-    field = *i;
-    coord = field->GetFieldCoordinates();
-    ++coord.y;
-    GetGameBoard()->GetBoardField(coord)->SetBall(field->GetBall());
-    field->SetBall(BoardField::NO_BALL);
+  std::vector<BoardField*>::reverse_iterator ri;
+
+  switch (direction) {
+  case UPLEFT:
+  case LEFT:
+  case DOWNLEFT:
+    for (i = mySelectedBalls.begin(); i != mySelectedBalls.end(); ++i) {
+      field = *i;
+      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), direction);
+      GetGameBoard()->GetBoardField(coord)->SetBall(field->GetBall());
+      field->SetBall(BoardField::NO_BALL);
+      field->SetIsSelected(false);
+    }
+    break;
+  case UPRIGHT:
+  case RIGHT:
+  case DOWNRIGHT:
+    for (ri = mySelectedBalls.rbegin(); ri != mySelectedBalls.rend(); ++ri) {
+      field = *ri;
+      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), direction);
+      GetGameBoard()->GetBoardField(coord)->SetBall(field->GetBall());
+      field->SetBall(BoardField::NO_BALL);
+      field->SetIsSelected(false);
+    }
+    break;
   }
-}
-
-void GameManager::MoveBallsUpRight()
-{
-  // TODO: implement
-}
-
-void GameManager::MoveBallsLeft()
-{
-  // TODO: implement
-}
-
-void GameManager::MoveBallsRight()
-{
-  // TODO: implement
-}
-
-void GameManager::MoveBallsDownLeft()
-{
-  // TODO: implement
-}
-
-void GameManager::MoveBallsDownRight()
-{
-  // TODO: implement
+  mySelectedBalls.clear();
+  TurnIsOver();
 }
 
 BallAxis GameManager::GetAxisOfSelectedBalls() const
@@ -450,12 +465,12 @@ void GameManager::GetSelectedAndOpponentFields(Direction direction, BoardField*&
       break;
       break;
     case DOWNRIGHT:
-      opponentField1 = myGameBoard->GetBoardFieldExist(fieldCoord1.x, fieldCoord1.y-1)
-        ? myGameBoard->GetBoardField(fieldCoord1.x, fieldCoord1.y-1) : 0;
-      opponentField2 = myGameBoard->GetBoardFieldExist(fieldCoord1.x, fieldCoord1.y-2)
-        ? myGameBoard->GetBoardField(fieldCoord1.x, fieldCoord1.y-2) : 0;
-      opponentField3 = myGameBoard->GetBoardFieldExist(fieldCoord1.x, fieldCoord1.y-3)
-        ? myGameBoard->GetBoardField(fieldCoord1.x, fieldCoord1.y-3) : 0;
+      opponentField1 = myGameBoard->GetBoardFieldExist(lastFieldCoord.x, lastFieldCoord.y-1)
+        ? myGameBoard->GetBoardField(lastFieldCoord.x, lastFieldCoord.y-1) : 0;
+      opponentField2 = myGameBoard->GetBoardFieldExist(lastFieldCoord.x, lastFieldCoord.y-2)
+        ? myGameBoard->GetBoardField(lastFieldCoord.x, lastFieldCoord.y-2) : 0;
+      opponentField3 = myGameBoard->GetBoardFieldExist(lastFieldCoord.x, lastFieldCoord.y-3)
+        ? myGameBoard->GetBoardField(lastFieldCoord.x, lastFieldCoord.y-3) : 0;
       break;
     }
   }
@@ -488,4 +503,14 @@ CPoint GameManager::GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direc
     break;
   }
   return ret;
+}
+
+void GameManager::AddLostBall(BoardField::Ball ball)
+{
+  if (ball == BoardField::BLACK_BALL) {
+    ++myLostBallsPlayer1;
+  }
+  else if (ball == BoardField::WHITE_BALL) {
+    ++myLostBallsPlayer2;
+  }
 }

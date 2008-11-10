@@ -444,7 +444,7 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
                 DrawBall(x, y, BALL_COLOR_WHITE_SELECTED);
                 myGameManager->AddSelectedBall(field);
               }
-              else {
+              else if (myGameManager->CanDeselectBall(field)) {
                 DrawBall(x, y, BALL_COLOR_WHITE);
                 myGameManager->RemoveSelectedBall(field);
               }
@@ -458,7 +458,7 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
                 DrawBall(x, y, BALL_COLOR_BLACK_SELECTED);
                 myGameManager->AddSelectedBall(field);
               }
-              else {
+              else if (myGameManager->CanDeselectBall(field)) {
                 DrawBall(x, y, BALL_COLOR_BLACK);
                 myGameManager->RemoveSelectedBall(field);
               }
@@ -610,7 +610,6 @@ void CAbaloneDlg::SetBallsStandardFormation()
   GameBoard* gameBoard = myGameManager->GetGameBoard();
 
   // set balls in the standard formation
-  // white balls
   for (int x = 0; x < 6; ++x) {
     for (int y = 0; y < 2; ++y) {
       if (gameBoard->GetBoardFieldExist(x, y)) {
@@ -622,7 +621,6 @@ void CAbaloneDlg::SetBallsStandardFormation()
   gameBoard->GetBoardField(3, 2)->SetBall(BoardField::BLACK_BALL);
   gameBoard->GetBoardField(4, 2)->SetBall(BoardField::BLACK_BALL);
 
-  // black balls
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = BOARD_FIELDS_ROW-1; y > BOARD_FIELDS_ROW-3; --y) {
       if (gameBoard->GetBoardFieldExist(x, y)) {

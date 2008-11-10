@@ -8,10 +8,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "Player.h"
+#include "BoardField.h"
 #include <vector>
 
 class GameBoard;
-class BoardField;
 
 enum Direction { UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT };
 // the axis on which the selected balls are lying
@@ -37,6 +37,7 @@ public:
   bool IsFirstPlayersTurn() const;
 
   bool CanSelectBall(BoardField* field) const;
+  bool CanDeselectBall(BoardField* field) const;
   void AddSelectedBall(BoardField* field);
   void RemoveSelectedBall(BoardField* field);
   void ClearSelectedBalls();
@@ -48,17 +49,12 @@ public:
 private:
 
   // help methods
-  void MoveBallsUpLeft();
-  void MoveBallsUpRight();
-  void MoveBallsLeft();
-  void MoveBallsRight();
-  void MoveBallsDownLeft();
-  void MoveBallsDownRight();
-
   BallAxis GetAxisOfSelectedBalls() const;
   void GetSelectedAndOpponentFields(Direction direction, BoardField*& selectedField1, BoardField*& selectedField2,
     BoardField*& selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
   CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
+
+  void AddLostBall(BoardField::Ball ball);
 
 
   // sorts the vector of selected balls, such that they are
@@ -71,6 +67,8 @@ private:
   Player* myPlayer1;
   Player* myPlayer2;
   Player* myNextTurn;
+  int myLostBallsPlayer1;
+  int myLostBallsPlayer2;
   std::vector<BoardField*> mySelectedBalls;
 };
 
