@@ -8,12 +8,14 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "Player.h"
-#include <set>
+#include <vector>
 
 class GameBoard;
 class BoardField;
 
 enum Direction { UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT };
+// the axis on which the selected balls are lying
+enum BallAxis { NO_VALID_AXIS, HORIZONTAL, DOWNLEFT_TO_UPPERRIGHT, UPPERLEFT_TO_DOWNRIGHT };
 
 class ABALONE_BASE_DLLINTERFACE GameManager {
 
@@ -46,13 +48,6 @@ public:
 private:
 
   // help methods
-  BOOL IsUpLeftPossible() const;
-  BOOL IsUpRightPossible() const;
-  BOOL IsLeftPossible() const;
-  BOOL IsRightPossible() const;
-  BOOL IsDownLeftPossible() const;
-  BOOL IsDownRightPossible() const;
-
   void MoveBallsUpLeft();
   void MoveBallsUpRight();
   void MoveBallsLeft();
@@ -60,13 +55,23 @@ private:
   void MoveBallsDownLeft();
   void MoveBallsDownRight();
 
+  BallAxis GetAxisOfSelectedBalls() const;
+  void GetSelectedAndOpponentFields(Direction direction, BoardField*& selectedField1, BoardField*& selectedField2,
+    BoardField*& selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
+  CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
+
+
+  // sorts the vector of selected balls, such that they are
+  // in the array as on the board from left to right
+  void SortSelectedBalls();
+
   // members
   GameBoard* myGameBoard;
   bool myIsGameStarted;
   Player* myPlayer1;
   Player* myPlayer2;
   Player* myNextTurn;
-  std::set<BoardField*> mySelectedBalls;
+  std::vector<BoardField*> mySelectedBalls;
 };
 
 inline GameBoard* GameManager::GetGameBoard() const

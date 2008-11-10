@@ -25,7 +25,7 @@ bool GameBoard::GetBoardFieldExist(int x, int y) const
 {
   bool ret = true;
 
-  if (y > x + 4 || y < x - 4) {
+  if (y > x + 4 || y < x - 4 || y < 0 || y > 8 || x < 0 || x > 8) {
     ret = false;
   }
 
