@@ -125,9 +125,12 @@ BOOL CAbaloneDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
-  myBtnMoveDownRight.SetWindowText("");
+  myBtnMoveUpLeft.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_UP_LEFT_ARROW)));
+  myBtnMoveUpRight.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_UP_RIGHT_ARROW)));
+  myBtnMoveLeft.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_LEFT_ARROW)));
+  myBtnMoveRight.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_RIGHT_ARROW)));
+  myBtnMoveDownLeft.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_DOWN_LEFT_ARROW)));
   myBtnMoveDownRight.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_DOWN_RIGHT_ARROW)));
-
   
 	myStaticPlayersTurn.SetWindowText("");
   DisableDirectionButtons();
@@ -784,5 +787,4 @@ void CAbaloneDlg::TurnIsOver()
 BOOL CAbaloneDlg::OnEraseBkgnd(CDC* pDC)
 {
   return CDialog::OnEraseBkgnd(pDC);
-  //return FALSE;
 }

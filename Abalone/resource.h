@@ -10,6 +10,11 @@
 #define IDR_MAIN_DLG_MENU               129
 #define IDD_NEWGAME_DIALOG              130
 #define IDI_DOWN_RIGHT_ARROW            131
+#define IDI_DOWN_LEFT_ARROW             132
+#define IDI_UP_LEFT_ARROW               133
+#define IDI_UP_RIGHT_ARROW              134
+#define IDI_RIGHT_ARROW                 135
+#define IDI_LEFT_ARROW                  136
 #define IDC_STATIC_PLAYER1              1001
 #define IDC_STATIC_NAME1                1002
 #define IDC_EDIT_NAME1                  1003
@@ -41,7 +46,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32775
 #define _APS_NEXT_CONTROL_VALUE         1024
 #define _APS_NEXT_SYMED_VALUE           101

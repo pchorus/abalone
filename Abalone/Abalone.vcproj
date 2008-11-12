@@ -267,7 +267,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\DownLeftArrow.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\DownRightArrow.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\LeftArrow.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\RightArrow.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\UpLeftArrow.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\UpRightArrow.ico"
 				>
 			</File>
 		</Filter>
