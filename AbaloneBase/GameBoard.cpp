@@ -2,7 +2,10 @@
 
 #include "GameBoard.h"
 
+#include "FileIO.h"
+
 GameBoard::GameBoard()
+: myFileIO(new FileIO("AbaloneBoard.log"))
 {
   
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
@@ -10,6 +13,8 @@ GameBoard::GameBoard()
       myFieldPoints[x][y] = new BoardField(x, y);
     }
   }
+
+  myFileIO->Open();
 }
 
 GameBoard::~GameBoard()
@@ -18,6 +23,12 @@ GameBoard::~GameBoard()
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
       delete myFieldPoints[x][y];
     }
+  }
+
+  if (myFileIO) {
+    myFileIO->Close();
+    delete myFileIO;
+
   }
 }
 
@@ -46,4 +57,28 @@ void GameBoard::Reset()
       myFieldPoints[x][y]->SetIsSelected(false);
     }
   }
+}
+
+void GameBoard::output()
+{
+  std::string line = "";
+  for (int y = 8; y >= 0; --y) {
+    for (int x = 0; x < 9; ++x) {
+      if (myFieldPoints[x][y]->GetBall() == BoardField::NO_BALL) {
+        line += "-";
+      }
+      else if (myFieldPoints[x][y]->GetBall() == BoardField::WHITE_BALL) {
+        line += "W";
+      }
+      else if (myFieldPoints[x][y]->GetBall() == BoardField::BLACK_BALL) {
+        line += "B";
+      }
+      line += " ";
+    }
+
+    myFileIO->WriteLine(line);
+    line.clear();
+  }
+  myFileIO->WriteLine("");
+  myFileIO->WriteLine("");
 }

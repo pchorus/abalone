@@ -44,7 +44,10 @@ public:
 
   void TurnIsOver();
 
-  inline void SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2);
+  int GetLostBallsPlayer1() const;
+  int GetLostBallsPlayer2() const;
+
+  void SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2);
 
 private:
 
@@ -111,4 +114,14 @@ inline void GameManager::SetGameStarted(bool started)
 inline bool GameManager::IsFirstPlayersTurn() const
 {
   return myPlayer1 == myNextTurn;
+}
+
+inline int GameManager::GetLostBallsPlayer1() const
+{
+  return myLostBallsPlayer1;
+}
+
+inline int GameManager::GetLostBallsPlayer2() const
+{
+  return myLostBallsPlayer2;
 }

@@ -74,6 +74,7 @@ void CAbaloneDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Control(pDX, IDC_BTN_MOVE_RIGHT, myBtnMoveRight);
   DDX_Control(pDX, IDC_BTN_MOVE_DOWNLEFT, myBtnMoveDownLeft);
   DDX_Control(pDX, IDC_BTN_MOVE_DOWNRIGHT, myBtnMoveDownRight);
+  DDX_Control(pDX, IDC_STATIC_LOST_BALLS, myGroupLostBalls);
 }
 
 BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
@@ -81,8 +82,11 @@ BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
   ON_WM_LBUTTONDOWN()
+  ON_WM_ERASEBKGND()
   ON_COMMAND(ID_NEWGAME, &CAbaloneDlg::OnNewGame)
   ON_UPDATE_COMMAND_UI(ID_NEWGAME, &CAbaloneDlg::OnUpdateNewGame)
+  ON_COMMAND(ID_CLOSE, &CAbaloneDlg::OnClose)
+  ON_UPDATE_COMMAND_UI(ID_CLOSE, &CAbaloneDlg::OnUpdateClose)
   ON_BN_CLICKED(IDC_BTN_MOVE_UPLEFT, &CAbaloneDlg::OnBtnMoveUpLeft)
   ON_BN_CLICKED(IDC_BTN_MOVE_UPRIGHT, &CAbaloneDlg::OnBtnMoveUpRight)
   ON_BN_CLICKED(IDC_BTN_MOVE_LEFT, &CAbaloneDlg::OnBtnMoveLeft)
@@ -121,6 +125,10 @@ BOOL CAbaloneDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 
+  myBtnMoveDownRight.SetWindowText("");
+  myBtnMoveDownRight.SetIcon(::LoadIcon(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(IDI_DOWN_RIGHT_ARROW)));
+
+  
 	myStaticPlayersTurn.SetWindowText("");
   DisableDirectionButtons();
 
@@ -169,6 +177,19 @@ void CAbaloneDlg::OnPaint()
     DrawBoard();
     if (myGameManager->IsGameStarted()) {
       DrawBallsAsidePlayerNames();
+      DrawLostBalls();
+      CString message;
+
+      if (myGameManager->GetLostBallsPlayer1() == 6 || myGameManager->GetLostBallsPlayer2() == 6) {
+        if (myGameManager->GetLostBallsPlayer1() == 6) {
+          message = myGameManager->GetPlayer2()->GetName() + " wins!";
+        }
+        else if (myGameManager->GetLostBallsPlayer2() == 6) {
+          message = myGameManager->GetPlayer1()->GetName() + " wins!";
+        }
+        AfxMessageBox(message, MB_ICONINFORMATION | MB_OK);
+        myGameManager->SetGameStarted(false);
+      }
     }
 	}
 }
@@ -363,11 +384,12 @@ void CAbaloneDlg::DrawBoard()
   DrawBalls();
 
   pDC->SelectObject(oldBrush);
+
+  ReleaseDC(pDC);
 }
 
 void CAbaloneDlg::DrawBall(long x, long y, BallColor color)
 {
-  CDC* pDC = GetDC();
   GameBoard* gameBoard = myGameManager->GetGameBoard();
   CPoint p = gameBoard->GetBoardField(x, y)->GetGUICoordinates();
 
@@ -400,6 +422,8 @@ void CAbaloneDlg::DrawBall(CPoint point, BallColor color, int radius)
 
   pDC->SelectObject(oldBrush);
   pDC->SelectObject(oldPen);
+
+  ReleaseDC(pDC);
 }
 
 CRect CAbaloneDlg::GetBoardRect() const
@@ -448,7 +472,8 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
                 DrawBall(x, y, BALL_COLOR_WHITE);
                 myGameManager->RemoveSelectedBall(field);
               }
-
+              Invalidate();
+              EnableDirectionButtons();
             }
             else if (field->GetBall() == BoardField::BLACK_BALL && nextTurnsBallColor == BoardField::BLACK_BALL) {
               if (!field->IsSelected()) {
@@ -462,13 +487,13 @@ void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
                 DrawBall(x, y, BALL_COLOR_BLACK);
                 myGameManager->RemoveSelectedBall(field);
               }
+              Invalidate();
+              EnableDirectionButtons();
             }
           }
         }
       }
     }
-    EnableDirectionButtons();
-    Invalidate();
   }
 }
 
@@ -489,7 +514,6 @@ void CAbaloneDlg::OnNewGame()
       SetBallsBelgianDaisyFormation();
     }
 
-    // TODO: now start the game
 
     // Initialize the controls
     CString namePlayer = "Player 1";
@@ -517,6 +541,16 @@ void CAbaloneDlg::OnNewGame()
 }
 
 void CAbaloneDlg::OnUpdateNewGame(CCmdUI *pCmdUI)
+{
+  pCmdUI->Enable();
+}
+
+void CAbaloneDlg::OnClose()
+{
+  CDialog::OnCancel();
+}
+
+void CAbaloneDlg::OnUpdateClose(CCmdUI *pCmdUI)
 {
   pCmdUI->Enable();
 }
@@ -583,6 +617,41 @@ void CAbaloneDlg::DrawBallsAsidePlayerNames()
   }
 
   DrawBall(point, color, radius);
+}
+
+void CAbaloneDlg::DrawLostBalls()
+{
+  CRect rect;
+  CPoint point;
+  myGroupLostBalls.GetWindowRect(&rect);
+  ScreenToClient(&rect);
+
+  int radius = 10;
+
+  rect.left += 10;
+  rect.right -= 10;
+  rect.top += 10;
+  rect.bottom -= 10;
+
+  int width = (rect.right - rect.left);
+
+  int ballRadius = width / 12 - 4;
+
+  point.x = rect.left + ballRadius + 4;
+  int left = point.x;
+  point.y = rect.top + ballRadius + 10;
+
+  for (int i = 0; i < myGameManager->GetLostBallsPlayer1(); ++i) {
+    point.x = left + i * (2 * ballRadius + 8);
+    DrawBall(point, BALL_COLOR_BLACK, ballRadius);
+  }
+
+  point.y = rect.bottom - ballRadius - 10;
+
+  for (int i = 0; i < myGameManager->GetLostBallsPlayer2(); ++i) {
+    point.x = left + i * (2 * ballRadius + 8);
+    DrawBall(point, BALL_COLOR_WHITE, ballRadius);
+  }
 }
 
 void CAbaloneDlg::EnableDirectionButtons()
@@ -710,4 +779,10 @@ void CAbaloneDlg::TurnIsOver()
   EnableDirectionButtons();
   myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayerForNextTurn()->GetName() + "'s turn!");
   Invalidate();
+}
+
+BOOL CAbaloneDlg::OnEraseBkgnd(CDC* pDC)
+{
+  return CDialog::OnEraseBkgnd(pDC);
+  //return FALSE;
 }

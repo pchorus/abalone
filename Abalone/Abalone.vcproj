@@ -266,6 +266,10 @@
 				RelativePath=".\res\Abalone.rc2"
 				>
 			</File>
+			<File
+				RelativePath=".\res\DownRightArrow.ico"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"

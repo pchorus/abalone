@@ -336,6 +336,8 @@ void GameManager::MoveBallsInDirection(Direction direction)
   }
   mySelectedBalls.clear();
   TurnIsOver();
+  // only for debug
+  myGameBoard->output();
 }
 
 BallAxis GameManager::GetAxisOfSelectedBalls() const

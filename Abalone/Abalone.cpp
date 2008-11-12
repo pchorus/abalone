@@ -21,8 +21,6 @@ END_MESSAGE_MAP()
 
 CAbaloneApp::CAbaloneApp()
 {
-	// TODO: Hier Code zur Konstruktion einfügen
-	// Alle wichtigen Initialisierungen in InitInstance positionieren
 }
 
 

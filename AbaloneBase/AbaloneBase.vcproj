@@ -167,6 +167,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileIO.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GameBoard.cpp"
 				>
 			</File>
@@ -198,6 +202,10 @@
 			</File>
 			<File
 				RelativePath=".\ComputerPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FileIO.h"
 				>
 			</File>
 			<File
