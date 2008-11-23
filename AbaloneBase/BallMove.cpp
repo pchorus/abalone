@@ -17,7 +17,6 @@ BallMove::~BallMove()
 void BallMove::AddBall(BoardField* field)
 {
   myBalls->push_back(field);
-  field->SetIsSelected(true);
   // TODO
   //  SortSelectedBalls();
 }
