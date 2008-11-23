@@ -14,7 +14,7 @@ class ABALONE_BASE_DLLINTERFACE HumanPlayer : public Player {
 
 public:
   // constructor / destructor
-  HumanPlayer(const CString& name);
+  HumanPlayer(const CString& name, BoardField::Ball ball);
   virtual ~HumanPlayer();
 
   // getter and setter

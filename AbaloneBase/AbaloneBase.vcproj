@@ -159,11 +159,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\BallMove.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\BoardField.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ComputerPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ComputerPlayerMonteCarlo.cpp"
 				>
 			</File>
 			<File
@@ -197,11 +205,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BallMove.h"
+				>
+			</File>
+			<File
 				RelativePath=".\BoardField.h"
 				>
 			</File>
 			<File
 				RelativePath=".\ComputerPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ComputerPlayerMonteCarlo.h"
 				>
 			</File>
 			<File

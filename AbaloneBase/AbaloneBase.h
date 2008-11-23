@@ -56,3 +56,5 @@
 #define ABALONE_BASE_DLLINTERFACE __declspec(dllimport)
 #endif
 #endif
+
+enum Direction { NO_VALID_DIRECTION, UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT };

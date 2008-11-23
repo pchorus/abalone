@@ -4,7 +4,8 @@
 
 #include "GameBoard.h"
 #include "HumanPlayer.h"
-#include "ComputerPlayer.h"
+#include "ComputerPlayerMonteCarlo.h"
+#include "BallMove.h"
 
 #include <algorithm>
 
@@ -16,6 +17,7 @@ GameManager::GameManager()
 , myNextTurn(0)
 , myLostBallsPlayer1(0)
 , myLostBallsPlayer2(0)
+, mySelectedBalls(new std::vector<BoardField*>)
 {
 }
 
@@ -26,6 +28,9 @@ GameManager::~GameManager()
   }
   if (myPlayer2) {
     delete myPlayer2;
+  }
+  if (mySelectedBalls) {
+    delete mySelectedBalls;
   }
 }
 
@@ -41,17 +46,17 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   ASSERT(typePlayer1 != Player::PLAYER_TYPE_NONE && typePlayer2 != Player::PLAYER_TYPE_NONE);
 
   if (typePlayer1 == Player::PLAYER_TYPE_HUMAN) {
-    myPlayer1 = new HumanPlayer(namePlayer1 != "" ? namePlayer1 : "Player 1");
+    myPlayer1 = new HumanPlayer(namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
   else {
-    myPlayer1 = new ComputerPlayer(namePlayer1 != "" ? namePlayer1 : "Player 1");
+    myPlayer1 = new ComputerPlayerMonteCarlo(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
 
   if (typePlayer2 == Player::PLAYER_TYPE_HUMAN) {
-    myPlayer2 = new HumanPlayer(namePlayer2 != "" ? namePlayer2 : "Player 2");
+    myPlayer2 = new HumanPlayer(namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
   else {
-    myPlayer2 = new ComputerPlayer(namePlayer2 != "" ? namePlayer2 : "Player 2");
+    myPlayer2 = new ComputerPlayerMonteCarlo(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
 
   myNextTurn = myPlayer1;
@@ -67,13 +72,13 @@ bool GameManager::CanSelectBall(BoardField* field) const
 
   CPoint fieldPoint = field->GetFieldCoordinates();
 
-  if (mySelectedBalls.size() < 3) {
-    if (mySelectedBalls.empty()) {
+  if (mySelectedBalls->size() < 3) {
+    if (mySelectedBalls->empty()) {
       ret = true;
     }
-    else if (mySelectedBalls.size() == 1) {
+    else if (mySelectedBalls->size() == 1) {
       std::vector<BoardField*>::const_iterator iter;
-      for (iter = mySelectedBalls.begin(); iter != mySelectedBalls.end(); ++iter) {
+      for (iter = mySelectedBalls->begin(); iter != mySelectedBalls->end(); ++iter) {
         selectedField1 = *iter;
         selectedFieldPoint1 = selectedField1->GetFieldCoordinates();
         if ((selectedFieldPoint1.x - fieldPoint.x == 0 && abs(selectedFieldPoint1.y - fieldPoint.y) == 1)
@@ -86,22 +91,32 @@ bool GameManager::CanSelectBall(BoardField* field) const
         }
       }
     }
-    else if (mySelectedBalls.size() == 2) {
-      selectedField1 = *mySelectedBalls.begin();
+    else if (mySelectedBalls->size() == 2) {
+      selectedField1 = *mySelectedBalls->begin();
       selectedFieldPoint1 = selectedField1->GetFieldCoordinates();
-      selectedField2 = *(++mySelectedBalls.begin());
+      selectedField2 = *(++mySelectedBalls->begin());
       selectedFieldPoint2 = selectedField2->GetFieldCoordinates();
 
-      if ((selectedFieldPoint1.x == selectedFieldPoint2.x && selectedFieldPoint1.x == fieldPoint.x)
-        || (selectedFieldPoint1.y == selectedFieldPoint2.y && selectedFieldPoint1.y == fieldPoint.y)
-        ||
-          ((selectedFieldPoint1.x - selectedFieldPoint2.x == 1 && selectedFieldPoint1.y - selectedFieldPoint2.y == 1)
-          || (selectedFieldPoint1.x - selectedFieldPoint2.x == -1 && selectedFieldPoint1.y - selectedFieldPoint2.y == -1))
-          && (   (selectedFieldPoint1.x - fieldPoint.x == 1 && selectedFieldPoint1.y - fieldPoint.y == 1)
-              || (selectedFieldPoint1.x - fieldPoint.x == -1 && selectedFieldPoint1.y - fieldPoint.y == -1)
-              || (selectedFieldPoint2.x - fieldPoint.x == 1 && selectedFieldPoint2.y - fieldPoint.y == 1)
-              || (selectedFieldPoint2.x - fieldPoint.x == -1 && selectedFieldPoint2.y - fieldPoint.y == -1))
-        ) {
+      if (GetAxisOfBalls(mySelectedBalls) == HORIZONTAL
+        && fieldPoint.y == selectedFieldPoint1.y
+        && fieldPoint.y == selectedFieldPoint2.y
+        && (fieldPoint.x == selectedFieldPoint1.x-1 || fieldPoint.x == selectedFieldPoint2.x+1))
+      {
+        ret = true;
+      }
+      else if (GetAxisOfBalls(mySelectedBalls) == DOWNLEFT_TO_UPPERRIGHT
+        && ((fieldPoint.x == selectedFieldPoint1.x-1 && fieldPoint.x == selectedFieldPoint2.x-2
+             && fieldPoint.y == selectedFieldPoint1.y-1 && fieldPoint.y == selectedFieldPoint2.y-2)
+        || fieldPoint.x == selectedFieldPoint1.x+2 && fieldPoint.x == selectedFieldPoint2.x+1
+             && fieldPoint.y == selectedFieldPoint1.y+2 && fieldPoint.y == selectedFieldPoint2.y+1))
+      {
+        ret = true;
+      }
+      else if (GetAxisOfBalls(mySelectedBalls) == UPPERLEFT_TO_DOWNRIGHT
+        && fieldPoint.x == selectedFieldPoint1.x
+        && fieldPoint.x == selectedFieldPoint2.x
+        && (fieldPoint.y == selectedFieldPoint1.y+1 || fieldPoint.y == selectedFieldPoint2.y-1))
+      {
         ret = true;
       }
     }
@@ -114,7 +129,7 @@ bool GameManager::CanDeselectBall(BoardField* field) const
 {
   bool ret = true;
 
-  if (mySelectedBalls.size() == 3 && *(++mySelectedBalls.begin()) == field) {
+  if (mySelectedBalls->size() == 3 && *(++mySelectedBalls->begin()) == field) {
     // the middle ball can't be deselect
     ret = false;
   }
@@ -123,7 +138,7 @@ bool GameManager::CanDeselectBall(BoardField* field) const
 
 void GameManager::AddSelectedBall(BoardField* field)
 {
-  mySelectedBalls.push_back(field);
+  mySelectedBalls->push_back(field);
   field->SetIsSelected(true);
   SortSelectedBalls();
 }
@@ -131,9 +146,9 @@ void GameManager::AddSelectedBall(BoardField* field)
 void GameManager::RemoveSelectedBall(BoardField* field)
 {
   std::vector<BoardField*>::iterator iter;
-  for (iter = mySelectedBalls.begin(); iter != mySelectedBalls.end(); ++iter) {
+  for (iter = mySelectedBalls->begin(); iter != mySelectedBalls->end(); ++iter) {
     if (field == *iter) {
-      mySelectedBalls.erase(iter);
+      mySelectedBalls->erase(iter);
       break;
     }
   }
@@ -143,14 +158,14 @@ void GameManager::RemoveSelectedBall(BoardField* field)
 void GameManager::ClearSelectedBalls()
 {
   std::vector<BoardField*>::const_iterator iter;
-  for (iter = mySelectedBalls.begin(); iter != mySelectedBalls.end(); ++iter) {
+  for (iter = mySelectedBalls->begin(); iter != mySelectedBalls->end(); ++iter) {
     (*iter)->SetIsSelected(false);
   }
 
-  mySelectedBalls.clear();
+  mySelectedBalls->clear();
 }
 
-BOOL GameManager::IsPossibleDirection(Direction direction) const
+BOOL GameManager::IsPossibleDirection(Direction direction, std::vector<BoardField*>* balls) const
 {
   BOOL ret = FALSE;
 
@@ -164,6 +179,10 @@ BOOL GameManager::IsPossibleDirection(Direction direction) const
   BoardField* opponentField2 = 0;
   BoardField* opponentField3 = 0;
   BoardField::Ball opponentBall = BoardField::NO_BALL;
+
+  if (!balls) {
+    balls = mySelectedBalls;
+  }
 
   BallAxis pushAxis = NO_VALID_AXIS;
   switch (direction) {
@@ -181,28 +200,37 @@ BOOL GameManager::IsPossibleDirection(Direction direction) const
     break;
   }
 
-  if (mySelectedBalls.size() >= 1) {
+  if (balls->size() >= 1) {
 
-    GetSelectedAndOpponentFields(direction, field1, field2, field3, opponentField1, opponentField2, opponentField3);
+    GetSelectedAndOpponentFields(direction, balls, field1, field2, field3, opponentField1, opponentField2, opponentField3);
     opponentBall = BoardField::BLACK_BALL;
     if (field1->GetBall() == BoardField::BLACK_BALL) {
       opponentBall = BoardField::WHITE_BALL;
     }
 
-    if (GetAxisOfSelectedBalls() == pushAxis) {
+    // debug
+    if (field1 && field2
+      && field1->GetFieldCoordinates().x == 3
+      && field1->GetFieldCoordinates().y == 7
+      && field2->GetFieldCoordinates().x == 4
+      && field2->GetFieldCoordinates().y == 7)
+    {
+      CString debug = "debug";
+    }
+    if (GetAxisOfBalls(balls) == pushAxis) {
       // -> O|X or -> OO|X or -> OOO|X
       if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL) {
         ret = TRUE;
       }
 
-      else if (mySelectedBalls.size() >= 2 && opponentField1 && opponentField1->GetBall() == opponentBall
+      else if (balls->size() >= 2 && opponentField1 && opponentField1->GetBall() == opponentBall
         && (!opponentField2 || opponentField2->GetBall() == BoardField::NO_BALL))
         // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
       {
         ret = TRUE;
       }
 
-      else if (mySelectedBalls.size() >= 3 && opponentField1 && opponentField2
+      else if (balls->size() >= 3 && opponentField1 && opponentField2
         && opponentField1->GetBall() == opponentBall && opponentField2->GetBall() == opponentBall
         && (!opponentField3 || (opponentField3 && opponentField3->GetBall() == BoardField::NO_BALL)))
         // -> OOO|00 or -> OOO|00X
@@ -213,21 +241,21 @@ BOOL GameManager::IsPossibleDirection(Direction direction) const
     // sidesteps
     else {
       fieldCoord1 = field1->GetFieldCoordinates();
-      if (mySelectedBalls.size() >= 2) {
+      if (balls->size() >= 2) {
         fieldCoord2 = field2->GetFieldCoordinates();
       }
-      if (mySelectedBalls.size() >= 3) {
+      if (balls->size() >= 3) {
         fieldCoord3 = field3->GetFieldCoordinates();
       }
 
       if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord1, direction))
         && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord1, direction))->GetBall() == BoardField::NO_BALL)
       {
-        if (mySelectedBalls.size() >= 2) {
+        if (balls->size() >= 2) {
           if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord2, direction))
             && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord2, direction))->GetBall() == BoardField::NO_BALL)
           {
-            if (mySelectedBalls.size() >= 3) {
+            if (balls->size() >= 3) {
               if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))
                 && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))->GetBall() == BoardField::NO_BALL)
               {
@@ -265,7 +293,7 @@ void GameManager::MoveBallsInDirection(Direction direction)
 
   BoardField::Ball opponentBall = BoardField::NO_BALL;
 
-  GetSelectedAndOpponentFields(direction, selectedField1, selectedField2, selectedField3,
+  GetSelectedAndOpponentFields(direction, mySelectedBalls, selectedField1, selectedField2, selectedField3,
                                opponentField1, opponentField2, opponentField3);
   opponentBall = BoardField::BLACK_BALL;
   if (selectedField1->GetBall() == BoardField::BLACK_BALL) {
@@ -314,7 +342,7 @@ void GameManager::MoveBallsInDirection(Direction direction)
   case UPLEFT:
   case LEFT:
   case DOWNLEFT:
-    for (i = mySelectedBalls.begin(); i != mySelectedBalls.end(); ++i) {
+    for (i = mySelectedBalls->begin(); i != mySelectedBalls->end(); ++i) {
       field = *i;
       coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), direction);
       GetGameBoard()->GetBoardField(coord)->SetBall(field->GetBall());
@@ -325,7 +353,7 @@ void GameManager::MoveBallsInDirection(Direction direction)
   case UPRIGHT:
   case RIGHT:
   case DOWNRIGHT:
-    for (ri = mySelectedBalls.rbegin(); ri != mySelectedBalls.rend(); ++ri) {
+    for (ri = mySelectedBalls->rbegin(); ri != mySelectedBalls->rend(); ++ri) {
       field = *ri;
       coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), direction);
       GetGameBoard()->GetBoardField(coord)->SetBall(field->GetBall());
@@ -334,13 +362,13 @@ void GameManager::MoveBallsInDirection(Direction direction)
     }
     break;
   }
-  mySelectedBalls.clear();
+  mySelectedBalls->clear();
   TurnIsOver();
   // only for debug
   myGameBoard->output();
 }
 
-BallAxis GameManager::GetAxisOfSelectedBalls() const
+BallAxis GameManager::GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const
 {
   BallAxis ret = NO_VALID_AXIS;
 
@@ -351,10 +379,10 @@ BallAxis GameManager::GetAxisOfSelectedBalls() const
 
   // because of validation done before, it is sufficient to only test the relative position
   // between two balls, even if three balls are selected
-  if (mySelectedBalls.size() > 1) {
-    selectedField1 = *mySelectedBalls.begin();
+  if (ballFields->size() > 1) {
+    selectedField1 = *ballFields->begin();
     selectedFieldPoint1 = selectedField1->GetFieldCoordinates();
-    selectedField2 = *(++mySelectedBalls.begin());
+    selectedField2 = *(++ballFields->begin());
     selectedFieldPoint2 = selectedField2->GetFieldCoordinates();
     if (selectedFieldPoint1.y == selectedFieldPoint2.y) {
       ret = HORIZONTAL;
@@ -385,10 +413,10 @@ struct BoardFieldSort
 
 void GameManager::SortSelectedBalls()
 {
-  std::sort(mySelectedBalls.begin(), mySelectedBalls.end(), BoardFieldSort());
+  std::sort(mySelectedBalls->begin(), mySelectedBalls->end(), BoardFieldSort());
 }
 
-void GameManager::GetSelectedAndOpponentFields(Direction direction, BoardField*& selectedField1,
+void GameManager::GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1,
                                                BoardField*& selectedField2, BoardField*& selectedField3,
                                                BoardField*& opponentField1, BoardField*& opponentField2,
                                                BoardField*& opponentField3) const
@@ -406,19 +434,19 @@ void GameManager::GetSelectedAndOpponentFields(Direction direction, BoardField*&
   CPoint fieldCoord2;
   CPoint fieldCoord3;
 
-  if (mySelectedBalls.size() >= 1) {
+  if (balls->size() >= 1) {
 
-    selectedField1 = *mySelectedBalls.begin();
+    selectedField1 = *balls->begin();
     fieldCoord1 = selectedField1->GetFieldCoordinates();
     lastFieldCoord = fieldCoord1;
 
-    if (mySelectedBalls.size() >= 2) {
-      selectedField2 = *(++mySelectedBalls.begin());
+    if (balls->size() >= 2) {
+      selectedField2 = *(++balls->begin());
       fieldCoord2 = selectedField2->GetFieldCoordinates();
       lastFieldCoord = fieldCoord2;
     }
-    if (mySelectedBalls.size() >= 3) {
-      selectedField3 = *(++(++mySelectedBalls.begin()));
+    if (balls->size() >= 3) {
+      selectedField3 = *(++(++balls->begin()));
       fieldCoord3 = selectedField3->GetFieldCoordinates();
       lastFieldCoord = fieldCoord3;
     }
@@ -515,4 +543,203 @@ void GameManager::AddLostBall(BoardField::Ball ball)
   else if (ball == BoardField::WHITE_BALL) {
     ++myLostBallsPlayer2;
   }
+}
+
+void GameManager::AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves)
+{
+  BoardField* field = 0;
+  std::vector<BoardField*> ballFields;
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      ballFields.clear();
+
+      if (myGameBoard->GetBoardFieldExist(x, y)) {
+        field = myGameBoard->GetBoardField(x, y);
+        if (field->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field);
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+    }
+  }
+}
+
+void GameManager::AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves)
+{
+  BoardField* field1 = 0;
+  BoardField* field2 = 0;
+  std::vector<BoardField*> ballFields;
+
+  // for every ball we check the movement for this ball and a neighbor ball to the upper right, right and
+  // downright, so every combination of balls is checked only once
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      ballFields.clear();
+
+      // check balls from downleft to upright
+      if (myGameBoard->GetBoardFieldExist(x, y) && myGameBoard->GetBoardFieldExist(x+1, y+1)) {
+        field1 = myGameBoard->GetBoardField(x, y);
+        field2 = myGameBoard->GetBoardField(x+1, y+1);
+        if (field1->GetBall() == myNextTurn->GetBall() && field2->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+
+      // check balls from left to right
+      if (myGameBoard->GetBoardFieldExist(x, y) && myGameBoard->GetBoardFieldExist(x+1, y)) {
+        ballFields.clear();
+        field1 = myGameBoard->GetBoardField(x, y);
+        field2 = myGameBoard->GetBoardField(x+1, y);
+        if (field1->GetBall() == myNextTurn->GetBall() && field2->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+      // check balls from upleft to downright
+      if (myGameBoard->GetBoardFieldExist(x, y) && myGameBoard->GetBoardFieldExist(x, y-1)) {
+        ballFields.clear();
+        field1 = myGameBoard->GetBoardField(x, y);
+        field2 = myGameBoard->GetBoardField(x, y-1);
+        if (field1->GetBall() == myNextTurn->GetBall() && field2->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+    }
+  }
+}
+
+void GameManager::AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMoves)
+{
+  BoardField* field1 = 0;
+  BoardField* field2 = 0;
+  BoardField* field3 = 0;
+  std::vector<BoardField*> ballFields;
+
+  // for every ball we check the movement for this ball and a neighbor ball to the upper right, right and
+  // downright, so every combination of balls is checked only once
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      ballFields.clear();
+
+      // check balls from downleft to upright
+      if (myGameBoard->GetBoardFieldExist(x, y) && myGameBoard->GetBoardFieldExist(x+1, y+1) && myGameBoard->GetBoardFieldExist(x+2, y+2)) {
+        field1 = myGameBoard->GetBoardField(x, y);
+        field2 = myGameBoard->GetBoardField(x+1, y+1);
+        field3 = myGameBoard->GetBoardField(x+2, y+2);
+        if (field1->GetBall() == myNextTurn->GetBall() && field2->GetBall() == myNextTurn->GetBall() && field3->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+          ballFields.push_back(field3);
+
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+
+      // check balls from left to right
+      if (myGameBoard->GetBoardFieldExist(x, y) && myGameBoard->GetBoardFieldExist(x+1, y) && myGameBoard->GetBoardFieldExist(x+2, y)) {
+        ballFields.clear();
+        field1 = myGameBoard->GetBoardField(x, y);
+        field2 = myGameBoard->GetBoardField(x+1, y);
+        field3 = myGameBoard->GetBoardField(x+2, y);
+
+        if (field1->GetBall() == myNextTurn->GetBall() && field2->GetBall() == myNextTurn->GetBall() && field3->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+          ballFields.push_back(field3);
+
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+      // check balls from upleft to downright
+      if (myGameBoard->GetBoardFieldExist(x, y) && myGameBoard->GetBoardFieldExist(x, y-1) && myGameBoard->GetBoardFieldExist(x, y-2)) {
+        ballFields.clear();
+        field1 = myGameBoard->GetBoardField(x, y);
+        field2 = myGameBoard->GetBoardField(x, y-1);
+        field3 = myGameBoard->GetBoardField(x, y-2);
+
+        if (field1->GetBall() == myNextTurn->GetBall() && field2->GetBall() == myNextTurn->GetBall() && field3->GetBall() == myNextTurn->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+          ballFields.push_back(field3);
+
+          CheckDirections(ballFields, ballMoves);
+        }
+      }
+    }
+  }
+}
+
+void GameManager::CheckDirections(std::vector<BoardField*> ballFields, std::vector<BallMove*>& ballMoves)
+{
+  if (IsPossibleDirection(UPLEFT, &ballFields)) {
+    ballMoves.push_back(CreateBallMove(UPLEFT, ballFields));
+  }
+  if (IsPossibleDirection(UPRIGHT, &ballFields)) {
+    ballMoves.push_back(CreateBallMove(UPRIGHT, ballFields));
+  }
+  if (IsPossibleDirection(LEFT, &ballFields)) {
+    ballMoves.push_back(CreateBallMove(LEFT, ballFields));
+  }
+  if (IsPossibleDirection(RIGHT, &ballFields)) {
+    ballMoves.push_back(CreateBallMove(RIGHT, ballFields));
+  }
+  if (IsPossibleDirection(DOWNLEFT, &ballFields)) {
+    ballMoves.push_back(CreateBallMove(DOWNLEFT, ballFields));
+  }
+  if (IsPossibleDirection(DOWNRIGHT, &ballFields)) {
+    ballMoves.push_back(CreateBallMove(DOWNRIGHT, ballFields));
+  }
+}
+
+void GameManager::TurnIsOver()
+{
+  ComputerPlayer* computerPlayer = 0;
+  myNextTurn = (myNextTurn == myPlayer1) ? myPlayer2 : myPlayer1;
+  mySelectedBalls->clear();
+
+  while (myNextTurn->GetType() == Player::PLAYER_TYPE_COMPUTER) {
+    computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
+
+    if (computerPlayer) {
+      computerPlayer->TakeNextTurn();
+      myNextTurn = (myNextTurn == myPlayer1) ? myPlayer2 : myPlayer1;
+      mySelectedBalls->clear();
+    }
+    else {
+      // this should never happen, because if the PlayerType is 
+      ASSERT(false);
+    }
+  }
+}
+
+BallMove* GameManager::CreateBallMove(Direction direction, std::vector<BoardField*> ballFields)
+{
+  BallMove* ballMove = new BallMove;
+
+  std::vector<BoardField*>::iterator i;
+  i = ballFields.begin();
+
+  if (ballFields.size() >= 1) {
+    ballMove->AddBall(*i);
+  }
+  if (ballFields.size() >= 2) {
+    ++i;
+    ballMove->AddBall(*i);
+  }
+  if (ballFields.size() >= 3) {
+    ++i;
+    ballMove->AddBall(*i);
+  }
+  ballMove->SetDirection(direction);
+
+  return ballMove;
 }

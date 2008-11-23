@@ -2,8 +2,8 @@
 
 #include "HumanPlayer.h"
 
-HumanPlayer::HumanPlayer(const CString& name)
-: Player(name)
+HumanPlayer::HumanPlayer(const CString& name, BoardField::Ball ball)
+: Player(name, ball)
 {
 }
 

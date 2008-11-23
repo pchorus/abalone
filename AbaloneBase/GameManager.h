@@ -12,8 +12,8 @@
 #include <vector>
 
 class GameBoard;
+class BallMove;
 
-enum Direction { UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT };
 // the axis on which the selected balls are lying
 enum BallAxis { NO_VALID_AXIS, HORIZONTAL, DOWNLEFT_TO_UPPERRIGHT, UPPERLEFT_TO_DOWNRIGHT };
 
@@ -32,7 +32,11 @@ public:
   bool IsGameStarted() const;
   void SetGameStarted(bool started);
 
-  BOOL IsPossibleDirection(Direction direction) const;
+  void AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves);
+  void AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves);
+  void AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMoves);
+
+  BOOL IsPossibleDirection(Direction direction, std::vector<BoardField*>* balls = 0) const;
   void MoveBallsInDirection(Direction direction);
   bool IsFirstPlayersTurn() const;
 
@@ -52,13 +56,15 @@ public:
 private:
 
   // help methods
-  BallAxis GetAxisOfSelectedBalls() const;
-  void GetSelectedAndOpponentFields(Direction direction, BoardField*& selectedField1, BoardField*& selectedField2,
+  BallAxis GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const;
+  void GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1, BoardField*& selectedField2,
     BoardField*& selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
   CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
 
   void AddLostBall(BoardField::Ball ball);
 
+  void CheckDirections(std::vector<BoardField*> ballFields, std::vector<BallMove*>& ballMoves);
+  BallMove* CreateBallMove(Direction direction, std::vector<BoardField*> ballFields);
 
   // sorts the vector of selected balls, such that they are
   // in the array as on the board from left to right
@@ -72,7 +78,7 @@ private:
   Player* myNextTurn;
   int myLostBallsPlayer1;
   int myLostBallsPlayer2;
-  std::vector<BoardField*> mySelectedBalls;
+  std::vector<BoardField*>* mySelectedBalls;
 };
 
 inline GameBoard* GameManager::GetGameBoard() const
@@ -93,12 +99,6 @@ inline Player* GameManager::GetPlayer1() const
 inline Player* GameManager::GetPlayer2() const
 {
   return myPlayer2;
-}
-
-inline void GameManager::TurnIsOver()
-{
-  myNextTurn = (myNextTurn == myPlayer1) ? myPlayer2 : myPlayer1;
-  mySelectedBalls.clear();
 }
 
 inline bool GameManager::IsGameStarted() const
