@@ -520,15 +520,21 @@ void CAbaloneDlg::OnNewGame()
 
     // Initialize the controls
     CString namePlayer = "Player 1";
-    if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER) {
-      namePlayer += " (Computer)";
+    if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
+      namePlayer += " (Monte Carlo)";
+    }
+    else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+      namePlayer += " (Alpha Beta)";
     }
     namePlayer += ":";
     myStaticNamePlayer1.SetWindowText(namePlayer);
 
     namePlayer = "Player 2";
-    if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER) {
-      namePlayer += " (Computer)";
+    if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
+      namePlayer += " (Monte Carlo)";
+    }
+    else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+      namePlayer += " (Alpha Beta)";
     }
     namePlayer += ":";
     myStaticNamePlayer2.SetWindowText(namePlayer);

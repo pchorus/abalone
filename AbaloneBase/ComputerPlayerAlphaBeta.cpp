@@ -1,20 +1,22 @@
 #include "AbaloneBase.h"
 
-#include "ComputerPlayerMonteCarlo.h"
+#include "ComputerPlayerAlphaBeta.h"
 
 #include "GameManager.h"
 
-ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
+ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
 {
 }
 
-ComputerPlayerMonteCarlo::~ComputerPlayerMonteCarlo()
+ComputerPlayerAlphaBeta::~ComputerPlayerAlphaBeta()
 {
 }
 
-BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
+BallMove ComputerPlayerAlphaBeta::CalculateNextMove() const
 {
+  ASSERT(false);
+  // TODO: implement
   BallMove ret;
   std::vector<BallMove*> ballMoves;
 
@@ -32,7 +34,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
   return ret;
 }
 
-Player::PlayerType ComputerPlayerMonteCarlo::GetType() const
+Player::PlayerType ComputerPlayerAlphaBeta::GetType() const
 {
-  return PLAYER_TYPE_COMPUTER_MONTE_CARLO;
+  return PLAYER_TYPE_COMPUTER_ALPHA_BETA;
 }

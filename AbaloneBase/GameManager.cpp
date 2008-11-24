@@ -5,6 +5,7 @@
 #include "GameBoard.h"
 #include "HumanPlayer.h"
 #include "ComputerPlayerMonteCarlo.h"
+#include "ComputerPlayerAlphaBeta.h"
 #include "BallMove.h"
 
 #include <algorithm>
@@ -48,15 +49,21 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   if (typePlayer1 == Player::PLAYER_TYPE_HUMAN) {
     myPlayer1 = new HumanPlayer(namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
-  else {
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
     myPlayer1 = new ComputerPlayerMonteCarlo(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
+  }
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+    myPlayer1 = new ComputerPlayerAlphaBeta(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
 
   if (typePlayer2 == Player::PLAYER_TYPE_HUMAN) {
     myPlayer2 = new HumanPlayer(namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
-  else {
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
     myPlayer2 = new ComputerPlayerMonteCarlo(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
+  }
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+    myPlayer2 = new ComputerPlayerAlphaBeta(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
 
   myNextTurn = myPlayer1;
@@ -706,7 +713,7 @@ void GameManager::TurnIsOver()
   myNextTurn = (myNextTurn == myPlayer1) ? myPlayer2 : myPlayer1;
   mySelectedBalls->clear();
 
-  while (myNextTurn->GetType() == Player::PLAYER_TYPE_COMPUTER) {
+  while (myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN) {
     computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
 
     if (computerPlayer) {

@@ -37,8 +37,8 @@ BOOL NewGameDlg::OnInitDialog()
 {
   BOOL ret = CDialog::OnInitDialog();
 
-  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_PLAYER1, IDC_RADIO_HUMAN_PLAYER1);
-  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_PLAYER2, IDC_RADIO_HUMAN_PLAYER2);
+  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1, IDC_RADIO_HUMAN_PLAYER1);
+  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2, IDC_RADIO_HUMAN_PLAYER2);
 
   myStartFormationComboBox.AddString(START_FORMATION_STR_STANDARD);
   myStartFormationComboBox.AddString(START_FORMATION_STR_BELGIAN_DAISY);
@@ -65,16 +65,37 @@ void NewGameDlg::OnOK()
   GetDlgItem(IDC_EDIT_NAME1)->GetWindowText(namePlayer1);
   GetDlgItem(IDC_EDIT_NAME2)->GetWindowText(namePlayer2);
 
-  int typePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_PLAYER1);
-  int typePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_PLAYER2);
+  int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1);
+  int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2);
 
-  myGameManager->SetPlayers(
-    namePlayer1,
-    typePlayer1 == IDC_RADIO_HUMAN_PLAYER1 ? Player::PLAYER_TYPE_HUMAN : Player::PLAYER_TYPE_COMPUTER,
-    namePlayer2,
-    typePlayer2 == IDC_RADIO_HUMAN_PLAYER2 ? Player::PLAYER_TYPE_HUMAN : Player::PLAYER_TYPE_COMPUTER
-    );
+  Player::PlayerType typePlayer1 = Player::PLAYER_TYPE_NONE;
+  Player::PlayerType typePlayer2 = Player::PLAYER_TYPE_NONE;
 
+  switch (radioTypePlayer1) {
+    case IDC_RADIO_HUMAN_PLAYER1:
+      typePlayer1 = Player::PLAYER_TYPE_HUMAN;
+      break;
+    case IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER1:
+      typePlayer1 = Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO;
+      break;
+    case IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1:
+      typePlayer1 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+      break;
+  }
+
+  switch (radioTypePlayer2) {
+    case IDC_RADIO_HUMAN_PLAYER2:
+      typePlayer2 = Player::PLAYER_TYPE_HUMAN;
+      break;
+    case IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER2:
+      typePlayer2 = Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO;
+      break;
+    case IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2:
+      typePlayer2 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+      break;
+  }
+
+  myGameManager->SetPlayers(namePlayer1, typePlayer1, namePlayer2, typePlayer2);
 
   CDialog::OnOK();
 }

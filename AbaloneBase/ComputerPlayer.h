@@ -2,9 +2,9 @@
 
 //////////////////////////////////////////////////////////////////////////
 //
-//  class HumanPlayer
-//    Implementation of abstract base class Player.
-//    Represents a human player for the game.
+//  class ComputerPlayer
+//    Base class for the computer players using Monte Carlo search
+//    or the Alpha-Beta algorithm
 //
 //////////////////////////////////////////////////////////////////////////
 
@@ -21,7 +21,7 @@ public:
   virtual ~ComputerPlayer();
 
   // getter and setter
-  virtual PlayerType GetType() const;
+  virtual PlayerType GetType() const = 0;
   GameManager* GetGameManager() const;
 
   virtual BallMove CalculateNextMove() const = 0;

@@ -12,11 +12,6 @@ ComputerPlayer::~ComputerPlayer()
 {
 }
 
-Player::PlayerType ComputerPlayer::GetType() const
-{
-  return PLAYER_TYPE_COMPUTER;
-}
-
 void ComputerPlayer::TakeNextTurn()
 {
   CalculateNextMove();

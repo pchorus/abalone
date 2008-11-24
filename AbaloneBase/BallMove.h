@@ -1,5 +1,14 @@
 #pragma once
 
+//////////////////////////////////////////////////////////////////////////
+//
+//  class BallMove
+//    Represents a possible move that can be taken in a specific
+//    game situation. It consists of the balls that should be moved
+//    and the direction in which they are moved.
+//
+//////////////////////////////////////////////////////////////////////////
+
 #include "AbaloneBase.h"
 
 #include <vector>

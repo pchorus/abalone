@@ -13,7 +13,7 @@ class ABALONE_BASE_DLLINTERFACE Player {
 
 public:
 
-  enum PlayerType { PLAYER_TYPE_NONE, PLAYER_TYPE_HUMAN, PLAYER_TYPE_COMPUTER };
+  enum PlayerType { PLAYER_TYPE_NONE, PLAYER_TYPE_HUMAN, PLAYER_TYPE_COMPUTER_MONTE_CARLO, PLAYER_TYPE_COMPUTER_ALPHA_BETA };
 
   // contructor / destructor
   Player(const CString& name, BoardField::Ball ball);
