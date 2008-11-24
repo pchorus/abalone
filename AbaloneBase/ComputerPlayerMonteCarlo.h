@@ -10,6 +10,8 @@
 
 #include "ComputerPlayer.h"
 
+class GameBoard;
+
 class ABALONE_BASE_DLLINTERFACE ComputerPlayerMonteCarlo : public ComputerPlayer {
 public:
   // constructor / destructor
@@ -21,4 +23,7 @@ public:
   virtual PlayerType GetType() const;
 
 private:
+  int SimulateGamesWithMove(BallMove* ballMove) const;
+
+  GameBoard* mySimGameBoard;
 };

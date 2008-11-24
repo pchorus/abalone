@@ -545,6 +545,7 @@ void CAbaloneDlg::OnNewGame()
     myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayer1()->GetName() + "'s turn!");
 
     myGameManager->SetGameStarted(true);
+    TurnIsOver();
     Invalidate();
   }
 }
@@ -787,6 +788,7 @@ void CAbaloneDlg::TurnIsOver()
 {
   EnableDirectionButtons();
   myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayerForNextTurn()->GetName() + "'s turn!");
+  myGameManager->TurnIsOver();
   Invalidate();
 }
 

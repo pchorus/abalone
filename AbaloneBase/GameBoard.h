@@ -20,6 +20,7 @@ class ABALONE_BASE_DLLINTERFACE GameBoard {
 public:
   // constructor / destructor
   GameBoard();
+  GameBoard(const GameBoard& other);
   ~GameBoard();
 
   // getter and setter
@@ -32,6 +33,8 @@ public:
   void Reset();
 
   void output();
+
+  GameBoard& operator=(const GameBoard& other);
 
 private:
   // the BoardFields

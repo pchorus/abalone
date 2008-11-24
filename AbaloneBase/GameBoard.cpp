@@ -7,10 +7,22 @@
 GameBoard::GameBoard()
 : myFileIO(new FileIO("AbaloneBoard.log"))
 {
-  
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
       myFieldPoints[x][y] = new BoardField(x, y);
+    }
+  }
+
+  myFileIO->Open();
+}
+
+GameBoard::GameBoard(const GameBoard& other)
+: myFileIO(new FileIO("AbaloneBoard.log"))
+{
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      myFieldPoints[x][y] = new BoardField(x, y);
+      *myFieldPoints[x][y] = *other.GetBoardField(x, y);
     }
   }
 
@@ -81,4 +93,15 @@ void GameBoard::output()
   }
   myFileIO->WriteLine("");
   myFileIO->WriteLine("");
+}
+
+GameBoard& GameBoard::operator=(const GameBoard& other)
+{
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      *myFieldPoints[x][y] = *other.GetBoardField(x, y);
+    }
+  }
+
+  return *this;
 }

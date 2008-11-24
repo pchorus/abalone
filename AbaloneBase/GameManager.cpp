@@ -66,7 +66,12 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
     myPlayer2 = new ComputerPlayerAlphaBeta(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
 
-  myNextTurn = myPlayer1;
+  myLostBallsPlayer1 = 0;
+  myLostBallsPlayer2 = 0;
+  // at the beginning of the game, the method turnisover must be called, because if player1
+  // is a computer player it should take his next move automatically
+  // so here myNextTurn must be Player2
+  myNextTurn = myPlayer2;
 }
 
 bool GameManager::CanSelectBall(BoardField* field) const
@@ -370,7 +375,6 @@ void GameManager::MoveBallsInDirection(Direction direction)
     break;
   }
   mySelectedBalls->clear();
-  TurnIsOver();
   // only for debug
   myGameBoard->output();
 }
