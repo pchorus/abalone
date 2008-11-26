@@ -54,6 +54,8 @@ BOOL CAbaloneApp::InitInstance()
 	// z.B. zum Namen Ihrer Firma oder Organisation.
 	SetRegistryKey(_T("Vom lokalen Anwendungs-Assistenten generierte Anwendungen"));
 
+  srand((unsigned)time(NULL));
+
 	CAbaloneDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();

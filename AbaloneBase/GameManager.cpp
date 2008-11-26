@@ -6,6 +6,7 @@
 #include "HumanPlayer.h"
 #include "ComputerPlayerMonteCarlo.h"
 #include "ComputerPlayerAlphaBeta.h"
+#include "ComputerPlayerRandomMoves.h"
 #include "BallMove.h"
 
 #include <algorithm>
@@ -19,6 +20,7 @@ GameManager::GameManager()
 , myLostBallsPlayer1(0)
 , myLostBallsPlayer2(0)
 , mySelectedBalls(new std::vector<BoardField*>)
+, myMaxNumberOfTurns(0)
 {
 }
 
@@ -35,7 +37,7 @@ GameManager::~GameManager()
   }
 }
 
-void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2)
+void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2, Player::PlayerNumber startPlayer)
 {
   if (myPlayer1) {
     delete myPlayer1;
@@ -55,6 +57,9 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     myPlayer1 = new ComputerPlayerAlphaBeta(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
+    myPlayer1 = new ComputerPlayerRandomMoves(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
+  }
 
   if (typePlayer2 == Player::PLAYER_TYPE_HUMAN) {
     myPlayer2 = new HumanPlayer(namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
@@ -65,13 +70,21 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     myPlayer2 = new ComputerPlayerAlphaBeta(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
+    myPlayer2 = new ComputerPlayerRandomMoves(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
+  }
 
   myLostBallsPlayer1 = 0;
   myLostBallsPlayer2 = 0;
   // at the beginning of the game, the method turnisover must be called, because if player1
   // is a computer player it should take his next move automatically
-  // so here myNextTurn must be Player2
-  myNextTurn = myPlayer2;
+  // so here myNextTurn must be Player2 if Player1 starts and vice versa
+  if (startPlayer == Player::PLAYER_ONE) {
+    myNextTurn = myPlayer2;
+  }
+  else {
+    myNextTurn = myPlayer1;
+  }
 }
 
 bool GameManager::CanSelectBall(BoardField* field) const
@@ -375,8 +388,6 @@ void GameManager::MoveBallsInDirection(Direction direction)
     break;
   }
   mySelectedBalls->clear();
-  // only for debug
-  myGameBoard->output();
 }
 
 BallAxis GameManager::GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const
@@ -713,11 +724,13 @@ void GameManager::CheckDirections(std::vector<BoardField*> ballFields, std::vect
 
 void GameManager::TurnIsOver()
 {
+  ASSERT(myNextTurn);
   ComputerPlayer* computerPlayer = 0;
   myNextTurn = (myNextTurn == myPlayer1) ? myPlayer2 : myPlayer1;
   mySelectedBalls->clear();
+  int turnCount = 0;
 
-  while (myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN) {
+  while (myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN && (myMaxNumberOfTurns == 0 || turnCount < myMaxNumberOfTurns)) {
     computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
 
     if (computerPlayer) {
@@ -729,6 +742,7 @@ void GameManager::TurnIsOver()
       // this should never happen, because if the PlayerType is 
       ASSERT(false);
     }
+    ++turnCount;
   }
 }
 

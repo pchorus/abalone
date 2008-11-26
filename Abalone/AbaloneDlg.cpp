@@ -526,6 +526,9 @@ void CAbaloneDlg::OnNewGame()
     else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
       namePlayer += " (Alpha Beta)";
     }
+    else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
+      namePlayer += " (Random Moves)";
+    }
     namePlayer += ":";
     myStaticNamePlayer1.SetWindowText(namePlayer);
 
@@ -536,6 +539,9 @@ void CAbaloneDlg::OnNewGame()
     else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
       namePlayer += " (Alpha Beta)";
     }
+    else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
+      namePlayer += " (Random Moves)";
+    }
     namePlayer += ":";
     myStaticNamePlayer2.SetWindowText(namePlayer);
 
@@ -545,6 +551,7 @@ void CAbaloneDlg::OnNewGame()
     myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayer1()->GetName() + "'s turn!");
 
     myGameManager->SetGameStarted(true);
+    myGameManager->SetMaxNumberOfTurns(300);
     TurnIsOver();
     Invalidate();
   }

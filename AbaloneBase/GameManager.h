@@ -30,7 +30,10 @@ public:
   Player* GetPlayer1() const;
   Player* GetPlayer2() const;
   bool IsGameStarted() const;
+
+  void SetStartPlayer(Player::PlayerNumber startPlayer);
   void SetGameStarted(bool started);
+  void SetMaxNumberOfTurns(int maxTurns);
 
   void AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves);
   void AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves);
@@ -51,7 +54,7 @@ public:
   int GetLostBallsPlayer1() const;
   int GetLostBallsPlayer2() const;
 
-  void SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2);
+  void SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2, Player::PlayerNumber startPlayer = Player::PLAYER_ONE);
 
 private:
 
@@ -79,6 +82,7 @@ private:
   int myLostBallsPlayer1;
   int myLostBallsPlayer2;
   std::vector<BoardField*>* mySelectedBalls;
+  int myMaxNumberOfTurns;
 };
 
 inline GameBoard* GameManager::GetGameBoard() const
@@ -124,4 +128,22 @@ inline int GameManager::GetLostBallsPlayer1() const
 inline int GameManager::GetLostBallsPlayer2() const
 {
   return myLostBallsPlayer2;
+}
+
+inline void GameManager::SetMaxNumberOfTurns(int maxTurns)
+{
+  myMaxNumberOfTurns = maxTurns;
+}
+
+inline void GameManager::SetStartPlayer(Player::PlayerNumber startPlayer)
+{
+  if (startPlayer == Player::PLAYER_ONE) {
+    myNextTurn = myPlayer2;
+  }
+  else if (startPlayer == Player::PLAYER_TWO) {
+    myNextTurn = myPlayer1;
+  }
+  else {
+    myNextTurn = 0;
+  }
 }

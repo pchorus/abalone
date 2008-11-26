@@ -24,5 +24,4 @@ void ComputerPlayer::TakeNextTurn()
   }
 
   GetGameManager()->MoveBallsInDirection(move.GetDirection());
-
 }

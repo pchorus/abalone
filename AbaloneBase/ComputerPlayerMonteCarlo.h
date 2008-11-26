@@ -10,7 +10,7 @@
 
 #include "ComputerPlayer.h"
 
-class GameBoard;
+class GameManager;
 
 class ABALONE_BASE_DLLINTERFACE ComputerPlayerMonteCarlo : public ComputerPlayer {
 public:
@@ -25,5 +25,5 @@ public:
 private:
   int SimulateGamesWithMove(BallMove* ballMove) const;
 
-  GameBoard* mySimGameBoard;
+  GameManager* mySimGameManager;
 };

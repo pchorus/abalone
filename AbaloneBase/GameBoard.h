@@ -34,6 +34,8 @@ public:
 
   void output();
 
+  void CopyBoardFields(const GameBoard* other);
+
   GameBoard& operator=(const GameBoard& other);
 
 private:

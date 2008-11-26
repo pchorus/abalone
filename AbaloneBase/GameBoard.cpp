@@ -99,9 +99,27 @@ GameBoard& GameBoard::operator=(const GameBoard& other)
 {
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-      *myFieldPoints[x][y] = *other.GetBoardField(x, y);
+      *myFieldPoints[x][y] = *other.myFieldPoints[x][y];
     }
   }
 
   return *this;
+}
+
+void GameBoard::CopyBoardFields(const GameBoard* other)
+{
+  BoardField* myField = 0;
+  BoardField* othersField = 0;
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      myField = myFieldPoints[x][y];
+      othersField = other->myFieldPoints[x][y];
+
+      myField->SetBall(othersField->GetBall());
+      myField->SetFieldCoordinates(othersField->GetFieldCoordinates());
+      myField->SetGUICoordinates(othersField->GetGUICoordinates());
+      myField->SetIsSelected(othersField->IsSelected());
+    }
+  }
 }
