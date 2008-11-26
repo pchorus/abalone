@@ -5,6 +5,8 @@
 #include "Abalone.h"
 #include "AbaloneDlg.h"
 
+#include "AbaloneBase/Output.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -55,6 +57,9 @@ BOOL CAbaloneApp::InitInstance()
 	SetRegistryKey(_T("Vom lokalen Anwendungs-Assistenten generierte Anwendungen"));
 
   srand((unsigned)time(NULL));
+  CHAR* buffer = new CHAR[256];
+  GetCurrentDirectory((DWORD)256, buffer);
+  Output::Init(buffer);
 
 	CAbaloneDlg dlg;
 	m_pMainWnd = &dlg;

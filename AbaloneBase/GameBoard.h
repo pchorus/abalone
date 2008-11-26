@@ -13,8 +13,6 @@ static const int BOARD_FIELDS_COLUMN = 9;
 
 #include "BoardField.h"
 
-class FileIO;
-
 class ABALONE_BASE_DLLINTERFACE GameBoard {
 
 public:
@@ -32,7 +30,7 @@ public:
   // Resets all BoardFields to initial state
   void Reset();
 
-  void output();
+  CString ToString();
 
   void CopyBoardFields(const GameBoard* other);
 
@@ -41,7 +39,6 @@ public:
 private:
   // the BoardFields
   BoardField* myFieldPoints[BOARD_FIELDS_ROW][BOARD_FIELDS_COLUMN];
-  FileIO* myFileIO;
 };
 
 inline BoardField* GameBoard::GetBoardField(int x, int y) const

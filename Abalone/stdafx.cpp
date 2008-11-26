@@ -3,5 +3,3 @@
 // stdafx.obj enthält die vorkompilierten Typinformationen
 
 #include "stdafx.h"
-
-
