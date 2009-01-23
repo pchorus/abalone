@@ -54,6 +54,8 @@ public:
   int GetLostBallsPlayer1() const;
   int GetLostBallsPlayer2() const;
 
+  void ResetLostBalls();
+
   void SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2, Player::PlayerNumber startPlayer = Player::PLAYER_ONE);
 
 private:
@@ -128,6 +130,12 @@ inline int GameManager::GetLostBallsPlayer1() const
 inline int GameManager::GetLostBallsPlayer2() const
 {
   return myLostBallsPlayer2;
+}
+
+inline void GameManager::ResetLostBalls()
+{
+  myLostBallsPlayer1 = 0;
+  myLostBallsPlayer2 = 0;
 }
 
 inline void GameManager::SetMaxNumberOfTurns(int maxTurns)

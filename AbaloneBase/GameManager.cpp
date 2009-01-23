@@ -233,15 +233,6 @@ BOOL GameManager::IsPossibleDirection(Direction direction, std::vector<BoardFiel
       opponentBall = BoardField::WHITE_BALL;
     }
 
-    // debug
-    if (field1 && field2
-      && field1->GetFieldCoordinates().x == 3
-      && field1->GetFieldCoordinates().y == 7
-      && field2->GetFieldCoordinates().x == 4
-      && field2->GetFieldCoordinates().y == 7)
-    {
-      CString debug = "debug";
-    }
     if (GetAxisOfBalls(balls) == pushAxis) {
       // -> O|X or -> OO|X or -> OOO|X
       if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL) {
@@ -730,7 +721,9 @@ void GameManager::TurnIsOver()
   mySelectedBalls->clear();
   int turnCount = 0;
 
-  while (myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN && (myMaxNumberOfTurns == 0 || turnCount < myMaxNumberOfTurns)) {
+  while (myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN && (myMaxNumberOfTurns == 0 || turnCount < myMaxNumberOfTurns)
+    && myLostBallsPlayer1 < 6 && myLostBallsPlayer2 < 6)
+  {
     computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
 
     if (computerPlayer) {

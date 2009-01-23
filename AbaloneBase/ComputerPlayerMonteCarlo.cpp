@@ -5,8 +5,8 @@
 #include "GameManager.h"
 #include "GameBoard.h"
 
-static const int GAMES_TO_SIMULATE = 30;
-static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 150;
+static const int GAMES_TO_SIMULATE = 10;
+static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 50;
 
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
@@ -82,10 +82,12 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
       mySimGameManager->AddSelectedBall(mySimGameManager->GetGameBoard()->GetBoardField((*i)->GetFieldCoordinates()));
     }
 
+    mySimGameManager->ResetLostBalls();
     mySimGameManager->SetStartPlayer(startPlayer);
     mySimGameManager->MoveBallsInDirection(ballMove->GetDirection());
     mySimGameManager->SetMaxNumberOfTurns(MAX_NUMBER_OF_TURNS_PER_SIM_GAME);
     mySimGameManager->SetGameStarted(true);
+    // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
 
     rating = mySimGameManager->GetLostBallsPlayer1() - mySimGameManager->GetLostBallsPlayer2();

@@ -6,7 +6,7 @@
 //===========================================================================
 #pragma once
 
-#define LOG_FILE_MESSAGE             _T("Abalog.msg")
+#define LOG_FILE_MESSAGE             _T("Abalog.log")
 #define LOG_FILE_ERROR               _T("Abalog.err")
 
 #define LOG_MESSAGE                  _T("Meldung")
