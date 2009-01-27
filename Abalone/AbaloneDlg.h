@@ -69,8 +69,6 @@ protected:
 private:
   CRect GetBoardRect() const;
   int GetBoardRadius() const;
-  void SetBallsStandardFormation();
-  void SetBallsBelgianDaisyFormation();
 
   // must be called after a player finished his turn
   void TurnIsOver();

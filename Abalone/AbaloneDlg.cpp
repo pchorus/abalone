@@ -509,13 +509,7 @@ void CAbaloneDlg::OnNewGame()
     GameBoard* gameBoard = myGameManager->GetGameBoard();
 
     gameBoard->Reset();
-
-    if (newGameDlg.GetStartFormationStr() == START_FORMATION_STR_STANDARD) {
-      SetBallsStandardFormation();
-    }
-    else if (newGameDlg.GetStartFormationStr() == START_FORMATION_STR_BELGIAN_DAISY) {
-      SetBallsBelgianDaisyFormation();
-    }
+    gameBoard->SetBallFormation(newGameDlg.GetStartFormationStr());
 
 
     // Initialize the controls
@@ -689,70 +683,6 @@ void CAbaloneDlg::DisableDirectionButtons()
   myBtnMoveRight.EnableWindow(FALSE);
   myBtnMoveDownLeft.EnableWindow(FALSE);
   myBtnMoveDownRight.EnableWindow(FALSE);
-}
-
-void CAbaloneDlg::SetBallsStandardFormation()
-{
-  GameBoard* gameBoard = myGameManager->GetGameBoard();
-
-  // set balls in the standard formation
-  for (int x = 0; x < 6; ++x) {
-    for (int y = 0; y < 2; ++y) {
-      if (gameBoard->GetBoardFieldExist(x, y)) {
-        gameBoard->GetBoardField(x, y)->SetBall(BoardField::BLACK_BALL);
-      }
-    }
-  }
-  gameBoard->GetBoardField(2, 2)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(3, 2)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(4, 2)->SetBall(BoardField::BLACK_BALL);
-
-  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
-    for (int y = BOARD_FIELDS_ROW-1; y > BOARD_FIELDS_ROW-3; --y) {
-      if (gameBoard->GetBoardFieldExist(x, y)) {
-        gameBoard->GetBoardField(x, y)->SetBall(BoardField::WHITE_BALL);
-      }
-    }
-  }
-  gameBoard->GetBoardField(4, 6)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(5, 6)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(6, 6)->SetBall(BoardField::WHITE_BALL);
-}
-
-void CAbaloneDlg::SetBallsBelgianDaisyFormation()
-{
-  GameBoard* gameBoard = myGameManager->GetGameBoard();
-  gameBoard->GetBoardField(0, 0)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(0, 1)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(1, 0)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(1, 1)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(1, 2)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(2, 1)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(2, 2)->SetBall(BoardField::BLACK_BALL);
-
-  gameBoard->GetBoardField(3, 0)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(3, 1)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(4, 0)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(4, 1)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(4, 2)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(5, 1)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(5, 2)->SetBall(BoardField::WHITE_BALL);
-
-  gameBoard->GetBoardField(3, 6)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(3, 7)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(4, 6)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(4, 7)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(4, 8)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(5, 7)->SetBall(BoardField::WHITE_BALL);
-  gameBoard->GetBoardField(5, 8)->SetBall(BoardField::WHITE_BALL);
-
-  gameBoard->GetBoardField(6, 6)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(6, 7)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(7, 6)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(7, 7)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(7, 8)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(8, 7)->SetBall(BoardField::BLACK_BALL);
-  gameBoard->GetBoardField(8, 8)->SetBall(BoardField::BLACK_BALL);
 }
 
 void CAbaloneDlg::OnBtnMoveUpLeft()

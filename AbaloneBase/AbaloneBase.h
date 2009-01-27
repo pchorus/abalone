@@ -58,3 +58,6 @@
 #endif
 
 enum Direction { NO_VALID_DIRECTION, UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT };
+
+static const CString START_FORMATION_STR_STANDARD = "Standard";
+static const CString START_FORMATION_STR_BELGIAN_DAISY = "Belgian Daisy";

@@ -43,6 +43,19 @@ BOOL NewGameDlg::OnInitDialog()
   myStartFormationComboBox.AddString(START_FORMATION_STR_STANDARD);
   myStartFormationComboBox.AddString(START_FORMATION_STR_BELGIAN_DAISY);
 
+  // add file titles to combobox
+  CFileFind fileFinder;
+  CString fileCStr;
+  BOOL working = fileFinder.FindFile("formations\\*.txt");
+
+  while (working) {
+    working = fileFinder.FindNextFile();
+
+    fileCStr = fileFinder.GetFileTitle();
+    if (!fileCStr.IsEmpty() && fileCStr != _T("."))
+      myStartFormationComboBox.AddString(fileCStr);
+  }
+
   myStartFormationComboBox.SetCurSel(myStartFormationComboBox.FindString(-1, START_FORMATION_STR_STANDARD));
   myStartFormationStr = START_FORMATION_STR_STANDARD;
 
