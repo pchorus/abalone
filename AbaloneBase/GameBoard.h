@@ -33,16 +33,9 @@ public:
   CString ToString();
 
   void CopyBoardFields(const GameBoard* other);
-  // sets the balls in the start formation
-  void SetBallFormation(const CString& formation);
-
   GameBoard& operator=(const GameBoard& other);
 
 private:
-  void SetBallsStandardFormation();
-  void SetBallsBelgianDaisyFormation();
-  void SetBallsCustomFormation(const CString& formation);
-
   // the BoardFields
   BoardField* myFieldPoints[BOARD_FIELDS_ROW][BOARD_FIELDS_COLUMN];
 };

@@ -509,7 +509,7 @@ void CAbaloneDlg::OnNewGame()
     GameBoard* gameBoard = myGameManager->GetGameBoard();
 
     gameBoard->Reset();
-    gameBoard->SetBallFormation(newGameDlg.GetStartFormationStr());
+    myGameManager->SetBallFormation(newGameDlg.GetStartFormationStr());
 
 
     // Initialize the controls

@@ -58,8 +58,10 @@ public:
 
   void SetPlayers(const CString& namePlayer1, Player::PlayerType typePlayer1,const CString& namePlayer2, Player::PlayerType typePlayer2, Player::PlayerNumber startPlayer = Player::PLAYER_ONE);
 
-private:
+  // sets the balls in the start formation
+  void SetBallFormation(const CString& formation);
 
+private:
   // help methods
   BallAxis GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const;
   void GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1, BoardField*& selectedField2,
@@ -74,6 +76,11 @@ private:
   // sorts the vector of selected balls, such that they are
   // in the array as on the board from left to right
   void SortSelectedBalls();
+
+  // ball start formations
+  void SetBallsStandardFormation();
+  void SetBallsBelgianDaisyFormation();
+  void SetBallsCustomFormation(const CString& formation);
 
   // members
   GameBoard* myGameBoard;

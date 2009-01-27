@@ -10,6 +10,9 @@
 #include "BallMove.h"
 
 #include <algorithm>
+#include <fstream>
+#include <string>
+
 
 GameManager::GameManager()
 : myGameBoard(new GameBoard)
@@ -760,4 +763,142 @@ BallMove* GameManager::CreateBallMove(Direction direction, std::vector<BoardFiel
   ballMove->SetDirection(direction);
 
   return ballMove;
+}
+
+void GameManager::SetBallFormation(const CString& formation)
+{
+  if (formation == START_FORMATION_STR_STANDARD) {
+    SetBallsStandardFormation();
+  }
+  else if (formation == START_FORMATION_STR_BELGIAN_DAISY) {
+    SetBallsBelgianDaisyFormation();
+  }
+  else {
+    SetBallsCustomFormation(formation);
+  }
+}
+
+void GameManager::SetBallsStandardFormation()
+{
+  // set balls in the standard formation
+  for (int x = 0; x < 6; ++x) {
+    for (int y = 0; y < 2; ++y) {
+      if (myGameBoard->GetBoardFieldExist(x, y)) {
+        myGameBoard->GetBoardField(x, y)->SetBall(BoardField::BLACK_BALL);
+      }
+    }
+  }
+  myGameBoard->GetBoardField(2, 2)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(3, 2)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(4, 2)->SetBall(BoardField::BLACK_BALL);
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = BOARD_FIELDS_ROW-1; y > BOARD_FIELDS_ROW-3; --y) {
+      if (myGameBoard->GetBoardFieldExist(x, y)) {
+        myGameBoard->GetBoardField(x, y)->SetBall(BoardField::WHITE_BALL);
+      }
+    }
+  }
+  myGameBoard->GetBoardField(4, 6)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(5, 6)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(6, 6)->SetBall(BoardField::WHITE_BALL);
+}
+
+void GameManager::SetBallsBelgianDaisyFormation()
+{
+  myGameBoard->GetBoardField(0, 0)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(0, 1)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(1, 0)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(1, 1)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(1, 2)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(2, 1)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(2, 2)->SetBall(BoardField::BLACK_BALL);
+
+  myGameBoard->GetBoardField(3, 0)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(3, 1)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(4, 0)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(4, 1)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(4, 2)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(5, 1)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(5, 2)->SetBall(BoardField::WHITE_BALL);
+
+  myGameBoard->GetBoardField(3, 6)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(3, 7)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(4, 6)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(4, 7)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(4, 8)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(5, 7)->SetBall(BoardField::WHITE_BALL);
+  myGameBoard->GetBoardField(5, 8)->SetBall(BoardField::WHITE_BALL);
+
+  myGameBoard->GetBoardField(6, 6)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(6, 7)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(7, 6)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(7, 7)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(7, 8)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(8, 7)->SetBall(BoardField::BLACK_BALL);
+  myGameBoard->GetBoardField(8, 8)->SetBall(BoardField::BLACK_BALL);
+}
+
+void GameManager::SetBallsCustomFormation(const CString& formation)
+{
+  if (!formation.IsEmpty()) {
+    int curPos = 0;
+    int curLine = 9;
+    int curColumn = 0;
+    int boardY = 0;
+    int countWhiteBalls = 0;
+    int countBlackBalls = 0;
+    CString file = "formations\\" + formation += ".txt";
+    CString cStr;
+    CString curStr;
+    std::ifstream input;
+    input.open(file, std::ios_base::in);
+
+    std::string str;
+
+    while (!input.eof()) {
+      std::getline(input, str);
+      --curLine;
+      curColumn = 0;
+      curPos = 0;
+
+      if (!str.empty()) {
+        cStr = str.data();
+        cStr.Trim();
+        curStr = cStr.Tokenize(_T(" "), curPos);
+
+        while (!curStr.IsEmpty()) {
+          if (curLine > 4) {
+            boardY = curLine - 4 + curColumn;
+          }
+          else {
+            boardY = curColumn;
+          }
+
+          switch (curStr.GetAt(0))
+          {
+          case 'w':
+          case 'W':
+            myGameBoard->GetBoardField(boardY, curLine)->SetBall(BoardField::WHITE_BALL);
+            ++countWhiteBalls;
+            break;
+          case 'b':
+          case 'B':
+            myGameBoard->GetBoardField(boardY, curLine)->SetBall(BoardField::BLACK_BALL);
+            ++countBlackBalls;
+            break;
+          }
+
+          curStr = cStr.Tokenize(_T(" "), curPos);
+          ++curColumn;
+        }
+      }
+    }
+
+    myLostBallsPlayer1 = 14 - countBlackBalls;
+    myLostBallsPlayer2 = 14 - countWhiteBalls;
+    if (input.is_open()) {
+      input.close();
+    }
+  }
 }
