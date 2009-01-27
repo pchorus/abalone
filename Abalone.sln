@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Abalone", "Abalone\Abalone.vcproj", "{BD9634F8-195A-4034-9734-A236958E7F59}"
 	ProjectSection(ProjectDependencies) = postProject
 		{780DD00B-C8F0-46FC-A74B-EFD30431E901} = {780DD00B-C8F0-46FC-A74B-EFD30431E901}
