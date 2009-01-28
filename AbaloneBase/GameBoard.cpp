@@ -61,15 +61,36 @@ void GameBoard::Reset()
 CString GameBoard::ToString()
 {
   CString line = "";
+  int xStart = 0;
+  int xEnd = 0;
+  int ws = 0;
   for (int y = 8; y >= 0; --y) {
-    for (int x = 0; x < 9; ++x) {
-      if (myFieldPoints[x][y]->GetBall() == BoardField::NO_BALL) {
+    xStart = 0;
+
+    if (y > 4) {
+      xStart = y - 4;
+      xEnd = 8;
+      ws = y - 4;
+    }
+    else {
+      xStart = 0;
+      xEnd = 4 + y;
+      ws = 4 - y;
+    }
+
+    CString str();
+    for (int i = 0; i < ws; ++i) {
+      line += " ";
+    }
+
+    for (; xStart <= xEnd; ++xStart) {
+      if (myFieldPoints[xStart][y]->GetBall() == BoardField::NO_BALL) {
         line += "-";
       }
-      else if (myFieldPoints[x][y]->GetBall() == BoardField::WHITE_BALL) {
+      else if (myFieldPoints[xStart][y]->GetBall() == BoardField::WHITE_BALL) {
         line += "W";
       }
-      else if (myFieldPoints[x][y]->GetBall() == BoardField::BLACK_BALL) {
+      else if (myFieldPoints[xStart][y]->GetBall() == BoardField::BLACK_BALL) {
         line += "B";
       }
       line += " ";
@@ -77,6 +98,7 @@ CString GameBoard::ToString()
 
     line += "\n";
   }
+  line += "\n";
 
   return line;
 }

@@ -845,7 +845,7 @@ void GameManager::SetBallsCustomFormation(const CString& formation)
     int curPos = 0;
     int curLine = 9;
     int curColumn = 0;
-    int boardY = 0;
+    int boardX = 0;
     int countWhiteBalls = 0;
     int countBlackBalls = 0;
     CString file = "formations\\" + formation += ".txt";
@@ -869,22 +869,22 @@ void GameManager::SetBallsCustomFormation(const CString& formation)
 
         while (!curStr.IsEmpty()) {
           if (curLine > 4) {
-            boardY = curLine - 4 + curColumn;
+            boardX = curLine - 4 + curColumn;
           }
           else {
-            boardY = curColumn;
+            boardX = curColumn;
           }
 
           switch (curStr.GetAt(0))
           {
           case 'w':
           case 'W':
-            myGameBoard->GetBoardField(boardY, curLine)->SetBall(BoardField::WHITE_BALL);
+            myGameBoard->GetBoardField(boardX, curLine)->SetBall(BoardField::WHITE_BALL);
             ++countWhiteBalls;
             break;
           case 'b':
           case 'B':
-            myGameBoard->GetBoardField(boardY, curLine)->SetBall(BoardField::BLACK_BALL);
+            myGameBoard->GetBoardField(boardX, curLine)->SetBall(BoardField::BLACK_BALL);
             ++countBlackBalls;
             break;
           }
