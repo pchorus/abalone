@@ -163,13 +163,13 @@ BEGIN
     BEGIN
         BLOCK "040704e4"
         BEGIN
-            VALUE "CompanyName", "TODO: <Firmenname>"
-            VALUE "FileDescription", "TODO: <Dateibeschreibung>"
+            VALUE "CompanyName", "Pascal Chorus"
+            VALUE "FileDescription", "Abalone.exe"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Abalone.exe"
-            VALUE "LegalCopyright", "TODO: (c) <Firmenname>. Alle Rechte vorbehalten."
+            VALUE "LegalCopyright", "(c) Pascal Chorus. Alle Rechte vorbehalten."
             VALUE "OriginalFilename", "Abalone.exe"
-            VALUE "ProductName", "TODO: <Produktname>"
+            VALUE "ProductName", "Abalone"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
