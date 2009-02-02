@@ -4,9 +4,11 @@
 
 #include "GameManager.h"
 #include "GameBoard.h"
+#include "Output.h"
 
-static const int GAMES_TO_SIMULATE = 10;
-static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 50;
+
+static const int GAMES_TO_SIMULATE = 25;
+static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 100;
 
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
@@ -28,16 +30,21 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
   BallMove ret;
   std::vector<BallMove*> ballMoves;
 
+//   DWORD time = 0;
+//   DWORD start = 0;
+//   DWORD end = 0;
+// 
+//   start = GetTickCount();
+
   int bestRating = INT_MIN;
   int newRating = INT_MIN;
 
-  GetGameManager()->AddPossibleMovesOneBall(ballMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(ballMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(ballMoves);
+  AddPossibleMovesOneBall(ballMoves);
+  AddPossibleMovesTwoBalls(ballMoves);
+  AddPossibleMovesThreeBalls(ballMoves);
 
   // destroy all BallMove objects which were created in the AddPossibleMoves methods
   std::vector<BallMove*>::iterator ballMoveIterator;
-
 
   for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
     newRating = SimulateGamesWithMove(*ballMoveIterator);
@@ -53,6 +60,17 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
 
   ASSERT(ret.GetBalls()->size() != 0);
   ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
+
+//   end = GetTickCount();
+// 
+//   time = end - start;
+// 
+//   CString str;
+//   str.Format("CalculateNextMove: %d\n", time);
+//   Output::Message(str, false, true);
+// 
+//   Output::Message(GetGameManager()->GetGameBoard()->ToString(), false, true);
+
   return ret;
 }
 
@@ -98,4 +116,9 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
   }
 
   return ret;
+}
+
+bool ComputerPlayerMonteCarlo::IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const
+{
+  return true;
 }

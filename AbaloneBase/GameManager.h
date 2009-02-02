@@ -35,10 +35,6 @@ public:
   void SetGameStarted(bool started);
   void SetMaxNumberOfTurns(int maxTurns);
 
-  void AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves);
-  void AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves);
-  void AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMoves);
-
   BOOL IsPossibleDirection(Direction direction, std::vector<BoardField*>* balls = 0) const;
   void MoveBallsInDirection(Direction direction);
   bool IsFirstPlayersTurn() const;
@@ -69,9 +65,6 @@ private:
   CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
 
   void AddLostBall(BoardField::Ball ball);
-
-  void CheckDirections(std::vector<BoardField*> ballFields, std::vector<BallMove*>& ballMoves);
-  BallMove* CreateBallMove(Direction direction, std::vector<BoardField*> ballFields);
 
   // sorts the vector of selected balls, such that they are
   // in the array as on the board from left to right

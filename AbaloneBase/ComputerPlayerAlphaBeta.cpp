@@ -20,9 +20,9 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove() const
   BallMove ret;
   std::vector<BallMove*> ballMoves;
 
-  GetGameManager()->AddPossibleMovesOneBall(ballMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(ballMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(ballMoves);
+  AddPossibleMovesOneBall(ballMoves);
+  AddPossibleMovesTwoBalls(ballMoves);
+  AddPossibleMovesThreeBalls(ballMoves);
 
   // destroy all BallMove objects which were created in the AddPossibleMoves methods
   std::vector<BallMove*>::iterator i;

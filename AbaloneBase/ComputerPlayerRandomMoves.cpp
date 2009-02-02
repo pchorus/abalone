@@ -23,9 +23,9 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove() const
   int bestRating = 0;
   int newRating = 0;
 
-  GetGameManager()->AddPossibleMovesOneBall(ballMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(ballMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(ballMoves);
+  AddPossibleMovesOneBall(ballMoves);
+  AddPossibleMovesTwoBalls(ballMoves);
+  AddPossibleMovesThreeBalls(ballMoves);
 
   int idx = (double)rand() / (double)RAND_MAX * (ballMoves.size()-1);
 
