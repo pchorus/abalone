@@ -57,12 +57,13 @@ public:
   // sets the balls in the start formation
   void SetBallFormation(const CString& formation);
 
+  CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
+
 private:
   // help methods
   BallAxis GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const;
   void GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1, BoardField*& selectedField2,
     BoardField*& selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
-  CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
 
   void AddLostBall(BoardField::Ball ball);
 

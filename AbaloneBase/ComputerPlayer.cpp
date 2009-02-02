@@ -41,7 +41,7 @@ void ComputerPlayer::AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves) 
         field = gameBoard->GetBoardField(x, y);
         if (field->GetBall() == myGameManager->GetPlayerForNextTurn()->GetBall()) {
           ballFields.push_back(field);
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
     }
@@ -70,7 +70,7 @@ void ComputerPlayer::AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves)
           ballFields.push_back(field1);
           ballFields.push_back(field2);
 
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
 
@@ -83,7 +83,7 @@ void ComputerPlayer::AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves)
           ballFields.push_back(field1);
           ballFields.push_back(field2);
 
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
       // check balls from upleft to downright
@@ -95,7 +95,7 @@ void ComputerPlayer::AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves)
           ballFields.push_back(field1);
           ballFields.push_back(field2);
 
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
     }
@@ -127,7 +127,7 @@ void ComputerPlayer::AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMove
           ballFields.push_back(field2);
           ballFields.push_back(field3);
 
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
 
@@ -143,7 +143,7 @@ void ComputerPlayer::AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMove
           ballFields.push_back(field2);
           ballFields.push_back(field3);
 
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
       // check balls from upleft to downright
@@ -158,50 +158,50 @@ void ComputerPlayer::AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMove
           ballFields.push_back(field2);
           ballFields.push_back(field3);
 
-          CheckDirections(ballFields, ballMoves);
+          CheckDirections(&ballFields, ballMoves);
         }
       }
     }
   }
 }
 
-void ComputerPlayer::CheckDirections(std::vector<BoardField*> ballFields, std::vector<BallMove*>& ballMoves) const
+void ComputerPlayer::CheckDirections(std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const
 {
-  if (myGameManager->IsPossibleDirection(UPLEFT, &ballFields) && IsMoveAllowed(UPLEFT, &ballFields)) {
+  if (myGameManager->IsPossibleDirection(UPLEFT, ballFields) && IsMoveAllowed(UPLEFT, ballFields)) {
     ballMoves.push_back(CreateBallMove(UPLEFT, ballFields));
   }
-  if (myGameManager->IsPossibleDirection(UPRIGHT, &ballFields) && IsMoveAllowed(UPRIGHT, &ballFields)) {
+  if (myGameManager->IsPossibleDirection(UPRIGHT, ballFields) && IsMoveAllowed(UPRIGHT, ballFields)) {
     ballMoves.push_back(CreateBallMove(UPRIGHT, ballFields));
   }
-  if (myGameManager->IsPossibleDirection(LEFT, &ballFields) && IsMoveAllowed(LEFT, &ballFields)) {
+  if (myGameManager->IsPossibleDirection(LEFT, ballFields) && IsMoveAllowed(LEFT, ballFields)) {
     ballMoves.push_back(CreateBallMove(LEFT, ballFields));
   }
-  if (myGameManager->IsPossibleDirection(RIGHT, &ballFields) && IsMoveAllowed(RIGHT, &ballFields)) {
+  if (myGameManager->IsPossibleDirection(RIGHT, ballFields) && IsMoveAllowed(RIGHT, ballFields)) {
     ballMoves.push_back(CreateBallMove(RIGHT, ballFields));
   }
-  if (myGameManager->IsPossibleDirection(DOWNLEFT, &ballFields) && IsMoveAllowed(DOWNLEFT, &ballFields)) {
+  if (myGameManager->IsPossibleDirection(DOWNLEFT, ballFields) && IsMoveAllowed(DOWNLEFT, ballFields)) {
     ballMoves.push_back(CreateBallMove(DOWNLEFT, ballFields));
   }
-  if (myGameManager->IsPossibleDirection(DOWNRIGHT, &ballFields) && IsMoveAllowed(DOWNRIGHT, &ballFields)) {
+  if (myGameManager->IsPossibleDirection(DOWNRIGHT, ballFields) && IsMoveAllowed(DOWNRIGHT, ballFields)) {
     ballMoves.push_back(CreateBallMove(DOWNRIGHT, ballFields));
   }
 }
 
-BallMove* ComputerPlayer::CreateBallMove(Direction direction, std::vector<BoardField*> ballFields) const
+BallMove* ComputerPlayer::CreateBallMove(Direction direction, std::vector<BoardField*>* ballFields) const
 {
   BallMove* ballMove = new BallMove;
 
   std::vector<BoardField*>::iterator i;
-  i = ballFields.begin();
+  i = ballFields->begin();
 
-  if (ballFields.size() >= 1) {
+  if (ballFields->size() >= 1) {
     ballMove->AddBall(*i);
   }
-  if (ballFields.size() >= 2) {
+  if (ballFields->size() >= 2) {
     ++i;
     ballMove->AddBall(*i);
   }
-  if (ballFields.size() >= 3) {
+  if (ballFields->size() >= 3) {
     ++i;
     ballMove->AddBall(*i);
   }

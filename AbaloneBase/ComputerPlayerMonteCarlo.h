@@ -26,6 +26,7 @@ private:
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
   int SimulateGamesWithMove(BallMove* ballMove) const;
+  bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
 
   GameManager* mySimGameManager;
 };

@@ -33,8 +33,8 @@ protected:
   void AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMoves) const;
 
 private:
-  void CheckDirections(std::vector<BoardField*> ballFields, std::vector<BallMove*>& ballMoves) const;
-  BallMove* CreateBallMove(Direction direction, std::vector<BoardField*> ballFields) const;
+  void CheckDirections(std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const;
+  BallMove* CreateBallMove(Direction direction, std::vector<BoardField*>* ballFields) const;
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
 
