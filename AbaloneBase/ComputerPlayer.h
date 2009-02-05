@@ -24,7 +24,7 @@ public:
   virtual PlayerType GetType() const = 0;
   GameManager* GetGameManager() const;
 
-  virtual BallMove CalculateNextMove() const = 0;
+  virtual BallMove CalculateNextMove() = 0;
   void TakeNextTurn();
 
 protected:

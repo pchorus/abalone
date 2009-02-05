@@ -57,7 +57,7 @@ public:
   // sets the balls in the start formation
   void SetBallFormation(const CString& formation);
 
-  CPoint GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const;
+  CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const;
 
 private:
   // help methods

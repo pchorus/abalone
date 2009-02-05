@@ -7,12 +7,13 @@
 #include "Output.h"
 
 
-static const int GAMES_TO_SIMULATE = 25;
-static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 100;
+static const size_t GAMES_TO_SIMULATE = 25;
+static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 200;
 
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
 , mySimGameManager(new GameManager)
+, myNoPossibleMoves(0)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 }
@@ -25,16 +26,16 @@ ComputerPlayerMonteCarlo::~ComputerPlayerMonteCarlo()
   }
 }
 
-BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
+BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 {
   BallMove ret;
   std::vector<BallMove*> ballMoves;
 
-//   DWORD time = 0;
-//   DWORD start = 0;
-//   DWORD end = 0;
-// 
-//   start = GetTickCount();
+  DWORD time = 0;
+  DWORD start = 0;
+  DWORD end = 0;
+
+  start = GetTickCount();
 
   int bestRating = INT_MIN;
   int newRating = INT_MIN;
@@ -46,6 +47,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
   // destroy all BallMove objects which were created in the AddPossibleMoves methods
   std::vector<BallMove*>::iterator ballMoveIterator;
 
+  myNoPossibleMoves = ballMoves.size();
   for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
     newRating = SimulateGamesWithMove(*ballMoveIterator);
     if (newRating > bestRating) {
@@ -61,15 +63,24 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove() const
   ASSERT(ret.GetBalls()->size() != 0);
   ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
 
-//   end = GetTickCount();
-// 
-//   time = end - start;
-// 
-//   CString str;
-//   str.Format("CalculateNextMove: %d\n", time);
-//   Output::Message(str, false, true);
-// 
-//   Output::Message(GetGameManager()->GetGameBoard()->ToString(), false, true);
+  end = GetTickCount();
+
+  time = end - start;
+
+  CString str;
+  CString out;
+  out = GetName() + ":\n";
+  str.Format("  CalculateNextMove: %d\n", time);
+  out += str;
+  str.Format("  Possible Moves:    %d\n", ballMoves.size());
+  out += str;
+  str.Format("  Simulated Games:   %d\n", GetGamesToSimulate());
+  out += str;
+  Output::Message(out, false, true);
+
+  out = GetGameManager()->GetGameBoard()->ToString();
+  out += GetName() + ":\n";
+  Output::Message2(out, false, true);
 
   return ret;
 }
@@ -83,6 +94,10 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
 {
   int ret = 0;
   int rating = 0;
+  // generic number of simulated games
+  size_t gamesToSimulate = GetGamesToSimulate();
+  // alternative: fixed number of simulated games
+//  size_t gamesToSimulate = GAMES_TO_SIMULATE;
 
   Player::PlayerNumber startPlayer = Player::PLAYER_ONE;
   std::vector<BoardField*>::const_iterator i;
@@ -92,7 +107,7 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
   }
 
 
-  for (int run = 0; run < GAMES_TO_SIMULATE; ++run) {
+  for (int run = 0; run < gamesToSimulate; ++run) {
     // copy current real situation to the gameboard for simulation
     mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
 
@@ -122,9 +137,13 @@ bool ComputerPlayerMonteCarlo::IsMoveAllowed(Direction direction, std::vector<Bo
 {
   bool ret = true;
 
-  if (balls->size() == 1 && CheckSingleBallMoveForLoneliness(direction, balls)) {
+  if (GetCenterDistanceRatio(direction, balls) > 0) {
     ret = false;
   }
+  else if (balls->size() == 1 && CheckSingleBallMoveForLoneliness(direction, balls)) {
+    ret = false;
+  }
+
   return ret;
 }
 
@@ -159,4 +178,24 @@ bool ComputerPlayerMonteCarlo::CheckSingleBallMoveForLoneliness(Direction direct
     return false;
   }
   return true;
+}
+
+int ComputerPlayerMonteCarlo::GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const
+{
+  int ret = 0;
+  int oldDistance = 0;
+  CPoint currentCoord;
+  CPoint centerCoord = GetGameManager()->GetGameBoard()->GetBoardField(4, 4)->GetFieldCoordinates();
+  CPoint afterMoveCoord;
+
+  // current Manhattan distance between balls and the game board's center
+  for (std::vector<BoardField*>::iterator i = balls->begin(); i != balls->end(); ++i) {
+    currentCoord = (*i)->GetFieldCoordinates();
+    afterMoveCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(currentCoord, direction);
+
+    ret += (abs(afterMoveCoord.x - centerCoord.x) + abs(afterMoveCoord.y - centerCoord.y))
+         - (abs(currentCoord.x - centerCoord.x) + abs(currentCoord.y - centerCoord.y));
+  }
+
+  return ret;
 }

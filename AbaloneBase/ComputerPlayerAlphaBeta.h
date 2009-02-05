@@ -16,7 +16,7 @@ public:
   ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball);
   virtual ~ComputerPlayerAlphaBeta();
 
-  virtual BallMove CalculateNextMove() const;
+  virtual BallMove CalculateNextMove();
 
   virtual PlayerType GetType() const;
 

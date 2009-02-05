@@ -522,7 +522,7 @@ void GameManager::GetSelectedAndOpponentFields(Direction direction, std::vector<
   }
 }
 
-CPoint GameManager::GetNextFieldCoordinatesInDirection(CPoint& fieldCoord, Direction direction) const
+CPoint GameManager::GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const
 {
   CPoint ret(fieldCoord);
 

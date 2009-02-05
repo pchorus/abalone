@@ -13,7 +13,7 @@ ComputerPlayerAlphaBeta::~ComputerPlayerAlphaBeta()
 {
 }
 
-BallMove ComputerPlayerAlphaBeta::CalculateNextMove() const
+BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 {
   ASSERT(false);
   // TODO: implement

@@ -7,6 +7,7 @@
 #pragma once
 
 #define LOG_FILE_MESSAGE             _T("Abalog.log")
+#define LOG_FILE_MESSAGE_2           _T("Abalog2.log")
 #define LOG_FILE_ERROR               _T("Abalog.err")
 
 #define LOG_MESSAGE                  _T("Meldung")
@@ -15,6 +16,7 @@
 namespace Output {
   ABALONE_BASE_DLLINTERFACE void Init(const CString& outputDir);
   ABALONE_BASE_DLLINTERFACE void Message(const CString& message, bool messageBox, bool log);
+  ABALONE_BASE_DLLINTERFACE void Message2(const CString& message, bool messageBox, bool log);
   ABALONE_BASE_DLLINTERFACE void Error(const CString& message, bool messageBox, bool log);
   ABALONE_BASE_DLLINTERFACE bool YesNo(const CString& message);
 }

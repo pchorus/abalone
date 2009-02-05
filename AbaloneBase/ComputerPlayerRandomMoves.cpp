@@ -15,7 +15,7 @@ ComputerPlayerRandomMoves::~ComputerPlayerRandomMoves()
 {
 }
 
-BallMove ComputerPlayerRandomMoves::CalculateNextMove() const
+BallMove ComputerPlayerRandomMoves::CalculateNextMove()
 {
   BallMove move;
 

@@ -18,15 +18,26 @@ public:
   ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball);
   virtual ~ComputerPlayerMonteCarlo();
 
-  virtual BallMove CalculateNextMove() const;
+  virtual BallMove CalculateNextMove();
 
   virtual PlayerType GetType() const;
 
 private:
+  size_t GetGamesToSimulate() const;
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
   int SimulateGamesWithMove(BallMove* ballMove) const;
+  // methods to check whether a move should be considered possible
+  int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;
   bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
 
   GameManager* mySimGameManager;
+
+  size_t myNoPossibleMoves;
 };
+
+inline size_t ComputerPlayerMonteCarlo::GetGamesToSimulate() const
+{
+//  return 8 * (100 - myNoPossibleMoves) / 10;
+  return 15 * (100 - myNoPossibleMoves) / 10;
+}

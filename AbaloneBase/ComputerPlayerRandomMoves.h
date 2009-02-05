@@ -18,7 +18,7 @@ public:
   ComputerPlayerRandomMoves(GameManager* gameManager, const CString& name, BoardField::Ball ball);
   virtual ~ComputerPlayerRandomMoves();
 
-  virtual BallMove CalculateNextMove() const;
+  virtual BallMove CalculateNextMove();
 
   virtual PlayerType GetType() const;
 

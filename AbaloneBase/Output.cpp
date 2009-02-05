@@ -30,6 +30,17 @@ namespace Output {
         }
       }
     }
+    else if (outputFile == LOG_FILE_MESSAGE_2) {
+      messageCaption = LOG_MESSAGE;
+      if (log) {
+        err = fopen_s(&myMessageFile, myOutputDir + "\\" + LOG_FILE_MESSAGE_2, _T("a"));
+        if (err == 0) {
+          fputs(message, myMessageFile);
+          fclose(myMessageFile);
+          myMessageFile = 0;
+        }
+      }
+    }
     else if (outputFile == LOG_FILE_ERROR) {
       messageCaption = LOG_ERROR;
       if (log) {
@@ -57,6 +68,11 @@ namespace Output {
   void Message(const CString& message, bool messageBox, bool log)
   {
     Write(message, messageBox, log, LOG_FILE_MESSAGE);
+  }
+
+  void Message2(const CString& message, bool messageBox, bool log)
+  {
+    Write(message, messageBox, log, LOG_FILE_MESSAGE_2);
   }
 
   void Error(const CString& message, bool messageBox, bool log)
