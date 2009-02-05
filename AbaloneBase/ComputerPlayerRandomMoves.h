@@ -23,4 +23,6 @@ public:
   virtual PlayerType GetType() const;
 
 private:
+  std::vector<BallMove*> myBallMoves;
+
 };

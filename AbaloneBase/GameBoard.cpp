@@ -78,7 +78,6 @@ CString GameBoard::ToString()
       ws = 4 - y;
     }
 
-    CString str();
     for (int i = 0; i < ws; ++i) {
       line += " ";
     }
@@ -126,8 +125,11 @@ void GameBoard::CopyBoardFields(const GameBoard* other)
 
       myField->SetBall(othersField->GetBall());
       myField->SetFieldCoordinates(othersField->GetFieldCoordinates());
-      myField->SetGUICoordinates(othersField->GetGUICoordinates());
-      myField->SetIsSelected(othersField->IsSelected());
+// the following two assignments need not be executed, because
+// for the simManager, the gui coordinates are of no interest and
+// there should be no field currently selected
+//      myField->SetGUICoordinates(othersField->GetGUICoordinates());
+//      myField->SetIsSelected(othersField->IsSelected());
     }
   }
 }

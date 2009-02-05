@@ -210,7 +210,7 @@ BallMove* ComputerPlayer::CreateBallMove(Direction direction, std::vector<BoardF
   return ballMove;
 }
 
-bool ComputerPlayer::IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const
+bool ComputerPlayer::IsMoveAllowed(Direction /*direction*/, std::vector<BoardField*>* /*balls*/) const
 {
   return true;
 }

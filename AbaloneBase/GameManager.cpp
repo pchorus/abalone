@@ -299,7 +299,6 @@ BOOL GameManager::IsPossibleDirection(Direction direction, std::vector<BoardFiel
 void GameManager::MoveBallsInDirection(Direction direction)
 {
   BoardField* field = 0;
-  BoardField* newField = 0;
   CPoint coord;
   CPoint hlpCoord;
 

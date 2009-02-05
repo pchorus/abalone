@@ -444,7 +444,7 @@ CRect CAbaloneDlg::GetBoardRect() const
   return boardRect;
 }
 
-void CAbaloneDlg::OnLButtonDown(UINT nFlags, CPoint point)
+void CAbaloneDlg::OnLButtonDown(UINT /*nFlags*/, CPoint point)
 {
   if (myGameManager->IsGameStarted() && myGameManager->GetPlayerForNextTurn()->GetType() == Player::PLAYER_TYPE_HUMAN) {
     // only react on the mouse click if it is a human player's turn
@@ -636,8 +636,6 @@ void CAbaloneDlg::DrawLostBalls()
   CPoint point;
   myGroupLostBalls.GetWindowRect(&rect);
   ScreenToClient(&rect);
-
-  int radius = 10;
 
   rect.left += 10;
   rect.right -= 10;

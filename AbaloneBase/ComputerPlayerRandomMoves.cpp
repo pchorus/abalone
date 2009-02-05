@@ -9,6 +9,7 @@
 ComputerPlayerRandomMoves::ComputerPlayerRandomMoves(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
 {
+  myBallMoves.reserve(100);
 }
 
 ComputerPlayerRandomMoves::~ComputerPlayerRandomMoves()
@@ -19,20 +20,18 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
 {
   BallMove move;
 
-  std::vector<BallMove*> ballMoves;
-  int bestRating = 0;
-  int newRating = 0;
+  myBallMoves.clear();
 
-  AddPossibleMovesOneBall(ballMoves);
-  AddPossibleMovesTwoBalls(ballMoves);
-  AddPossibleMovesThreeBalls(ballMoves);
+  AddPossibleMovesOneBall(myBallMoves);
+  AddPossibleMovesTwoBalls(myBallMoves);
+  AddPossibleMovesThreeBalls(myBallMoves);
 
-  int idx = (double)rand() / (double)RAND_MAX * (ballMoves.size()-1);
+  int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMoves.size()-1));
 
-  move = *ballMoves.at(idx);
+  move = *myBallMoves.at(idx);
 
   std::vector<BallMove*>::iterator ballMoveIterator;
-  for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
+  for (ballMoveIterator = myBallMoves.begin(); ballMoveIterator != myBallMoves.end(); ++ballMoveIterator) {
     delete *ballMoveIterator;
   }
 

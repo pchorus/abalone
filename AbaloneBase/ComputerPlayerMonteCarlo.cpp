@@ -30,6 +30,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 {
   BallMove ret;
   std::vector<BallMove*> ballMoves;
+  ballMoves.reserve(100);
 
   DWORD time = 0;
   DWORD start = 0;
@@ -106,8 +107,9 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     startPlayer = Player::PLAYER_TWO;
   }
 
+  mySimGameManager->SetMaxNumberOfTurns(MAX_NUMBER_OF_TURNS_PER_SIM_GAME);
 
-  for (int run = 0; run < gamesToSimulate; ++run) {
+  for (size_t run = 0; run < gamesToSimulate; ++run) {
     // copy current real situation to the gameboard for simulation
     mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
 
@@ -118,7 +120,6 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     mySimGameManager->ResetLostBalls();
     mySimGameManager->SetStartPlayer(startPlayer);
     mySimGameManager->MoveBallsInDirection(ballMove->GetDirection());
-    mySimGameManager->SetMaxNumberOfTurns(MAX_NUMBER_OF_TURNS_PER_SIM_GAME);
     mySimGameManager->SetGameStarted(true);
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
@@ -183,7 +184,6 @@ bool ComputerPlayerMonteCarlo::CheckSingleBallMoveForLoneliness(Direction direct
 int ComputerPlayerMonteCarlo::GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const
 {
   int ret = 0;
-  int oldDistance = 0;
   CPoint currentCoord;
   CPoint centerCoord = GetGameManager()->GetGameBoard()->GetBoardField(4, 4)->GetFieldCoordinates();
   CPoint afterMoveCoord;

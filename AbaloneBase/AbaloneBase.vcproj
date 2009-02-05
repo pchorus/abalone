@@ -46,6 +46,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="AbaloneBase.h"
+				WarningLevel="4"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -119,7 +120,7 @@
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="AbaloneBase.h"
-				WarningLevel="1"
+				WarningLevel="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

@@ -83,7 +83,7 @@ namespace Output {
   bool YesNo(const CString& message)
   {
     UINT messageFlags = MB_YESNO | MB_ICONQUESTION;
-    int ret;
+    int ret = IDNO;
     HWND hWnd = GetActiveWindow();
     if (hWnd) {
       ret = ::MessageBox(hWnd, message, AI_DOC_APP_NAME, messageFlags);
