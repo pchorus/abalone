@@ -7,12 +7,14 @@
 BallMove::BallMove()
 : myBalls(new std::vector<BoardField*>)
 , myDirection(NO_VALID_DIRECTION)
+, myIsAttacking(false)
 {
 }
 
 BallMove::BallMove(const BallMove& other)
 : myBalls(new std::vector<BoardField*>)
 , myDirection(NO_VALID_DIRECTION)
+, myIsAttacking(false)
 {
   std::vector<BoardField*>::const_iterator i;
 
@@ -40,6 +42,7 @@ BallMove& BallMove::operator= (const BallMove& other)
     myBalls->push_back(*i);
   }
   myDirection = other.GetDirection();
+  myIsAttacking = other.IsAttacking();
 
   return *this;
 }

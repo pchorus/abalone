@@ -193,9 +193,11 @@ void GameManager::ClearSelectedBalls()
   mySelectedBalls->clear();
 }
 
-BOOL GameManager::IsPossibleDirection(Direction direction, std::vector<BoardField*>* balls) const
+BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, std::vector<BoardField*>* balls) const
 {
   BOOL ret = FALSE;
+
+  isAttacking = false;
 
   BoardField* field1 = 0;
   CPoint fieldCoord1;
@@ -246,6 +248,7 @@ BOOL GameManager::IsPossibleDirection(Direction direction, std::vector<BoardFiel
         && (!opponentField2 || opponentField2->GetBall() == BoardField::NO_BALL))
         // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
       {
+        isAttacking = true;
         ret = TRUE;
       }
 
@@ -254,6 +257,7 @@ BOOL GameManager::IsPossibleDirection(Direction direction, std::vector<BoardFiel
         && (!opponentField3 || (opponentField3 && opponentField3->GetBall() == BoardField::NO_BALL)))
         // -> OOO|00 or -> OOO|00X
       {
+        isAttacking = true;
         ret = TRUE;
       }
     }

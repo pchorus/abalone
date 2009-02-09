@@ -29,11 +29,15 @@ public:
   Direction GetDirection() const;
   void SetDirection(Direction direction);
 
+  bool IsAttacking() const;
+  void SetIsAttacking(bool isAttacking);
+
   BallMove& operator= (const BallMove& other);
 
 private:
   std::vector<BoardField*>* myBalls;
   Direction myDirection;
+  bool myIsAttacking;
 };
 
 inline std::vector<BoardField*>* BallMove::GetBalls() const
@@ -59,4 +63,14 @@ inline void BallMove::AddBall(BoardField* field)
 inline void BallMove::ClearBalls()
 {
   myBalls->clear();
+}
+
+inline bool BallMove::IsAttacking() const
+{
+  return myIsAttacking;
+}
+
+inline void BallMove::SetIsAttacking(bool isAttacking)
+{
+  myIsAttacking = isAttacking;
 }

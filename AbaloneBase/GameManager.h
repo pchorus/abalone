@@ -35,7 +35,7 @@ public:
   void SetGameStarted(bool started);
   void SetMaxNumberOfTurns(int maxTurns);
 
-  BOOL IsPossibleDirection(Direction direction, std::vector<BoardField*>* balls = 0) const;
+  BOOL IsPossibleDirection(Direction direction, bool& isAttacking, std::vector<BoardField*>* balls = 0) const;
   void MoveBallsInDirection(Direction direction);
   bool IsFirstPlayersTurn() const;
 

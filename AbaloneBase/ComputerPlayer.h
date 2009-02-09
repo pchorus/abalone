@@ -27,14 +27,13 @@ public:
   virtual BallMove CalculateNextMove() = 0;
   void TakeNextTurn();
 
-protected:
   void AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves) const;
   void AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves) const;
   void AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMoves) const;
 
 private:
   void CheckDirections(std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const;
-  BallMove* CreateBallMove(Direction direction, std::vector<BoardField*>* ballFields) const;
+  BallMove* CreateBallMove(Direction direction, bool isAttacking, std::vector<BoardField*>* ballFields) const;
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
 
