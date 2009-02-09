@@ -37,8 +37,8 @@ BOOL NewGameDlg::OnInitDialog()
 {
   BOOL ret = CDialog::OnInitDialog();
 
-  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1, IDC_RADIO_HUMAN_PLAYER1);
-  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2, IDC_RADIO_HUMAN_PLAYER2);
+  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER1, IDC_RADIO_HUMAN_PLAYER1);
+  CheckRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER2, IDC_RADIO_HUMAN_PLAYER2);
 
   myStartFormationComboBox.AddString(START_FORMATION_STR_STANDARD);
   myStartFormationComboBox.AddString(START_FORMATION_STR_BELGIAN_DAISY);
@@ -78,8 +78,8 @@ void NewGameDlg::OnOK()
   GetDlgItem(IDC_EDIT_NAME1)->GetWindowText(namePlayer1);
   GetDlgItem(IDC_EDIT_NAME2)->GetWindowText(namePlayer2);
 
-  int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1);
-  int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2);
+  int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER1);
+  int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER2);
 
   Player::PlayerType typePlayer1 = Player::PLAYER_TYPE_NONE;
   Player::PlayerType typePlayer2 = Player::PLAYER_TYPE_NONE;
@@ -97,6 +97,9 @@ void NewGameDlg::OnOK()
     case IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1:
       typePlayer1 = Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
       break;
+    case IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER1:
+      typePlayer1 = Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE;
+      break;
   }
 
   switch (radioTypePlayer2) {
@@ -111,6 +114,9 @@ void NewGameDlg::OnOK()
       break;
     case IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2:
       typePlayer2 = Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
+      break;
+    case IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER2:
+      typePlayer2 = Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE;
       break;
   }
 

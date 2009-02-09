@@ -523,6 +523,9 @@ void CAbaloneDlg::OnNewGame()
     else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
       namePlayer += " (Random Moves)";
     }
+    else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE) {
+      namePlayer += " (Evaluate Move)";
+    }
     namePlayer += ":";
     myStaticNamePlayer1.SetWindowText(namePlayer);
 
@@ -535,6 +538,9 @@ void CAbaloneDlg::OnNewGame()
     }
     else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
       namePlayer += " (Random Moves)";
+    }
+    else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE) {
+      namePlayer += " (Evaluate Move)";
     }
     namePlayer += ":";
     myStaticNamePlayer2.SetWindowText(namePlayer);

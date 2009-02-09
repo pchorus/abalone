@@ -7,6 +7,7 @@
 #include "ComputerPlayerMonteCarlo.h"
 #include "ComputerPlayerAlphaBeta.h"
 #include "ComputerPlayerRandomMoves.h"
+#include "ComputerPlayerEvaluateNextMove.h"
 #include "BallMove.h"
 
 #include <algorithm>
@@ -63,6 +64,9 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
     myPlayer1 = new ComputerPlayerRandomMoves(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE) {
+    myPlayer1 = new ComputerPlayerEvaluateNextMove(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
+  }
 
   if (typePlayer2 == Player::PLAYER_TYPE_HUMAN) {
     myPlayer2 = new HumanPlayer(namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
@@ -75,6 +79,9 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   }
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
     myPlayer2 = new ComputerPlayerRandomMoves(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
+  }
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE) {
+    myPlayer2 = new ComputerPlayerEvaluateNextMove(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
 
   myLostBallsPlayer1 = 0;

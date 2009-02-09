@@ -13,7 +13,13 @@ class ABALONE_BASE_DLLINTERFACE Player {
 
 public:
 
-  enum PlayerType { PLAYER_TYPE_NONE, PLAYER_TYPE_HUMAN, PLAYER_TYPE_COMPUTER_MONTE_CARLO, PLAYER_TYPE_COMPUTER_ALPHA_BETA, PLAYER_TYPE_COMPUTER_RANDOM_MOVES };
+  enum PlayerType { PLAYER_TYPE_NONE,
+                    PLAYER_TYPE_HUMAN,
+                    PLAYER_TYPE_COMPUTER_MONTE_CARLO,
+                    PLAYER_TYPE_COMPUTER_ALPHA_BETA,
+                    PLAYER_TYPE_COMPUTER_RANDOM_MOVES,
+                    PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE
+                  };
   enum PlayerNumber { PLAYER_NONE, PLAYER_ONE, PLAYER_TWO };
 
   // contructor / destructor
