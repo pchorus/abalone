@@ -26,13 +26,19 @@ private:
   size_t GetGamesToSimulate() const;
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
-  int SimulateGamesWithMove(BallMove* ballMove) const;
+  double SimulateGamesWithMove(BallMove* ballMove) const;
   // methods to check whether a move should be considered possible
   int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;
   bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
+  // evaluates the outcome of a simulated game
+  double EvaluateSimGame() const;
+  // returns the average distance of the player's marbles to the game board's center
+  // at the end of a simulated game
+  double GetAvgCenterDistanceSimGame() const;
+  // returns the Manhattan distance of the passed coordinates to the center
+  int GetCenterDistance(CPoint coord) const;
 
   GameManager* mySimGameManager;
-
   size_t myNoPossibleMoves;
 };
 

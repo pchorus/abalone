@@ -38,8 +38,11 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 
   start = GetTickCount();
 
-  int bestRating = INT_MIN;
-  int newRating = INT_MIN;
+  // these doubles have to be initialized with the smallest
+  // number they can take (or even smaller),
+  // TODO: define a range of possible ratings
+  double bestRating = -100.;
+  double newRating = -100.;
 
   AddPossibleMovesOneBall(ballMoves);
   AddPossibleMovesTwoBalls(ballMoves);
@@ -91,10 +94,10 @@ Player::PlayerType ComputerPlayerMonteCarlo::GetType() const
   return PLAYER_TYPE_COMPUTER_MONTE_CARLO;
 }
 
-int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
+double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
 {
-  int ret = 0;
-  int rating = 0;
+  double ret = 0;
+  double rating = 0;
   // generic number of simulated games
   size_t gamesToSimulate = GetGamesToSimulate();
   // alternative: fixed number of simulated games
@@ -124,10 +127,7 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
 
-    rating = mySimGameManager->GetLostBallsPlayer1() - mySimGameManager->GetLostBallsPlayer2();
-    if (GetGameManager()->IsFirstPlayersTurn()) {
-      rating *= -1;
-    }
+    rating = EvaluateSimGame();
     ret += rating;
   }
 
@@ -185,17 +185,85 @@ int ComputerPlayerMonteCarlo::GetCenterDistanceRatio(Direction direction, std::v
 {
   int ret = 0;
   CPoint currentCoord;
-  CPoint centerCoord = GetGameManager()->GetGameBoard()->GetBoardField(4, 4)->GetFieldCoordinates();
+  CPoint centerCoord(4, 4);
   CPoint afterMoveCoord;
 
   // current Manhattan distance between balls and the game board's center
   for (std::vector<BoardField*>::iterator i = balls->begin(); i != balls->end(); ++i) {
     currentCoord = (*i)->GetFieldCoordinates();
     afterMoveCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(currentCoord, direction);
-
-    ret += (abs(afterMoveCoord.x - centerCoord.x) + abs(afterMoveCoord.y - centerCoord.y))
-         - (abs(currentCoord.x - centerCoord.x) + abs(currentCoord.y - centerCoord.y));
+    ret += GetCenterDistance(afterMoveCoord) - GetCenterDistance(currentCoord);
   }
+
+  return ret;
+}
+
+double ComputerPlayerMonteCarlo::EvaluateSimGame() const
+{
+  double rating /*= mySimGameManager->GetLostBallsPlayer1() - mySimGameManager->GetLostBallsPlayer2()*/;
+  rating = GetAvgCenterDistanceSimGame();
+
+//   if (GetGameManager()->IsFirstPlayersTurn()) {
+//     rating *= -1;
+//   }
+  return rating;
+}
+
+double ComputerPlayerMonteCarlo::GetAvgCenterDistanceSimGame() const
+{
+  double ret = 0.;
+  int centerDistance = 0;
+  BoardField::Ball playersBall = BoardField::WHITE_BALL;
+  BoardField* currentField = 0;
+  CPoint centerCoord(4, 4);
+
+  if (GetGameManager()->IsFirstPlayersTurn()) {
+    // we have to regard the black marbles
+    playersBall = BoardField::BLACK_BALL;
+  }
+
+  GameBoard* gameBoard = mySimGameManager->GetGameBoard();
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      if (gameBoard->GetBoardFieldExist(x, y)) {
+        currentField = gameBoard->GetBoardField(x, y);
+
+        if (currentField->GetBall() == playersBall) {
+          centerDistance += GetCenterDistance(currentField->GetFieldCoordinates());
+        }
+      }
+    }
+  }
+
+  // we return the average center distance of each ball on the board,
+  // so we have to exclude the balls which are already lost
+  if (GetGameManager()->IsFirstPlayersTurn()) {
+    ret = centerDistance / double(14 - mySimGameManager->GetLostBallsPlayer1());
+  }
+  else {
+    ret = centerDistance / double(14 - mySimGameManager->GetLostBallsPlayer2());
+  }
+  return ret;
+}
+
+int ComputerPlayerMonteCarlo::GetCenterDistance(CPoint coord) const
+{
+  int ret = 0;
+  int hlp = 0;
+  CPoint centerCoord(4, 4);
+
+  while ((coord.x < centerCoord.x && coord.y < centerCoord.y)
+    || (coord.x > centerCoord.x && coord.y > centerCoord.y))
+  {
+    // extra effort
+    // transformation: turn the game board counter clockwise until the
+    // marble is in the down right or upper left corner of the board
+    hlp = coord.y;
+    coord.y = coord.x;
+    coord.x += 4 - hlp;
+  }
+  ret = abs(coord.x - centerCoord.x) + abs(coord.y - centerCoord.y);
 
   return ret;
 }
