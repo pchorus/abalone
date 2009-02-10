@@ -561,6 +561,165 @@ CPoint GameManager::GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord,
   return ret;
 }
 
+double GameManager::CalcLostBallsRatio(const Player* player) const
+{
+  double ret = GetLostBallsPlayer1() - GetLostBallsPlayer2();
+  if (player == GetPlayer1()) {
+    ret *= -1;
+  }
+
+  return ret;
+}
+
+double GameManager::CalcAvgCenterDistance(const Player* player) const
+{
+  double ret = 0.;
+  int centerDistance = 0;
+  BoardField::Ball playersBall = player->GetBall();
+  BoardField* currentField = 0;
+  CPoint centerCoord(4, 4);
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      if (myGameBoard->GetBoardFieldExist(x, y)) {
+        currentField = myGameBoard->GetBoardField(x, y);
+
+        if (currentField->GetBall() == playersBall) {
+          centerDistance += CalcCenterDistance(currentField->GetFieldCoordinates());
+        }
+      }
+    }
+  }
+
+  // we return the average center distance of each ball on the board,
+  // so we have to exclude the balls which are already lost
+  if (player == GetPlayer1()) {
+    ret = centerDistance / double(14 - GetLostBallsPlayer1());
+  }
+  else {
+    ret = centerDistance / double(14 - GetLostBallsPlayer2());
+  }
+  return ret;
+}
+
+double GameManager::CalcAvgGrouping(const Player* player) const
+{
+  double ret = 0.;
+  int grouping = 0;
+  BoardField::Ball playersBall = player->GetBall();
+  BoardField* currentField = 0;
+  CPoint centerCoord(4, 4);
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      if (myGameBoard->GetBoardFieldExist(x, y)) {
+        currentField = myGameBoard->GetBoardField(x, y);
+
+        if (currentField->GetBall() == playersBall) {
+          grouping += CalcGroupingField(player, currentField->GetFieldCoordinates());
+        }
+      }
+    }
+  }
+
+  // we return the average center distance of each ball on the board,
+  // so we have to exclude the balls which are already lost
+  if (player == GetPlayer1()) {
+    ret = grouping / double(14 - GetLostBallsPlayer1());
+  }
+  else {
+    ret = grouping / double(14 - GetLostBallsPlayer2());
+  }
+  return ret;
+}
+
+double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
+{
+  double ret = 0.;
+  std::vector<BallMove*> ballMoves;
+  ballMoves.reserve(100);
+  std::vector<BallMove*>::iterator i;
+
+  BallMove* currentMove = 0;
+  const ComputerPlayer* computerPlayer = dynamic_cast<const ComputerPlayer*>(player);
+
+  computerPlayer->AddPossibleMovesTwoBalls(ballMoves);
+  computerPlayer->AddPossibleMovesThreeBalls(ballMoves);
+
+  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
+    currentMove = *i;
+
+    if (currentMove->IsAttacking()) {
+      ++ret;
+    }
+  }
+
+  ret = ret / (double)ballMoves.size();
+
+  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
+    delete *i;
+  }
+
+  return ret;
+}
+
+int GameManager::CalcCenterDistance(CPoint coord) const
+{
+  int ret = 0;
+  int hlp = 0;
+  CPoint centerCoord(4, 4);
+
+  while ((coord.x < centerCoord.x && coord.y < centerCoord.y)
+    || (coord.x > centerCoord.x && coord.y > centerCoord.y))
+  {
+    // extra effort
+    // transformation: turn the game board counter clockwise until the
+    // marble is in the down right or upper left corner of the board
+    hlp = coord.y;
+    coord.y = coord.x;
+    coord.x += 4 - hlp;
+  }
+  ret = abs(coord.x - centerCoord.x) + abs(coord.y - centerCoord.y);
+
+  return ret;
+}
+
+int GameManager::CalcGroupingField(const Player* player, CPoint coord) const
+{
+  int ret = 0;
+
+  // TODO: perhaps this method can be implemented with the help of a loop over
+  // the Direction enum's values
+
+  CPoint checkCoord;
+  // check the fields around the new field for fellow balls
+  checkCoord = GetNextFieldCoordinatesInDirection(coord, UPLEFT);
+  if (myGameBoard->GetBoardFieldExist(checkCoord) && myGameBoard->GetBoardField(checkCoord)->GetBall() == player->GetBall()) {
+    ++ret;
+  }
+  checkCoord = GetNextFieldCoordinatesInDirection(coord, UPRIGHT);
+  if (myGameBoard->GetBoardFieldExist(checkCoord) && myGameBoard->GetBoardField(checkCoord)->GetBall() == player->GetBall()) {
+    ++ret;
+  }
+  checkCoord = GetNextFieldCoordinatesInDirection(coord, LEFT);
+  if (myGameBoard->GetBoardFieldExist(checkCoord) && myGameBoard->GetBoardField(checkCoord)->GetBall() == player->GetBall()) {
+    ++ret;
+  }
+  checkCoord = GetNextFieldCoordinatesInDirection(coord, RIGHT);
+  if (myGameBoard->GetBoardFieldExist(checkCoord) && myGameBoard->GetBoardField(checkCoord)->GetBall() == player->GetBall()) {
+    ++ret;
+  }
+  checkCoord = GetNextFieldCoordinatesInDirection(coord, DOWNLEFT);
+  if (myGameBoard->GetBoardFieldExist(checkCoord) && myGameBoard->GetBoardField(checkCoord)->GetBall() == player->GetBall()) {
+    ++ret;
+  }
+  checkCoord = GetNextFieldCoordinatesInDirection(coord, DOWNRIGHT);
+  if (myGameBoard->GetBoardFieldExist(checkCoord) && myGameBoard->GetBoardField(checkCoord)->GetBall() == player->GetBall()) {
+    ++ret;
+  }
+  return ret;
+}
+
 void GameManager::AddLostBall(BoardField::Ball ball)
 {
   if (ball == BoardField::BLACK_BALL) {

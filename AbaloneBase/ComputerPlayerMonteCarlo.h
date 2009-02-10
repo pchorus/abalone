@@ -32,23 +32,6 @@ private:
   bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
   // evaluates the outcome of a simulated game
   double EvaluateSimGame() const;
-  // calculates the ratio of lost balls
-  double CalcLostBallsRatioSimGame() const;
-  // returns the average distance of the player's marbles to the game board's center
-  // at the end of a simulated game
-  double CalcAvgCenterDistanceSimGame() const;
-  // calculates the average grouping of the marbles
-  // TODO: this can be calculated in the same loop as in GetAvgCenterDistanceSimGame
-  // put them into one to improve performance
-  double CalcAvgGroupingSimGame() const;
-  // calculates the attacking power on the opponent
-  double CalcAttackingPowerOnOpponentSimGame() const;
-
-  // returns the Manhattan distance of the passed coordinates to the center
-  int CalcCenterDistance(CPoint coord) const;
-  // returns the amount of neighbor marbles of the same color the
-  // marble at coord
-  int CalcGroupingSimGameField(CPoint coord) const;
 
   GameManager* mySimGameManager;
   size_t myNoPossibleMoves;

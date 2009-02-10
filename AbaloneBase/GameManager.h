@@ -59,6 +59,26 @@ public:
 
   CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const;
 
+  // methods for evaluation of the current game board situation
+  // calculates the ratio of lost balls
+  double CalcLostBallsRatio(const Player* player) const;
+  // returns the average distance of the player's marbles to the game board's center
+  // at the end of a simulated game
+  double CalcAvgCenterDistance(const Player* player) const;
+  // calculates the average grouping of the marbles
+  // TODO: this can be calculated in the same loop as in GetAvgCenterDistanceSimGame
+  // put them into one to improve performance
+  double CalcAvgGrouping(const Player* player) const;
+  // calculates the attacking power on the opponent
+  double CalcAttackingPowerOnOpponent(const Player* player) const;
+
+
+  // returns the Manhattan distance of the passed coordinates to the center
+  int CalcCenterDistance(CPoint coord) const;
+  // returns the amount of neighbor marbles of the same color the
+  // marble at coord
+  int CalcGroupingField(const Player* player, CPoint coord) const;
+
 private:
   // help methods
   BallAxis GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const;

@@ -206,7 +206,7 @@ int ComputerPlayerMonteCarlo::GetCenterDistanceRatio(Direction direction, std::v
   for (std::vector<BoardField*>::iterator i = balls->begin(); i != balls->end(); ++i) {
     currentCoord = (*i)->GetFieldCoordinates();
     afterMoveCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(currentCoord, direction);
-    ret += CalcCenterDistance(afterMoveCoord) - CalcCenterDistance(currentCoord);
+    ret += GetGameManager()->CalcCenterDistance(afterMoveCoord) - GetGameManager()->CalcCenterDistance(currentCoord);
   }
 
   return ret;
@@ -214,22 +214,31 @@ int ComputerPlayerMonteCarlo::GetCenterDistanceRatio(Direction direction, std::v
 
 double ComputerPlayerMonteCarlo::EvaluateSimGame() const
 {
-  double lostBallsRating = CalcLostBallsRatioSimGame();
+  ComputerPlayer* simGamePlayer = 0;
+
+  if (GetGameManager()->IsFirstPlayersTurn()) {
+    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
+  }
+  else {
+    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
+  }
+
+  double lostBallsRating = mySimGameManager->CalcLostBallsRatio(simGamePlayer);
   // best ratio:  +6
   // worst ratio: -6
   lostBallsRating = (lostBallsRating + 6.) / 12.;
 
-  double centerDistanceRating = CalcAvgCenterDistanceSimGame();
+  double centerDistanceRating = mySimGameManager->CalcAvgCenterDistance(simGamePlayer);
   // 1.3 = 1.0 (1.357 is the best value to achieve with all 14 marbles)
   // 4.0 =  0.0 (4.0 => every marble is on the game board's border)
   centerDistanceRating = 1. - ((centerDistanceRating - 1.3) / 2.7);
 
-  double groupingRating = CalcAvgGroupingSimGame();
+  double groupingRating = mySimGameManager->CalcAvgGrouping(simGamePlayer);
   // 4.14 = 1.0 : all marbles are in a huge single group
   // 0.0  = 0.0 : no marble has any neighboring fellow marbles
   groupingRating /= 4.1;
 
-  double attackingPowerRating = CalcAttackingPowerOnOpponentSimGame();
+  double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
 
   double evaluation = LOST_BALLS_EVALUATION_WEIGHT      * lostBallsRating
                     + CENTER_DISTANCE_EVALUATION_WEIGHT * centerDistanceRating
@@ -248,176 +257,4 @@ double ComputerPlayerMonteCarlo::EvaluateSimGame() const
 
   Output::Message(out, false, true);
   return evaluation;
-}
-
-double ComputerPlayerMonteCarlo::CalcLostBallsRatioSimGame() const
-{
-  double ret = mySimGameManager->GetLostBallsPlayer1() - mySimGameManager->GetLostBallsPlayer2();
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    ret *= -1;
-  }
-
-  return ret;
-}
-
-double ComputerPlayerMonteCarlo::CalcAvgCenterDistanceSimGame() const
-{
-  double ret = 0.;
-  int centerDistance = 0;
-  BoardField::Ball playersBall = GetBall();
-  BoardField* currentField = 0;
-  CPoint centerCoord(4, 4);
-
-  GameBoard* gameBoard = mySimGameManager->GetGameBoard();
-
-  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
-    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-      if (gameBoard->GetBoardFieldExist(x, y)) {
-        currentField = gameBoard->GetBoardField(x, y);
-
-        if (currentField->GetBall() == playersBall) {
-          centerDistance += CalcCenterDistance(currentField->GetFieldCoordinates());
-        }
-      }
-    }
-  }
-
-  // we return the average center distance of each ball on the board,
-  // so we have to exclude the balls which are already lost
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    ret = centerDistance / double(14 - mySimGameManager->GetLostBallsPlayer1());
-  }
-  else {
-    ret = centerDistance / double(14 - mySimGameManager->GetLostBallsPlayer2());
-  }
-  return ret;
-}
-
-double ComputerPlayerMonteCarlo::CalcAvgGroupingSimGame() const
-{
-  double ret = 0.;
-  int grouping = 0;
-  BoardField::Ball playersBall = GetBall();
-  BoardField* currentField = 0;
-  CPoint centerCoord(4, 4);
-
-  GameBoard* gameBoard = mySimGameManager->GetGameBoard();
-
-  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
-    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-      if (gameBoard->GetBoardFieldExist(x, y)) {
-        currentField = gameBoard->GetBoardField(x, y);
-
-        if (currentField->GetBall() == playersBall) {
-          grouping += CalcGroupingSimGameField(currentField->GetFieldCoordinates());
-        }
-      }
-    }
-  }
-
-  // we return the average center distance of each ball on the board,
-  // so we have to exclude the balls which are already lost
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    ret = grouping / double(14 - mySimGameManager->GetLostBallsPlayer1());
-  }
-  else {
-    ret = grouping / double(14 - mySimGameManager->GetLostBallsPlayer2());
-  }
-  return ret;
-}
-
-double ComputerPlayerMonteCarlo::CalcAttackingPowerOnOpponentSimGame() const
-{
-  double ret = 0.;
-  std::vector<BallMove*> ballMoves;
-  ballMoves.reserve(100);
-  std::vector<BallMove*>::iterator i;
-
-  BallMove* currentMove = 0;
-  ComputerPlayer* simGamePlayer = 0;
-
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
-  }
-  else {
-    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
-  }
-
-  simGamePlayer->AddPossibleMovesTwoBalls(ballMoves);
-  simGamePlayer->AddPossibleMovesThreeBalls(ballMoves);
-
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    currentMove = *i;
-
-    if (currentMove->IsAttacking()) {
-      ++ret;
-    }
-  }
-
-  ret = ret / (double)ballMoves.size();
-
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    delete *i;
-  }
-
-  return ret;
-}
-
-int ComputerPlayerMonteCarlo::CalcCenterDistance(CPoint coord) const
-{
-  int ret = 0;
-  int hlp = 0;
-  CPoint centerCoord(4, 4);
-
-  while ((coord.x < centerCoord.x && coord.y < centerCoord.y)
-    || (coord.x > centerCoord.x && coord.y > centerCoord.y))
-  {
-    // extra effort
-    // transformation: turn the game board counter clockwise until the
-    // marble is in the down right or upper left corner of the board
-    hlp = coord.y;
-    coord.y = coord.x;
-    coord.x += 4 - hlp;
-  }
-  ret = abs(coord.x - centerCoord.x) + abs(coord.y - centerCoord.y);
-
-  return ret;
-}
-
-int ComputerPlayerMonteCarlo::CalcGroupingSimGameField(CPoint coord) const
-{
-  int ret = 0;
-
-  // TODO: perhaps this method can be implemented with the help of a loop over
-  // the Direction enum's values
-
-
-  GameBoard* gameBoard = mySimGameManager->GetGameBoard();
-  CPoint checkCoord;
-  // check the fields around the new field for fellow balls
-  checkCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(coord, UPLEFT);
-  if (gameBoard->GetBoardFieldExist(checkCoord) && gameBoard->GetBoardField(checkCoord)->GetBall() == GetBall()) {
-    ++ret;
-  }
-  checkCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(coord, UPRIGHT);
-  if (gameBoard->GetBoardFieldExist(checkCoord) && gameBoard->GetBoardField(checkCoord)->GetBall() == GetBall()) {
-    ++ret;
-  }
-  checkCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(coord, LEFT);
-  if (gameBoard->GetBoardFieldExist(checkCoord) && gameBoard->GetBoardField(checkCoord)->GetBall() == GetBall()) {
-    ++ret;
-  }
-  checkCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(coord, RIGHT);
-  if (gameBoard->GetBoardFieldExist(checkCoord) && gameBoard->GetBoardField(checkCoord)->GetBall() == GetBall()) {
-    ++ret;
-  }
-  checkCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(coord, DOWNLEFT);
-  if (gameBoard->GetBoardFieldExist(checkCoord) && gameBoard->GetBoardField(checkCoord)->GetBall() == GetBall()) {
-    ++ret;
-  }
-  checkCoord = GetGameManager()->GetNextFieldCoordinatesInDirection(coord, DOWNRIGHT);
-  if (gameBoard->GetBoardFieldExist(checkCoord) && gameBoard->GetBoardField(checkCoord)->GetBall() == GetBall()) {
-    ++ret;
-  }
-  return ret;
 }
