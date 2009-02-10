@@ -48,7 +48,9 @@ public:
   void TurnIsOver();
 
   int GetLostBallsPlayer1() const;
+  void SetLostBallsPlayer1(int lostBalls);
   int GetLostBallsPlayer2() const;
+  void SetLostBallsPlayer2(int lostBalls);
 
   void ResetLostBalls();
 
@@ -148,9 +150,19 @@ inline int GameManager::GetLostBallsPlayer1() const
   return myLostBallsPlayer1;
 }
 
+inline void GameManager::SetLostBallsPlayer1(int lostBalls)
+{
+  myLostBallsPlayer1 = lostBalls;
+}
+
 inline int GameManager::GetLostBallsPlayer2() const
 {
   return myLostBallsPlayer2;
+}
+
+inline void GameManager::SetLostBallsPlayer2(int lostBalls)
+{
+  myLostBallsPlayer2 = lostBalls;
 }
 
 inline void GameManager::ResetLostBalls()

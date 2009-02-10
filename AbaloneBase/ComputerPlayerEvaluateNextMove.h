@@ -21,4 +21,9 @@ public:
 
   virtual PlayerType GetType() const;
 
+private:
+  double SimulateMove(BallMove* ballMove) const;
+  double EvaluateMove() const;
+
+  GameManager* mySimGameManager;
 };

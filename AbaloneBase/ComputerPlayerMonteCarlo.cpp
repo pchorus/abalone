@@ -10,10 +10,6 @@
 static const size_t GAMES_TO_SIMULATE = 25;
 static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 200;
 
-static const double LOST_BALLS_EVALUATION_WEIGHT        = 0.15;
-static const double CENTER_DISTANCE_EVALUATION_WEIGHT   = 0.3;
-static const double GROUPING_EVALUATION_WEIGHT          = 0.4;
-static const double ATTACKING_POWER_EVALUATION_WEIGHT   = 0.15;
 
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
@@ -64,6 +60,8 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
     newRating = SimulateGamesWithMove(*ballMoveIterator);
     if (newRating > bestRating) {
+      // TODO: improvement: assignment from pointer to pointer and after the loop,
+      // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
       ret = **ballMoveIterator;
     }
@@ -103,8 +101,8 @@ Player::PlayerType ComputerPlayerMonteCarlo::GetType() const
 
 double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
 {
-  double ret = 0;
-  double rating = 0;
+  double ret = 0.;
+  double rating = 0.;
   // generic number of simulated games
   size_t gamesToSimulate = GetGamesToSimulate();
   // alternative: fixed number of simulated games
@@ -127,7 +125,9 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
       mySimGameManager->AddSelectedBall(mySimGameManager->GetGameBoard()->GetBoardField((*i)->GetFieldCoordinates()));
     }
 
-    mySimGameManager->ResetLostBalls();
+    // mySimGameManager->ResetLostBalls();
+    mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
+    mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
     mySimGameManager->SetStartPlayer(startPlayer);
     mySimGameManager->MoveBallsInDirection(ballMove->GetDirection());
     mySimGameManager->SetGameStarted(true);
