@@ -73,6 +73,8 @@ public:
   double CalcAvgGrouping(const Player* player) const;
   // calculates the attacking power on the opponent
   double CalcAttackingPowerOnOpponent(const Player* player) const;
+  // calculates how strong the player is attacked by the other player
+  double CalcAttackedByOpponent(const Player* player) const;
 
 
   // returns the Manhattan distance of the passed coordinates to the center

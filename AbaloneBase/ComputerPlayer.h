@@ -14,10 +14,11 @@
 class GameManager;
 
 
-static const double LOST_BALLS_EVALUATION_WEIGHT        = 0.15;
-static const double CENTER_DISTANCE_EVALUATION_WEIGHT   = 0.3;
-static const double GROUPING_EVALUATION_WEIGHT          = 0.4;
-static const double ATTACKING_POWER_EVALUATION_WEIGHT   = 0.15;
+static const double LOST_BALLS_EVALUATION_WEIGHT              = 0.1;
+static const double CENTER_DISTANCE_EVALUATION_WEIGHT         = 0.3;
+static const double GROUPING_EVALUATION_WEIGHT                = 0.4;
+static const double ATTACKING_POWER_EVALUATION_WEIGHT         = 0.1;
+static const double ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT    = 0.1;
 
 
 class ABALONE_BASE_DLLINTERFACE ComputerPlayer : public Player {
@@ -37,6 +38,11 @@ public:
   void AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves) const;
   void AddPossibleMovesTwoBalls(std::vector<BallMove*>& ballMoves) const;
   void AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMoves) const;
+
+protected:
+  // methods to check whether a move should be considered possible
+  int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;
+  bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
 
 private:
   void CheckDirections(std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const;

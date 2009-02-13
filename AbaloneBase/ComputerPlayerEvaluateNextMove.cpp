@@ -76,9 +76,8 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   out += str;
   Output::Message(out, false, true);
 
-  //   out = GetGameManager()->GetGameBoard()->ToString();
-  //   out += GetName() + ":\n";
-  //   Output::Message2(out, false, true);
+  out = GetGameManager()->GetGameBoard()->ToString();
+//  Output::Message2(out, false, true);
 
   return ret;
 }
@@ -90,7 +89,6 @@ Player::PlayerType ComputerPlayerEvaluateNextMove::GetType() const
 
 double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
 {
-  double ret = 0.;
   Player::PlayerNumber startPlayer = Player::PLAYER_ONE;
   std::vector<BoardField*>::const_iterator i;
 
@@ -113,9 +111,7 @@ double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
 
   Output::Message2(mySimGameManager->GetGameBoard()->ToString(), false, true);
 
-  ret = EvaluateMove();
-
-  return ret;
+  return EvaluateMove();
 }
 
 double ComputerPlayerEvaluateNextMove::EvaluateMove() const
@@ -145,20 +141,32 @@ double ComputerPlayerEvaluateNextMove::EvaluateMove() const
   groupingRating /= 4.1;
 
   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
+  double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
+  // 0 attacks  = 1.0
+  // 10 attacks = 0.0
+  if (attackedByOpponent > 10.)
+    attackedByOpponent = 10.;
+  attackedByOpponent = (10. - attackedByOpponent) * 0.1;
 
-  double evaluation = LOST_BALLS_EVALUATION_WEIGHT      * lostBallsRating
-    + CENTER_DISTANCE_EVALUATION_WEIGHT * centerDistanceRating
-    + GROUPING_EVALUATION_WEIGHT        * groupingRating;
+  // TODO: another evaluation: if you can win the game with your next move,
+  // you should take it anyway
+  double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
+    + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
+    + GROUPING_EVALUATION_WEIGHT                    * groupingRating
+    + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
+    + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
 
   CString out;
   CString str;
-  str.Format("  Lost Balls:       %f\n", lostBallsRating);
+  str.Format("  Lost Balls:             %f\n", lostBallsRating);
   out += str;
-  str.Format("  Center Distance:  %f\n", centerDistanceRating);
+  str.Format("  Center Distance:        %f\n", centerDistanceRating);
   out += str;
-  str.Format("  Grouping:         %f\n", groupingRating);
+  str.Format("  Grouping:               %f\n", groupingRating);
   out += str;
-  str.Format("  Attacking Power:  %f\n\n", attackingPowerRating);
+  str.Format("  Attacking Power:        %f\n\n", attackingPowerRating);
+  out += str;
+  str.Format("  Attacked By Opponent:   %f\n\n", attackingPowerRating);
   out += str;
 
   Output::Message(out, false, true);

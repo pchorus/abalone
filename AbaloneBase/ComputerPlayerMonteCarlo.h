@@ -27,9 +27,6 @@ private:
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
   double SimulateGamesWithMove(BallMove* ballMove) const;
-  // methods to check whether a move should be considered possible
-  int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;
-  bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
   // evaluates the outcome of a simulated game
   double EvaluateSimGame() const;
 

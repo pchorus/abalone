@@ -663,6 +663,46 @@ double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
   return ret;
 }
 
+double GameManager::CalcAttackedByOpponent(const Player* player) const
+{
+  double ret = 0.;
+  std::vector<BallMove*> ballMoves;
+  ballMoves.reserve(100);
+  std::vector<BallMove*>::iterator i;
+
+  BallMove* currentMove = 0;
+  const ComputerPlayer* computerPlayer = 0;
+
+  // computerPlayer should be the opponent
+  if (player == myPlayer1) {
+    computerPlayer = dynamic_cast<const ComputerPlayer*>(myPlayer2);
+  }
+  else {
+    computerPlayer = dynamic_cast<const ComputerPlayer*>(myPlayer1);
+  }
+
+  computerPlayer->AddPossibleMovesTwoBalls(ballMoves);
+  computerPlayer->AddPossibleMovesThreeBalls(ballMoves);
+
+  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
+    currentMove = *i;
+
+    if (currentMove->IsAttacking()) {
+      ++ret;
+    }
+  }
+
+  // TODO: the absolute number of the opponent's attacking moves
+  // is returned
+//  ret = ret / (double)ballMoves.size();
+
+  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
+    delete *i;
+  }
+
+  return ret;
+}
+
 int GameManager::CalcCenterDistance(CPoint coord) const
 {
   int ret = 0;
