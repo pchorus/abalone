@@ -200,7 +200,7 @@ void GameManager::ClearSelectedBalls()
   mySelectedBalls->clear();
 }
 
-BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, std::vector<BoardField*>* balls) const
+BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bool& ejectsBall, std::vector<BoardField*>* balls, std::vector<BoardField*>* opponentBalls) const
 {
   BOOL ret = FALSE;
 
@@ -255,6 +255,10 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, st
         && (!opponentField2 || opponentField2->GetBall() == BoardField::NO_BALL))
         // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
       {
+        if (opponentBalls) {
+          opponentBalls->push_back(opponentField1);
+        }
+        ejectsBall = !opponentField2;
         isAttacking = true;
         ret = TRUE;
       }
@@ -264,6 +268,12 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, st
         && (!opponentField3 || (opponentField3 && opponentField3->GetBall() == BoardField::NO_BALL)))
         // -> OOO|00 or -> OOO|00X
       {
+        if (opponentBalls) {
+          opponentBalls->push_back(opponentField1);
+          opponentBalls->push_back(opponentField2);
+        }
+
+        ejectsBall = !opponentField3;
         isAttacking = true;
         ret = TRUE;
       }
@@ -394,6 +404,97 @@ void GameManager::MoveBallsInDirection(Direction direction)
   mySelectedBalls->clear();
 }
 
+void GameManager::DoMove(BallMove* move)
+{
+  std::vector<BoardField*>::const_iterator i;
+
+  for (i = move->GetBalls()->begin(); i != move->GetBalls()->end(); ++i) {
+    AddSelectedBall(GetGameBoard()->GetBoardField((*i)->GetFieldCoordinates()));
+  }
+
+  MoveBallsInDirection(move->GetDirection());
+}
+
+void GameManager::UndoMove(BallMove* move)
+{
+  std::vector<BoardField*>* balls = move->GetBalls();
+  std::vector<BoardField*>* opponentBalls = move->GetOpponentBalls();
+  std::vector<BoardField*>::iterator i;
+  std::vector<BoardField*>::reverse_iterator ri;
+  BoardField* field = 0;
+  CPoint coord;
+
+  BoardField::Ball opponentBall = BoardField::NO_BALL;
+
+  opponentBall = BoardField::BLACK_BALL;
+  coord = GetNextFieldCoordinatesInDirection((*balls->begin())->GetFieldCoordinates(), move->GetDirection());
+  if (GetGameBoard()->GetBoardField(coord)->GetBall() == BoardField::BLACK_BALL) {
+    opponentBall = BoardField::WHITE_BALL;
+  }
+
+  SortBalls(move->GetOpponentBalls());
+
+  switch (move->GetDirection()) {
+  case UPLEFT:
+  case LEFT:
+  case DOWNLEFT:
+    // own balls
+    for (ri = balls->rbegin(); ri != balls->rend(); ++ri) {
+      field = *ri;
+      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
+      // we have to get the boardfield new, because it may be that the field in the collection
+      // belongs to the sim game board and not to this board
+      GetGameBoard()->GetBoardField(field->GetFieldCoordinates())->SetBall(GetGameBoard()->GetBoardField(coord)->GetBall());
+      GetGameBoard()->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
+      GetGameBoard()->GetBoardField(coord)->SetIsSelected(false);
+    }
+
+    // opponent balls
+    for (ri = opponentBalls->rbegin(); ri != opponentBalls->rend(); ++ri) {
+      field = *ri;
+      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
+      GetGameBoard()->GetBoardField(field->GetFieldCoordinates())->SetBall(opponentBall);
+
+      if (GetGameBoard()->GetBoardFieldExist(coord)) {
+        GetGameBoard()->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
+        GetGameBoard()->GetBoardField(coord)->SetIsSelected(false);
+      }
+      else {
+        RemoveLostBall(opponentBall);
+      }
+    }
+    break;
+  case UPRIGHT:
+  case RIGHT:
+  case DOWNRIGHT:
+    // own balls
+    for (i = balls->begin(); i != balls->end(); ++i) {
+      field = *i;
+      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
+      GetGameBoard()->GetBoardField(field->GetFieldCoordinates())->SetBall(GetGameBoard()->GetBoardField(coord)->GetBall());
+      GetGameBoard()->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
+      GetGameBoard()->GetBoardField(coord)->SetIsSelected(false);
+    }
+
+    // opponent balls
+    for (i = opponentBalls->begin(); i != opponentBalls->end(); ++i) {
+      field = *i;
+      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
+      GetGameBoard()->GetBoardField(field->GetFieldCoordinates())->SetBall(opponentBall);
+
+      if (GetGameBoard()->GetBoardFieldExist(coord)) {
+        GetGameBoard()->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
+        GetGameBoard()->GetBoardField(coord)->SetIsSelected(false);
+      }
+      else {
+        RemoveLostBall(opponentBall);
+      }
+    }
+    break;
+  }
+  mySelectedBalls->clear();
+}
+
 BallAxis GameManager::GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const
 {
   BallAxis ret = NO_VALID_AXIS;
@@ -440,6 +541,11 @@ struct BoardFieldSort
 void GameManager::SortSelectedBalls()
 {
   std::sort(mySelectedBalls->begin(), mySelectedBalls->end(), BoardFieldSort());
+}
+
+void GameManager::SortBalls(std::vector<BoardField*>* balls)
+{
+  std::sort(balls->begin(), balls->end(), BoardFieldSort());
 }
 
 void GameManager::GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1,
@@ -767,6 +873,16 @@ void GameManager::AddLostBall(BoardField::Ball ball)
   }
   else if (ball == BoardField::WHITE_BALL) {
     ++myLostBallsPlayer2;
+  }
+}
+
+void GameManager::RemoveLostBall(BoardField::Ball ball)
+{
+  if (ball == BoardField::BLACK_BALL) {
+    --myLostBallsPlayer1;
+  }
+  else if (ball == BoardField::WHITE_BALL) {
+    --myLostBallsPlayer2;
   }
 }
 

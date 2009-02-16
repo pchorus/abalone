@@ -20,11 +20,7 @@ void ComputerPlayer::TakeNextTurn()
   BallMove move = CalculateNextMove();
   std::vector<BoardField*>::iterator boardFieldIterator;
 
-  for (boardFieldIterator = move.GetBalls()->begin(); boardFieldIterator != move.GetBalls()->end(); ++boardFieldIterator) {
-    GetGameManager()->AddSelectedBall(*boardFieldIterator);
-  }
-
-  GetGameManager()->MoveBallsInDirection(move.GetDirection());
+  GetGameManager()->DoMove(&move);
 }
 
 void ComputerPlayer::AddPossibleMovesOneBall(std::vector<BallMove*>& ballMoves) const
@@ -167,28 +163,39 @@ void ComputerPlayer::AddPossibleMovesThreeBalls(std::vector<BallMove*>& ballMove
 void ComputerPlayer::CheckDirections(std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const
 {
   bool isAttacking = false;
+  bool ejectsBall = false;
 
-  if (myGameManager->IsPossibleDirection(UPLEFT, isAttacking, ballFields) && IsMoveAllowed(UPLEFT, ballFields)) {
-    ballMoves.push_back(CreateBallMove(UPLEFT, isAttacking, ballFields));
+  std::vector<BoardField*>* opponentFields = new std::vector<BoardField*>;
+
+  if (myGameManager->IsPossibleDirection(UPLEFT, isAttacking, ejectsBall, ballFields, opponentFields) && IsMoveAllowed(UPLEFT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(UPLEFT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
   }
-  if (myGameManager->IsPossibleDirection(UPRIGHT, isAttacking, ballFields) && IsMoveAllowed(UPRIGHT, ballFields)) {
-    ballMoves.push_back(CreateBallMove(UPRIGHT, isAttacking, ballFields));
+  if (myGameManager->IsPossibleDirection(UPRIGHT, isAttacking, ejectsBall, ballFields, opponentFields) && IsMoveAllowed(UPRIGHT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(UPRIGHT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
   }
-  if (myGameManager->IsPossibleDirection(LEFT, isAttacking, ballFields) && IsMoveAllowed(LEFT, ballFields)) {
-    ballMoves.push_back(CreateBallMove(LEFT, isAttacking, ballFields));
+  if (myGameManager->IsPossibleDirection(LEFT, isAttacking, ejectsBall, ballFields, opponentFields) && IsMoveAllowed(LEFT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(LEFT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
   }
-  if (myGameManager->IsPossibleDirection(RIGHT, isAttacking, ballFields) && IsMoveAllowed(RIGHT, ballFields)) {
-    ballMoves.push_back(CreateBallMove(RIGHT, isAttacking, ballFields));
+  if (myGameManager->IsPossibleDirection(RIGHT, isAttacking, ejectsBall, ballFields, opponentFields) && IsMoveAllowed(RIGHT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(RIGHT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
   }
-  if (myGameManager->IsPossibleDirection(DOWNLEFT, isAttacking, ballFields) && IsMoveAllowed(DOWNLEFT, ballFields)) {
-    ballMoves.push_back(CreateBallMove(DOWNLEFT, isAttacking, ballFields));
+  if (myGameManager->IsPossibleDirection(DOWNLEFT, isAttacking, ejectsBall, ballFields, opponentFields) && IsMoveAllowed(DOWNLEFT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(DOWNLEFT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
   }
-  if (myGameManager->IsPossibleDirection(DOWNRIGHT, isAttacking, ballFields) && IsMoveAllowed(DOWNRIGHT, ballFields)) {
-    ballMoves.push_back(CreateBallMove(DOWNRIGHT, isAttacking, ballFields));
+  if (myGameManager->IsPossibleDirection(DOWNRIGHT, isAttacking, ejectsBall, ballFields, opponentFields) && IsMoveAllowed(DOWNRIGHT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(DOWNRIGHT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
   }
+
+  delete opponentFields;
 }
 
-BallMove* ComputerPlayer::CreateBallMove(Direction direction, bool isAttacking, std::vector<BoardField*>* ballFields) const
+BallMove* ComputerPlayer::CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const
 {
   BallMove* ballMove = new BallMove;
 
@@ -207,8 +214,23 @@ BallMove* ComputerPlayer::CreateBallMove(Direction direction, bool isAttacking, 
     ballMove->AddBall(*i);
   }
 
+  i = opponentFields->begin();
+
+  if (opponentFields->size() >= 1) {
+    ballMove->AddOpponentBall(*i);
+  }
+  if (opponentFields->size() >= 2) {
+    ++i;
+    ballMove->AddOpponentBall(*i);
+  }
+  if (opponentFields->size() >= 3) {
+    ++i;
+    ballMove->AddOpponentBall(*i);
+  }
+
   ballMove->SetDirection(direction);
   ballMove->SetIsAttacking(isAttacking);
+  ballMove->SetEjectsBall(ejectsBall);
 
   return ballMove;
 }

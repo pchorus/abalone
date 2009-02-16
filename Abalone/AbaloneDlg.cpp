@@ -672,12 +672,12 @@ void CAbaloneDlg::DrawLostBalls()
 void CAbaloneDlg::EnableDirectionButtons()
 {
   bool dummy = false;
-  myBtnMoveUpLeft.EnableWindow(myGameManager->IsPossibleDirection(UPLEFT, dummy));
-  myBtnMoveUpRight.EnableWindow(myGameManager->IsPossibleDirection(UPRIGHT, dummy));
-  myBtnMoveLeft.EnableWindow(myGameManager->IsPossibleDirection(LEFT, dummy));
-  myBtnMoveRight.EnableWindow(myGameManager->IsPossibleDirection(RIGHT, dummy));
-  myBtnMoveDownLeft.EnableWindow(myGameManager->IsPossibleDirection(DOWNLEFT, dummy));
-  myBtnMoveDownRight.EnableWindow(myGameManager->IsPossibleDirection(DOWNRIGHT, dummy));
+  myBtnMoveUpLeft.EnableWindow(myGameManager->IsPossibleDirection(UPLEFT, dummy, dummy));
+  myBtnMoveUpRight.EnableWindow(myGameManager->IsPossibleDirection(UPRIGHT, dummy, dummy));
+  myBtnMoveLeft.EnableWindow(myGameManager->IsPossibleDirection(LEFT, dummy, dummy));
+  myBtnMoveRight.EnableWindow(myGameManager->IsPossibleDirection(RIGHT, dummy, dummy));
+  myBtnMoveDownLeft.EnableWindow(myGameManager->IsPossibleDirection(DOWNLEFT, dummy, dummy));
+  myBtnMoveDownRight.EnableWindow(myGameManager->IsPossibleDirection(DOWNRIGHT, dummy, dummy));
 }
 
 void CAbaloneDlg::DisableDirectionButtons()

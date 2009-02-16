@@ -20,7 +20,7 @@ enum BallAxis { NO_VALID_AXIS, HORIZONTAL, DOWNLEFT_TO_UPPERRIGHT, UPPERLEFT_TO_
 class ABALONE_BASE_DLLINTERFACE GameManager {
 
 public:
-  // contructor / destructor
+  // constructor / destructor
   GameManager();
   ~GameManager();
 
@@ -35,8 +35,11 @@ public:
   void SetGameStarted(bool started);
   void SetMaxNumberOfTurns(int maxTurns);
 
-  BOOL IsPossibleDirection(Direction direction, bool& isAttacking, std::vector<BoardField*>* balls = 0) const;
+  BOOL IsPossibleDirection(Direction direction, bool& isAttacking, bool& ejectsBall, std::vector<BoardField*>* balls = 0, std::vector<BoardField*>* opponentBalls = 0) const;
   void MoveBallsInDirection(Direction direction);
+  void DoMove(BallMove* move);
+  void UndoMove(BallMove* move);
+
   bool IsFirstPlayersTurn() const;
 
   bool CanSelectBall(BoardField* field) const;
@@ -90,10 +93,13 @@ private:
     BoardField*& selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
 
   void AddLostBall(BoardField::Ball ball);
+  void RemoveLostBall(BoardField::Ball ball);
 
   // sorts the vector of selected balls, such that they are
   // in the array as on the board from left to right
   void SortSelectedBalls();
+  // sorts the passed collection of balls
+  void SortBalls(std::vector<BoardField*>* balls);
 
   // ball start formations
   void SetBallsStandardFormation();

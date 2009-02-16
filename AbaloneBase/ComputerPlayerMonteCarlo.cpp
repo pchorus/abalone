@@ -121,15 +121,11 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     // copy current real situation to the gameboard for simulation
     mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
 
-    for (i = ballMove->GetBalls()->begin(); i != ballMove->GetBalls()->end(); ++i) {
-      mySimGameManager->AddSelectedBall(mySimGameManager->GetGameBoard()->GetBoardField((*i)->GetFieldCoordinates()));
-    }
-
     // mySimGameManager->ResetLostBalls();
     mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
     mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
     mySimGameManager->SetStartPlayer(startPlayer);
-    mySimGameManager->MoveBallsInDirection(ballMove->GetDirection());
+    mySimGameManager->DoMove(ballMove);
     mySimGameManager->SetGameStarted(true);
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();

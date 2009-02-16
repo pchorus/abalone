@@ -46,7 +46,7 @@ protected:
 
 private:
   void CheckDirections(std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const;
-  BallMove* CreateBallMove(Direction direction, bool isAttacking, std::vector<BoardField*>* ballFields) const;
+  BallMove* CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const;
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
 

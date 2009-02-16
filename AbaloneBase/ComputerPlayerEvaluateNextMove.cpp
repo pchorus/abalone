@@ -36,12 +36,27 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   double bestRating = -1.;
   double newRating = -1.;
 
+  // TODO: perhaps first of all add the moves with three balls
+  // because they are more promising
   AddPossibleMovesOneBall(ballMoves);
   AddPossibleMovesTwoBalls(ballMoves);
   AddPossibleMovesThreeBalls(ballMoves);
 
   // destroy all BallMove objects which were created in the AddPossibleMoves methods
   std::vector<BallMove*>::iterator ballMoveIterator;
+
+  // copy current real situation to the game board for simulation
+  mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
+
+  Player::PlayerNumber startPlayer = Player::PLAYER_ONE;
+
+  if (GetGameManager()->IsFirstPlayersTurn()) {
+    startPlayer = Player::PLAYER_TWO;
+  }
+
+  mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
+  mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
+  mySimGameManager->SetStartPlayer(startPlayer);
 
   CString out;
   out = GetName() + ":\n";
@@ -89,29 +104,13 @@ Player::PlayerType ComputerPlayerEvaluateNextMove::GetType() const
 
 double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
 {
-  Player::PlayerNumber startPlayer = Player::PLAYER_ONE;
-  std::vector<BoardField*>::const_iterator i;
+  double ret = 0.;
 
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    startPlayer = Player::PLAYER_TWO;
-  }
+  mySimGameManager->DoMove(ballMove);
+  ret = EvaluateMove();
+  mySimGameManager->UndoMove(ballMove);
 
-  // copy current real situation to the gameboard for simulation
-  mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
-
-  for (i = ballMove->GetBalls()->begin(); i != ballMove->GetBalls()->end(); ++i) {
-    mySimGameManager->AddSelectedBall(mySimGameManager->GetGameBoard()->GetBoardField((*i)->GetFieldCoordinates()));
-  }
-
-  mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
-  mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
-  mySimGameManager->SetStartPlayer(startPlayer);
-  mySimGameManager->MoveBallsInDirection(ballMove->GetDirection());
-  mySimGameManager->SetGameStarted(true);
-
-  Output::Message2(mySimGameManager->GetGameBoard()->ToString(), false, true);
-
-  return EvaluateMove();
+  return ret;
 }
 
 double ComputerPlayerEvaluateNextMove::EvaluateMove() const
