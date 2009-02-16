@@ -45,9 +45,9 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   double bestRating = -1.;
   double newRating = -1.;
 
-  AddPossibleMovesOneBall(ballMoves);
-  AddPossibleMovesTwoBalls(ballMoves);
-  AddPossibleMovesThreeBalls(ballMoves);
+  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves);
 
   // destroy all BallMove objects which were created in the AddPossibleMoves methods
   std::vector<BallMove*>::iterator ballMoveIterator;

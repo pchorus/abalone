@@ -22,11 +22,10 @@ public:
 
   virtual PlayerType GetType() const;
 
-private:
   // test if the move is allowed by the computer player
 //  virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
 
+private:
   std::vector<BallMove*> myBallMoves;
   bool myAllowAllMoves;
-
 };

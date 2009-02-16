@@ -23,15 +23,15 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
 
   myBallMoves.clear();
 
-  AddPossibleMovesOneBall(myBallMoves);
-  AddPossibleMovesTwoBalls(myBallMoves);
-  AddPossibleMovesThreeBalls(myBallMoves);
+  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves);
 
   if (myBallMoves.empty()) {
     myAllowAllMoves = true;
-    AddPossibleMovesOneBall(myBallMoves);
-    AddPossibleMovesTwoBalls(myBallMoves);
-    AddPossibleMovesThreeBalls(myBallMoves);
+    GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves);
+    GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves);
+    GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves);
     myAllowAllMoves = false;
 
   }

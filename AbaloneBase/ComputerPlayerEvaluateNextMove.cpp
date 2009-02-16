@@ -38,9 +38,9 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 
   // TODO: perhaps first of all add the moves with three balls
   // because they are more promising
-  AddPossibleMovesOneBall(ballMoves);
-  AddPossibleMovesTwoBalls(ballMoves);
-  AddPossibleMovesThreeBalls(ballMoves);
+  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves);
 
   // destroy all BallMove objects which were created in the AddPossibleMoves methods
   std::vector<BallMove*>::iterator ballMoveIterator;

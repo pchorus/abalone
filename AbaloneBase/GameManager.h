@@ -13,6 +13,7 @@
 
 class GameBoard;
 class BallMove;
+class ComputerPlayer;
 
 // the axis on which the selected balls are lying
 enum BallAxis { NO_VALID_AXIS, HORIZONTAL, DOWNLEFT_TO_UPPERRIGHT, UPPERLEFT_TO_DOWNRIGHT };
@@ -49,6 +50,10 @@ public:
   void ClearSelectedBalls();
 
   void TurnIsOver();
+
+  void AddPossibleMovesOneBall(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
+  void AddPossibleMovesTwoBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
+  void AddPossibleMovesThreeBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
 
   int GetLostBallsPlayer1() const;
   void SetLostBallsPlayer1(int lostBalls);
@@ -87,6 +92,9 @@ public:
   int CalcGroupingField(const Player* player, CPoint coord) const;
 
 private:
+  void CheckDirections(const ComputerPlayer* player, std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const;
+  BallMove* CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const;
+
   // help methods
   BallAxis GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const;
   void GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1, BoardField*& selectedField2,

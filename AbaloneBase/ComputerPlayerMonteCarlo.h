@@ -22,10 +22,11 @@ public:
 
   virtual PlayerType GetType() const;
 
-private:
-  size_t GetGamesToSimulate() const;
   // test if the move is allowed by the computer player
   virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
+
+private:
+  size_t GetGamesToSimulate() const;
   double SimulateGamesWithMove(BallMove* ballMove) const;
   // evaluates the outcome of a simulated game
   double EvaluateSimGame() const;

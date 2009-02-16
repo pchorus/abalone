@@ -741,6 +741,7 @@ double GameManager::CalcAvgGrouping(const Player* player) const
 
 double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
 {
+  // TODO: Player is not longer needed
   double ret = 0.;
   std::vector<BallMove*> ballMoves;
   ballMoves.reserve(100);
@@ -749,8 +750,8 @@ double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
   BallMove* currentMove = 0;
   const ComputerPlayer* computerPlayer = dynamic_cast<const ComputerPlayer*>(player);
 
-  computerPlayer->AddPossibleMovesTwoBalls(ballMoves);
-  computerPlayer->AddPossibleMovesThreeBalls(ballMoves);
+  AddPossibleMovesTwoBalls(computerPlayer, ballMoves);
+  AddPossibleMovesThreeBalls(computerPlayer, ballMoves);
 
   for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
     currentMove = *i;
@@ -787,8 +788,8 @@ double GameManager::CalcAttackedByOpponent(const Player* player) const
     computerPlayer = dynamic_cast<const ComputerPlayer*>(myPlayer1);
   }
 
-  computerPlayer->AddPossibleMovesTwoBalls(ballMoves);
-  computerPlayer->AddPossibleMovesThreeBalls(ballMoves);
+  AddPossibleMovesTwoBalls(computerPlayer, ballMoves);
+  AddPossibleMovesThreeBalls(computerPlayer, ballMoves);
 
   for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
     currentMove = *i;
@@ -909,6 +910,142 @@ void GameManager::TurnIsOver()
       ASSERT(false);
     }
     ++turnCount;
+  }
+}
+
+void GameManager::AddPossibleMovesOneBall(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const
+{
+  BoardField* field = 0;
+  std::vector<BoardField*> ballFields;
+  GameBoard* gameBoard = GetGameBoard();
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      ballFields.clear();
+
+      if (gameBoard->GetBoardFieldExist(x, y)) {
+        field = gameBoard->GetBoardField(x, y);
+        if (field->GetBall() == player->GetBall()) {
+          ballFields.push_back(field);
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+    }
+  }
+}
+
+void GameManager::AddPossibleMovesTwoBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const
+{
+  BoardField* field1 = 0;
+  BoardField* field2 = 0;
+  std::vector<BoardField*> ballFields;
+  GameBoard* gameBoard = GetGameBoard();
+
+  // for every ball we check the movement for this ball and a neighbor ball to the upper right, right and
+  // downright, so every combination of balls is checked only once
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      ballFields.clear();
+
+      // check balls from downleft to upright
+      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y+1)) {
+        field1 = gameBoard->GetBoardField(x, y);
+        field2 = gameBoard->GetBoardField(x+1, y+1);
+        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+
+      // check balls from left to right
+      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y)) {
+        ballFields.clear();
+        field1 = gameBoard->GetBoardField(x, y);
+        field2 = gameBoard->GetBoardField(x+1, y);
+        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+      // check balls from up left to downright
+      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x, y-1)) {
+        ballFields.clear();
+        field1 = gameBoard->GetBoardField(x, y);
+        field2 = gameBoard->GetBoardField(x, y-1);
+        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+    }
+  }
+}
+
+void GameManager::AddPossibleMovesThreeBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const
+{
+  BoardField* field1 = 0;
+  BoardField* field2 = 0;
+  BoardField* field3 = 0;
+  std::vector<BoardField*> ballFields;
+  GameBoard* gameBoard = GetGameBoard();
+
+  // for every ball we check the movement for this ball and a neighbor ball to the upper right, right and
+  // downright, so every combination of balls is checked only once
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      ballFields.clear();
+
+      // check balls from downleft to upright
+      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y+1) && gameBoard->GetBoardFieldExist(x+2, y+2)) {
+        field1 = gameBoard->GetBoardField(x, y);
+        field2 = gameBoard->GetBoardField(x+1, y+1);
+        field3 = gameBoard->GetBoardField(x+2, y+2);
+        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall() && field3->GetBall() == player->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+          ballFields.push_back(field3);
+
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+
+      // check balls from left to right
+      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y) && gameBoard->GetBoardFieldExist(x+2, y)) {
+        ballFields.clear();
+        field1 = gameBoard->GetBoardField(x, y);
+        field2 = gameBoard->GetBoardField(x+1, y);
+        field3 = gameBoard->GetBoardField(x+2, y);
+
+        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall() && field3->GetBall() == player->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+          ballFields.push_back(field3);
+
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+      // check balls from upleft to downright
+      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x, y-1) && gameBoard->GetBoardFieldExist(x, y-2)) {
+        ballFields.clear();
+        field1 = gameBoard->GetBoardField(x, y);
+        field2 = gameBoard->GetBoardField(x, y-1);
+        field3 = gameBoard->GetBoardField(x, y-2);
+
+        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall() && field3->GetBall() == player->GetBall()) {
+          ballFields.push_back(field1);
+          ballFields.push_back(field2);
+          ballFields.push_back(field3);
+
+          CheckDirections(player, &ballFields, ballMoves);
+        }
+      }
+    }
   }
 }
 
@@ -1048,4 +1185,79 @@ void GameManager::SetBallsCustomFormation(const CString& formation)
       input.close();
     }
   }
+}
+
+void GameManager::CheckDirections(const ComputerPlayer* player, std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const
+{
+  bool isAttacking = false;
+  bool ejectsBall = false;
+
+  std::vector<BoardField*>* opponentFields = new std::vector<BoardField*>;
+
+  if (IsPossibleDirection(UPLEFT, isAttacking, ejectsBall, ballFields, opponentFields) && player->IsMoveAllowed(UPLEFT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(UPLEFT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
+  }
+  if (IsPossibleDirection(UPRIGHT, isAttacking, ejectsBall, ballFields, opponentFields) && player->IsMoveAllowed(UPRIGHT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(UPRIGHT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
+  }
+  if (IsPossibleDirection(LEFT, isAttacking, ejectsBall, ballFields, opponentFields) && player->IsMoveAllowed(LEFT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(LEFT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
+  }
+  if (IsPossibleDirection(RIGHT, isAttacking, ejectsBall, ballFields, opponentFields) && player->IsMoveAllowed(RIGHT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(RIGHT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
+  }
+  if (IsPossibleDirection(DOWNLEFT, isAttacking, ejectsBall, ballFields, opponentFields) && player->IsMoveAllowed(DOWNLEFT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(DOWNLEFT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
+  }
+  if (IsPossibleDirection(DOWNRIGHT, isAttacking, ejectsBall, ballFields, opponentFields) && player->IsMoveAllowed(DOWNRIGHT, ballFields)) {
+    ballMoves.push_back(CreateBallMove(DOWNRIGHT, isAttacking, ejectsBall, ballFields, opponentFields));
+    opponentFields->clear();
+  }
+
+  delete opponentFields;
+}
+
+BallMove* GameManager::CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const
+{
+  BallMove* ballMove = new BallMove;
+
+  std::vector<BoardField*>::iterator i;
+  i = ballFields->begin();
+
+  if (ballFields->size() >= 1) {
+    ballMove->AddBall(*i);
+  }
+  if (ballFields->size() >= 2) {
+    ++i;
+    ballMove->AddBall(*i);
+  }
+  if (ballFields->size() >= 3) {
+    ++i;
+    ballMove->AddBall(*i);
+  }
+
+  i = opponentFields->begin();
+
+  if (opponentFields->size() >= 1) {
+    ballMove->AddOpponentBall(*i);
+  }
+  if (opponentFields->size() >= 2) {
+    ++i;
+    ballMove->AddOpponentBall(*i);
+  }
+  if (opponentFields->size() >= 3) {
+    ++i;
+    ballMove->AddOpponentBall(*i);
+  }
+
+  ballMove->SetDirection(direction);
+  ballMove->SetIsAttacking(isAttacking);
+  ballMove->SetEjectsBall(ejectsBall);
+
+  return ballMove;
 }
