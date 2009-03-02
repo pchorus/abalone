@@ -9,6 +9,8 @@
 
 #include "resource.h"		// Hauptsymbole
 
+#include "AbaloneBase/Player.h"
+#include <map>
 
 // CAbaloneApp:
 // Siehe Abalone.cpp für die Implementierung dieser Klasse
@@ -20,12 +22,23 @@ public:
 	CAbaloneApp();
 
 // Überschreibungen
-	public:
+public:
 	virtual BOOL InitInstance();
 
 // Implementierung
 
 	DECLARE_MESSAGE_MAP()
+
+private:
+  void ParseParam();
+  void PlayBatchGame();
+  Player::PlayerType GetPlayerType(const CString& playerType);
+  bool FormationFileExists();
+  void ShowHelpText();
+
+  bool myIsBatch;
+  bool myIsHelp;
+  std::map<CString, CString> myCmdLineParams;
 };
 
 extern CAbaloneApp theApp;
