@@ -206,6 +206,7 @@ HCURSOR CAbaloneDlg::OnQueryDragIcon()
 
 void CAbaloneDlg::DrawBoard()
 {
+  CString hlp;
   CRect rect;
   GetClientRect(&rect);
   CDC* pDC = GetDC();
@@ -265,6 +266,11 @@ void CAbaloneDlg::DrawBoard()
     gameBoard->GetBoardField(i, 0)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
+
+    // Label
+    CRect rect(currentPoint.x+4, currentPoint.y + 10, currentPoint.x + 20, currentPoint.y + 35);
+    hlp.Format("%d", i+1);
+    pDC->DrawText(hlp, rect, 0);
   }
 
   // rechts unten nach rechts mitte (5A nach 9E)
@@ -277,6 +283,11 @@ void CAbaloneDlg::DrawBoard()
     gameBoard->GetBoardField(i+4, i)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
+
+    // Label
+    CRect rect(currentPoint.x+4, currentPoint.y + 10, currentPoint.x + 20, currentPoint.y + 35);
+    hlp.Format("%d", i+5);
+    pDC->DrawText(hlp, rect, 0);
   }
 
   // rechts mitte nach rechts oben (9E nach 9I)
@@ -311,6 +322,11 @@ void CAbaloneDlg::DrawBoard()
     gameBoard->GetBoardField(i, 4+i)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
+
+    // Label
+    CRect rect(currentPoint.x - 25, currentPoint.y - 7, currentPoint.x - 5, currentPoint.y + 20);
+    hlp = char(69+i);
+    pDC->DrawText(hlp, rect, 0);
   }
 
   // links unten nach links mitte
@@ -322,6 +338,11 @@ void CAbaloneDlg::DrawBoard()
     gameBoard->GetBoardField(0, i)->SetGUICoordinates(currentPoint);
     pDC->Ellipse(currentPoint.x-BOARD_POINT_RADIUS, currentPoint.y-BOARD_POINT_RADIUS,
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
+
+    // Label
+    CRect rect(currentPoint.x - 25, currentPoint.y - 7, currentPoint.x - 5, currentPoint.y + 20);
+    hlp = char(65+i);
+    pDC->DrawText(hlp, rect, 0);
   }
 
   int xLeft = 0;
