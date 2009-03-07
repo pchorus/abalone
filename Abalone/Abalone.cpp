@@ -227,5 +227,26 @@ bool CAbaloneApp::FormationFileExists()
 
 void CAbaloneApp::ShowHelpText()
 {
-  std::cout << "You need help?" << std::endl;
+  CString msg("Please use the following parameters to run the program in batch mode:\n\n");
+  msg += "  -batch\t\tenables the batch mode\n";
+  msg += "  -player1=XX\tsets the player type for player1\n";
+  msg += "  -player2=XX\tsets the player type for player2\n";
+  msg += "  -formation=XXX\tsets the start formation for the game\n";
+  msg += "\n";
+  msg += "\n";
+  msg += "Player types:\n";
+  msg += "\n";
+  msg += "  - AB\tAlpha Beta search\n";
+  msg += "  - MC\tMonte Carlo search\n";
+  msg += "  - ENM\tEvaluate the next move\n";
+  msg += "  - RM\tRandom Moves";
+  msg += "\n";
+  msg += "\n";
+  msg += "start formations:\n";
+  msg += "\n";
+  msg += "  - Standard\n";
+  msg += "  - Belgian Daisy\n";
+  msg += "  - or custom formation, file in the \"formations\\\"-folder\n";
+
+  AfxMessageBox(msg);
 }
