@@ -887,7 +887,7 @@ void GameManager::RemoveLostBall(BoardField::Ball ball)
   }
 }
 
-void GameManager::TurnIsOver()
+void GameManager::TurnIsOver(LPVOID pParam)
 {
   ASSERT(myNextTurn);
   ComputerPlayer* computerPlayer = 0;
@@ -910,6 +910,8 @@ void GameManager::TurnIsOver()
       ASSERT(false);
     }
     ++turnCount;
+    if (pParam)
+      ::PostMessage((HWND)pParam, WM_COMPUTER_CALC_FINISHED, 0, 0);
   }
 }
 

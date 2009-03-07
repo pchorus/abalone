@@ -11,6 +11,8 @@
 #include "BoardField.h"
 #include <vector>
 
+#define WM_COMPUTER_CALC_FINISHED     WM_USER + 23
+
 class GameBoard;
 class BallMove;
 class ComputerPlayer;
@@ -49,7 +51,7 @@ public:
   void RemoveSelectedBall(BoardField* field);
   void ClearSelectedBalls();
 
-  void TurnIsOver();
+  void TurnIsOver(LPVOID pParam = 0);
 
   void AddPossibleMovesOneBall(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
   void AddPossibleMovesTwoBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;

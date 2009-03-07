@@ -16,6 +16,23 @@
 #define new DEBUG_NEW
 #endif
 
+// global variables to start the computer player calculations in another thread
+GameManager* gameManager = 0;
+
+
+// this method must be called after a player finished his turn
+UINT TurnIsOver(LPVOID pParam)
+{
+  gameManager->TurnIsOver(pParam);
+
+  // TODO: PostMessage is called out of gameManager->TurnIsOver
+  // it could be more expensive for MonteCarlo. If that is the case
+  // we put this PostMessage here in the code and take it out of the GameManager
+
+  //  ::PostMessage((HWND)pParam, WM_COMPUTER_CALC_FINISHED, 0, 0);
+  return 0;
+}
+
 
 // CAboutDlg-Dialogfeld für Anwendungsbefehl "Info"
 
@@ -58,6 +75,7 @@ CAbaloneDlg::CAbaloneDlg(CWnd* pParent /*=NULL*/)
 , myGameManager(new GameManager)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+  gameManager = myGameManager;
 }
 
 void CAbaloneDlg::DoDataExchange(CDataExchange* pDX)
@@ -93,6 +111,7 @@ BEGIN_MESSAGE_MAP(CAbaloneDlg, CDialog)
   ON_BN_CLICKED(IDC_BTN_MOVE_RIGHT, &CAbaloneDlg::OnBtnMoveRight)
   ON_BN_CLICKED(IDC_BTN_MOVE_DOWNLEFT, &CAbaloneDlg::OnBtnMoveDownLeft)
   ON_BN_CLICKED(IDC_BTN_MOVE_DOWNRIGHT, &CAbaloneDlg::OnBtnMoveDownRight)
+  ON_MESSAGE(WM_COMPUTER_CALC_FINISHED, &CAbaloneDlg::ComputerCalcFinished)
 END_MESSAGE_MAP()
 
 
@@ -573,8 +592,8 @@ void CAbaloneDlg::OnNewGame()
 
     myGameManager->SetGameStarted(true);
     myGameManager->SetMaxNumberOfTurns(300);
-    TurnIsOver();
-    Invalidate();
+
+    AfxBeginThread(TurnIsOver, GetSafeHwnd());
   }
 }
 
@@ -714,45 +733,58 @@ void CAbaloneDlg::DisableDirectionButtons()
 void CAbaloneDlg::OnBtnMoveUpLeft()
 {
   myGameManager->MoveBallsInDirection(UPLEFT);
-  TurnIsOver();
+  DisableDirectionButtons();
+  AfxBeginThread(TurnIsOver, GetSafeHwnd());
+  Invalidate();
 }
 
 void CAbaloneDlg::OnBtnMoveUpRight()
 {
   myGameManager->MoveBallsInDirection(UPRIGHT);
-  TurnIsOver();
+  DisableDirectionButtons();
+  AfxBeginThread(TurnIsOver, GetSafeHwnd());
+  Invalidate();
 }
 
 void CAbaloneDlg::OnBtnMoveLeft()
 {
   myGameManager->MoveBallsInDirection(LEFT);
-  TurnIsOver();
+  DisableDirectionButtons();
+  AfxBeginThread(TurnIsOver, GetSafeHwnd());
+  Invalidate();
 }
 
 void CAbaloneDlg::OnBtnMoveRight()
 {
   myGameManager->MoveBallsInDirection(RIGHT);
-  TurnIsOver();
+  DisableDirectionButtons();
+  AfxBeginThread(TurnIsOver, GetSafeHwnd());
+  Invalidate();
 }
 
 void CAbaloneDlg::OnBtnMoveDownLeft()
 {
   myGameManager->MoveBallsInDirection(DOWNLEFT);
-  TurnIsOver();
+  DisableDirectionButtons();
+  AfxBeginThread(TurnIsOver, GetSafeHwnd());
+  Invalidate();
 }
 
 void CAbaloneDlg::OnBtnMoveDownRight()
 {
   myGameManager->MoveBallsInDirection(DOWNRIGHT);
-  TurnIsOver();
+  DisableDirectionButtons();
+  AfxBeginThread(TurnIsOver, GetSafeHwnd());
+  Invalidate();
 }
 
-void CAbaloneDlg::TurnIsOver()
+LRESULT CAbaloneDlg::ComputerCalcFinished(WPARAM /*wParam*/, LPARAM /*lParam*/)
 {
   EnableDirectionButtons();
   myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayerForNextTurn()->GetName() + "'s turn!");
-  myGameManager->TurnIsOver();
   Invalidate();
+
+  return 0;
 }
 
 BOOL CAbaloneDlg::OnEraseBkgnd(CDC* pDC)

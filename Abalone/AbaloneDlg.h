@@ -48,6 +48,8 @@ protected:
   afx_msg void OnBtnMoveRight();
   afx_msg void OnBtnMoveDownLeft();
   afx_msg void OnBtnMoveDownRight();
+  afx_msg LRESULT ComputerCalcFinished(WPARAM wParam, LPARAM lParam);
+
   afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	DECLARE_MESSAGE_MAP()
 
@@ -69,9 +71,6 @@ protected:
 private:
   CRect GetBoardRect() const;
   int GetBoardRadius() const;
-
-  // must be called after a player finished his turn
-  void TurnIsOver();
 
   // the GameManager
   GameManager* myGameManager;
