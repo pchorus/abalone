@@ -733,6 +733,10 @@ void CAbaloneDlg::DisableDirectionButtons()
 
 void CAbaloneDlg::OnBtnMoveUpLeft()
 {
+  Player* nextPlayer = myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()
+    ? myGameManager->GetPlayer2() : myGameManager->GetPlayer1();
+  myStaticPlayersTurn.SetWindowText("It is " + nextPlayer->GetName() + "'s turn!");
+
   myGameManager->MoveBallsInDirection(UPLEFT);
   DisableDirectionButtons();
   AfxBeginThread(TurnIsOver, GetSafeHwnd());
@@ -741,6 +745,10 @@ void CAbaloneDlg::OnBtnMoveUpLeft()
 
 void CAbaloneDlg::OnBtnMoveUpRight()
 {
+  Player* nextPlayer = myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()
+    ? myGameManager->GetPlayer2() : myGameManager->GetPlayer1();
+  myStaticPlayersTurn.SetWindowText("It is " + nextPlayer->GetName() + "'s turn!");
+
   myGameManager->MoveBallsInDirection(UPRIGHT);
   DisableDirectionButtons();
   AfxBeginThread(TurnIsOver, GetSafeHwnd());
@@ -749,6 +757,10 @@ void CAbaloneDlg::OnBtnMoveUpRight()
 
 void CAbaloneDlg::OnBtnMoveLeft()
 {
+  Player* nextPlayer = myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()
+    ? myGameManager->GetPlayer2() : myGameManager->GetPlayer1();
+  myStaticPlayersTurn.SetWindowText("It is " + nextPlayer->GetName() + "'s turn!");
+
   myGameManager->MoveBallsInDirection(LEFT);
   DisableDirectionButtons();
   AfxBeginThread(TurnIsOver, GetSafeHwnd());
@@ -757,6 +769,10 @@ void CAbaloneDlg::OnBtnMoveLeft()
 
 void CAbaloneDlg::OnBtnMoveRight()
 {
+  Player* nextPlayer = myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()
+    ? myGameManager->GetPlayer2() : myGameManager->GetPlayer1();
+  myStaticPlayersTurn.SetWindowText("It is " + nextPlayer->GetName() + "'s turn!");
+
   myGameManager->MoveBallsInDirection(RIGHT);
   DisableDirectionButtons();
   AfxBeginThread(TurnIsOver, GetSafeHwnd());
@@ -765,6 +781,10 @@ void CAbaloneDlg::OnBtnMoveRight()
 
 void CAbaloneDlg::OnBtnMoveDownLeft()
 {
+  Player* nextPlayer = myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()
+    ? myGameManager->GetPlayer2() : myGameManager->GetPlayer1();
+  myStaticPlayersTurn.SetWindowText("It is " + nextPlayer->GetName() + "'s turn!");
+
   myGameManager->MoveBallsInDirection(DOWNLEFT);
   DisableDirectionButtons();
   AfxBeginThread(TurnIsOver, GetSafeHwnd());
@@ -773,8 +793,13 @@ void CAbaloneDlg::OnBtnMoveDownLeft()
 
 void CAbaloneDlg::OnBtnMoveDownRight()
 {
+  Player* nextPlayer = myGameManager->GetPlayerForNextTurn() == myGameManager->GetPlayer1()
+    ? myGameManager->GetPlayer2() : myGameManager->GetPlayer1();
+  myStaticPlayersTurn.SetWindowText("It is " + nextPlayer->GetName() + "'s turn!");
+
   myGameManager->MoveBallsInDirection(DOWNRIGHT);
   DisableDirectionButtons();
+
   AfxBeginThread(TurnIsOver, GetSafeHwnd());
   Invalidate();
 }
