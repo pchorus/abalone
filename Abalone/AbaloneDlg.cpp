@@ -287,7 +287,7 @@ void CAbaloneDlg::DrawBoard()
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
 
     // Label
-    CRect rect(currentPoint.x+4, currentPoint.y + 10, currentPoint.x + 20, currentPoint.y + 35);
+    CRect rect(currentPoint.x+8, currentPoint.y + 25, currentPoint.x + 28, currentPoint.y + 60);
     hlp.Format("%d", i+1);
     pDC->DrawText(hlp, rect, 0);
   }
@@ -304,7 +304,7 @@ void CAbaloneDlg::DrawBoard()
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
 
     // Label
-    CRect rect(currentPoint.x+4, currentPoint.y + 10, currentPoint.x + 20, currentPoint.y + 35);
+    CRect rect(currentPoint.x+8, currentPoint.y + 25, currentPoint.x + 28, currentPoint.y + 60);
     hlp.Format("%d", i+5);
     pDC->DrawText(hlp, rect, 0);
   }
@@ -343,7 +343,7 @@ void CAbaloneDlg::DrawBoard()
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
 
     // Label
-    CRect rect(currentPoint.x - 25, currentPoint.y - 7, currentPoint.x - 5, currentPoint.y + 20);
+    CRect rect(currentPoint.x - 40, currentPoint.y - 7, currentPoint.x - 20, currentPoint.y + 20);
     hlp = char(69+i);
     pDC->DrawText(hlp, rect, 0);
   }
@@ -359,7 +359,7 @@ void CAbaloneDlg::DrawBoard()
       currentPoint.x+BOARD_POINT_RADIUS, currentPoint.y+BOARD_POINT_RADIUS);
 
     // Label
-    CRect rect(currentPoint.x - 25, currentPoint.y - 7, currentPoint.x - 5, currentPoint.y + 20);
+    CRect rect(currentPoint.x - 40, currentPoint.y - 7, currentPoint.x - 20, currentPoint.y + 20);
     hlp = char(65+i);
     pDC->DrawText(hlp, rect, 0);
   }
@@ -594,6 +594,7 @@ void CAbaloneDlg::OnNewGame()
     myGameManager->SetMaxNumberOfTurns(300);
 
     AfxBeginThread(TurnIsOver, GetSafeHwnd());
+    Invalidate();
   }
 }
 

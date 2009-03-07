@@ -92,5 +92,5 @@ private:
 
 inline int CAbaloneDlg::GetBoardRadius() const
 {
-  return (GetBoardRect().right - 60) / 2;
+  return (GetBoardRect().right - 100) / 2;
 }
