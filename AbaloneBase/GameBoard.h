@@ -42,12 +42,22 @@ private:
 
 inline BoardField* GameBoard::GetBoardField(int x, int y) const
 {
-  ASSERT(GetBoardFieldExist(x, y));
+//  ASSERT(GetBoardFieldExist(x, y));
   return myFieldPoints[x][y];
 }
 
 inline BoardField* GameBoard::GetBoardField(CPoint point) const
 {
-  ASSERT(GetBoardFieldExist(point.x, point.y));
+//  ASSERT(GetBoardFieldExist(point.x, point.y));
   return myFieldPoints[point.x][point.y];
+}
+
+// inline bool GameBoard::GetBoardFieldExist(int x, int y) const
+// {
+//   return !(y > x + 4 || y < x - 4 || y < 0 || y > 8 || x < 0 || x > 8);
+// }
+
+inline bool GameBoard::GetBoardFieldExist(int x, int y) const
+{
+  return (y <= x + 4 && y >= x - 4 && y >= 0 && y <= 8 && x >= 0 && x <= 8);
 }

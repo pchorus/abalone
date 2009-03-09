@@ -31,17 +31,6 @@ GameBoard::~GameBoard()
   }
 }
 
-bool GameBoard::GetBoardFieldExist(int x, int y) const
-{
-  bool ret = true;
-
-  if (y > x + 4 || y < x - 4 || y < 0 || y > 8 || x < 0 || x > 8) {
-    ret = false;
-  }
-
-  return ret;
-}
-
 bool GameBoard::GetBoardFieldExist(CPoint point) const
 {
   return GetBoardFieldExist(point.x, point.y);

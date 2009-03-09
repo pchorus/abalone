@@ -109,7 +109,6 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
 //  size_t gamesToSimulate = GAMES_TO_SIMULATE;
 
   Player::PlayerNumber startPlayer = Player::PLAYER_ONE;
-  std::vector<BoardField*>::const_iterator i;
 
   if (GetGameManager()->IsFirstPlayersTurn()) {
     startPlayer = Player::PLAYER_TWO;

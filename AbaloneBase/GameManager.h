@@ -109,8 +109,7 @@ private:
   // in the array as on the board from left to right
   void SortSelectedBalls();
   // sorts the passed collection of balls
-  void SortBalls(std::vector<BoardField*>* balls);
-  void SortBalls(BoardField* ball1, BoardField* ball2, BoardField* ball3);
+  void SortBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3);
 
   // ball start formations
   void SetBallsStandardFormation();
@@ -125,7 +124,9 @@ private:
   Player* myNextTurn;
   int myLostBallsPlayer1;
   int myLostBallsPlayer2;
-  std::vector<BoardField*>* mySelectedBalls;
+  BoardField* mySelectedBall1;
+  BoardField* mySelectedBall2;
+  BoardField* mySelectedBall3;
   int myMaxNumberOfTurns;
 };
 

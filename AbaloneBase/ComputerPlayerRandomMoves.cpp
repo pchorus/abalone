@@ -27,14 +27,6 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
   GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves);
   GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves);
 
-  if (myBallMoves.empty()) {
-    myAllowAllMoves = true;
-    GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves);
-    GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves);
-    GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves);
-    myAllowAllMoves = false;
-
-  }
   int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMoves.size()-1));
 
   move = *myBallMoves.at(idx);
