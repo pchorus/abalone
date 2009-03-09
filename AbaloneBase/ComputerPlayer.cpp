@@ -18,8 +18,6 @@ ComputerPlayer::~ComputerPlayer()
 void ComputerPlayer::TakeNextTurn()
 {
   BallMove move = CalculateNextMove();
-  std::vector<BoardField*>::iterator boardFieldIterator;
-
   GetGameManager()->DoMove(&move);
 }
 
