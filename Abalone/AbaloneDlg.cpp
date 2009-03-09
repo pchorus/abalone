@@ -713,12 +713,12 @@ void CAbaloneDlg::DrawLostBalls()
 void CAbaloneDlg::EnableDirectionButtons()
 {
   bool dummy = false;
-  myBtnMoveUpLeft.EnableWindow(myGameManager->IsPossibleDirection(UPLEFT, dummy, dummy));
-  myBtnMoveUpRight.EnableWindow(myGameManager->IsPossibleDirection(UPRIGHT, dummy, dummy));
-  myBtnMoveLeft.EnableWindow(myGameManager->IsPossibleDirection(LEFT, dummy, dummy));
-  myBtnMoveRight.EnableWindow(myGameManager->IsPossibleDirection(RIGHT, dummy, dummy));
-  myBtnMoveDownLeft.EnableWindow(myGameManager->IsPossibleDirection(DOWNLEFT, dummy, dummy));
-  myBtnMoveDownRight.EnableWindow(myGameManager->IsPossibleDirection(DOWNRIGHT, dummy, dummy));
+  myBtnMoveUpLeft.EnableWindow(myGameManager->IsPossibleDirection(UPLEFT, dummy, dummy, 0, 0, 0, 0, 0, 0));
+  myBtnMoveUpRight.EnableWindow(myGameManager->IsPossibleDirection(UPRIGHT, dummy, dummy, 0, 0, 0, 0, 0, 0));
+  myBtnMoveLeft.EnableWindow(myGameManager->IsPossibleDirection(LEFT, dummy, dummy, 0, 0, 0, 0, 0, 0));
+  myBtnMoveRight.EnableWindow(myGameManager->IsPossibleDirection(RIGHT, dummy, dummy, 0, 0, 0, 0, 0, 0));
+  myBtnMoveDownLeft.EnableWindow(myGameManager->IsPossibleDirection(DOWNLEFT, dummy, dummy, 0, 0, 0, 0, 0, 0));
+  myBtnMoveDownRight.EnableWindow(myGameManager->IsPossibleDirection(DOWNRIGHT, dummy, dummy, 0, 0, 0, 0, 0, 0));
 }
 
 void CAbaloneDlg::DisableDirectionButtons()

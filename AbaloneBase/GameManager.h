@@ -38,7 +38,7 @@ public:
   void SetGameStarted(bool started);
   void SetMaxNumberOfTurns(int maxTurns);
 
-  BOOL IsPossibleDirection(Direction direction, bool& isAttacking, bool& ejectsBall, std::vector<BoardField*>* balls = 0, std::vector<BoardField*>* opponentBalls = 0) const;
+  BOOL IsPossibleDirection(Direction direction, bool& isAttacking, bool& ejectsBall, const BoardField* ball1, const BoardField* ball2, const BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3) const;
   void MoveBallsInDirection(Direction direction);
   void DoMove(BallMove* move);
   void UndoMove(BallMove* move);
@@ -94,13 +94,13 @@ public:
   int CalcGroupingField(const Player* player, CPoint coord) const;
 
 private:
-  void CheckDirections(const ComputerPlayer* player, std::vector<BoardField*>* ballFields, std::vector<BallMove*>& ballMoves) const;
+  void CheckDirections(/*const ComputerPlayer* player, */BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const;
   BallMove* CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const;
 
   // help methods
-  BallAxis GetAxisOfBalls(const std::vector<BoardField*>* const ballFields) const;
-  void GetSelectedAndOpponentFields(Direction direction, std::vector<BoardField*>* balls, BoardField*& selectedField1, BoardField*& selectedField2,
-    BoardField*& selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
+  BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2) const;
+  void GetOpponentFields(Direction direction, const BoardField* selectedField1, const BoardField* selectedField2,
+    const BoardField* selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
 
   void AddLostBall(BoardField::Ball ball);
   void RemoveLostBall(BoardField::Ball ball);
@@ -110,6 +110,7 @@ private:
   void SortSelectedBalls();
   // sorts the passed collection of balls
   void SortBalls(std::vector<BoardField*>* balls);
+  void SortBalls(BoardField* ball1, BoardField* ball2, BoardField* ball3);
 
   // ball start formations
   void SetBallsStandardFormation();

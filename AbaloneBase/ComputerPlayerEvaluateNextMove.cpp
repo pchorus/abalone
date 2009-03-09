@@ -77,7 +77,7 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
     delete *ballMoveIterator;
   }
 
-  ASSERT(ret.GetBalls()->size() != 0);
+  ASSERT(ret.HasBalls());
   ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
 
   end = GetTickCount();

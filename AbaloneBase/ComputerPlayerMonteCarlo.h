@@ -38,5 +38,6 @@ private:
 inline size_t ComputerPlayerMonteCarlo::GetGamesToSimulate() const
 {
 //  return 8 * (100 - myNoPossibleMoves) / 10;
-  return 15 * (100 - myNoPossibleMoves) / 10;
+//  return 15 * (100 - myNoPossibleMoves) / 10;
+  return 100;
 }

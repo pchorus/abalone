@@ -19,13 +19,14 @@ class ABALONE_BASE_DLLINTERFACE BallMove {
 public:
   // constructor / destructor
   BallMove();
+  BallMove(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3);
   BallMove(const BallMove& other);
   ~BallMove();
 
-  std::vector<BoardField*>* GetBalls() const;
+  void GetBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
   void AddBall(BoardField* field);
   void ClearBalls();
-  std::vector<BoardField*>* GetOpponentBalls() const;
+  void GetOpponentBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
   void AddOpponentBall(BoardField* field);
   void ClearOpponentBalls();
 
@@ -40,9 +41,15 @@ public:
 
   BallMove& operator= (const BallMove& other);
 
+  bool HasBalls() const;
+
 private:
-  std::vector<BoardField*>* myBalls;
-  std::vector<BoardField*>* myOpponentBalls;
+  BoardField* myBall1;
+  BoardField* myBall2;
+  BoardField* myBall3;
+  BoardField* myOpponentBall1;
+  BoardField* myOpponentBall2;
+  BoardField* myOpponentBall3;
   // direction of the move
   Direction myDirection;
   // true, if the move pushes opponent's balls
@@ -51,14 +58,18 @@ private:
   bool myEjectsBall;
 };
 
-inline std::vector<BoardField*>* BallMove::GetBalls() const
+inline void BallMove::GetBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const
 {
-  return myBalls;
+  ball1 = myBall1;
+  ball2 = myBall2;
+  ball3 = myBall3;
 }
 
-inline std::vector<BoardField*>* BallMove::GetOpponentBalls() const
+inline void BallMove::GetOpponentBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const
 {
-  return myOpponentBalls;
+  ball1 = myOpponentBall1;
+  ball2 = myOpponentBall2;
+  ball3 = myOpponentBall3;
 }
 
 inline Direction BallMove::GetDirection() const
@@ -73,22 +84,42 @@ inline void BallMove::SetDirection(Direction direction)
 
 inline void BallMove::AddBall(BoardField* field)
 {
-  myBalls->push_back(field);
+  if (!myBall1) {
+    myBall1 = field;
+  }
+  else if (!myBall2) {
+    myBall2 = field;
+  }
+  else if (!myBall3) {
+    myBall3 = field;
+  }
 }
 
 inline void BallMove::ClearBalls()
 {
-  myBalls->clear();
+  myBall1 = 0;
+  myBall2 = 0;
+  myBall3 = 0;
 }
 
 inline void BallMove::AddOpponentBall(BoardField* field)
 {
-  myOpponentBalls->push_back(field);
+  if (!myOpponentBall1) {
+    myOpponentBall1 = field;
+  }
+  else if (!myOpponentBall2) {
+    myOpponentBall2 = field;
+  }
+  else if (!myOpponentBall3) {
+    myOpponentBall3 = field;
+  }
 }
 
 inline void BallMove::ClearOpponentBalls()
 {
-  myOpponentBalls->clear();
+  myOpponentBall1 = 0;
+  myOpponentBall2 = 0;
+  myOpponentBall3 = 0;
 }
 
 inline bool BallMove::IsAttacking() const
@@ -109,4 +140,9 @@ inline bool BallMove::GetEjectsBall() const
 inline void BallMove::SetEjectsBall(bool ejectsBall)
 {
   myEjectsBall = ejectsBall;
+}
+
+inline bool BallMove::HasBalls() const
+{
+  return !!myBall1;
 }

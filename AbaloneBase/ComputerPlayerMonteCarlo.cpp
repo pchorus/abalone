@@ -71,7 +71,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
     delete *ballMoveIterator;
   }
 
-  ASSERT(ret.GetBalls()->size() != 0);
+  ASSERT(ret.HasBalls());
   ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
 
   end = GetTickCount();
@@ -130,8 +130,6 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
 
-    Output::Message2(mySimGameManager->GetGameBoard()->ToString(), false, true);
-
     rating = EvaluateSimGame();
     ret += rating;
   }
@@ -186,17 +184,5 @@ double ComputerPlayerMonteCarlo::EvaluateSimGame() const
                     + CENTER_DISTANCE_EVALUATION_WEIGHT * centerDistanceRating
                     + GROUPING_EVALUATION_WEIGHT        * groupingRating;
 
-  CString out;
-  CString str;
-  str.Format("  Lost Balls:       %f\n", lostBallsRating);
-  out += str;
-  str.Format("  Center Distance:  %f\n", centerDistanceRating);
-  out += str;
-  str.Format("  Grouping:         %f\n", groupingRating);
-  out += str;
-  str.Format("  Attacking Power:  %f\n\n", attackingPowerRating);
-  out += str;
-
-  Output::Message(out, false, true);
   return evaluation;
 }
