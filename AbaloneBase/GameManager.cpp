@@ -200,12 +200,8 @@ void GameManager::ClearSelectedBalls()
   mySelectedBalls->clear();
 }
 
-BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bool& ejectsBall, const BoardField* ball1, const BoardField* ball2, const BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3) const
+void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const
 {
-  BOOL ret = FALSE;
-
-  isAttacking = false;
-
   CPoint fieldCoord1;
   CPoint fieldCoord2;
   CPoint fieldCoord3;
@@ -213,23 +209,11 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bo
   BoardField* opponentField2 = 0;
   BoardField* opponentField3 = 0;
 
-  opponentBall1 = 0;
-  opponentBall2 = 0;
-  opponentBall3 = 0;
+  BoardField* opponentBall1 = 0;
+  BoardField* opponentBall2 = 0;
+  BoardField* opponentBall3 = 0;
 
   BoardField::Ball opponentBall = BoardField::NO_BALL;
-
-  if (!ball1 && !ball2 && !ball3) {
-    if (mySelectedBalls->size() >= 1) {
-      ball1 = *mySelectedBalls->begin();
-      if (mySelectedBalls->size() >= 2) {
-        ball2 = *(++mySelectedBalls->begin());
-      }
-      if (mySelectedBalls->size() >= 3) {
-        ball3 = *(++(++mySelectedBalls->begin()));
-      }
-    }
-  }
 
   BallAxis pushAxis = NO_VALID_AXIS;
   switch (direction) {
@@ -247,9 +231,7 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bo
     break;
   }
 
-  // TODO: maybe we can leave the if out
   if (ball1) {
-
     GetOpponentFields(direction, ball1, ball2, ball3, opponentField1, opponentField2, opponentField3);
     opponentBall = BoardField::BLACK_BALL;
     if (ball1->GetBall() == BoardField::BLACK_BALL) {
@@ -259,7 +241,7 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bo
     if (GetAxisOfBalls(ball1, ball2) == pushAxis) {
       // -> O|X or -> OO|X or -> OOO|X
       if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL) {
-        ret = TRUE;
+        ballMoves.push_back(new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
       }
 
       else if (ball2 && opponentField1 && opponentField1->GetBall() == opponentBall
@@ -267,9 +249,7 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bo
         // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
       {
         opponentBall1 = opponentField1;
-        ejectsBall = !opponentField2;
-        isAttacking = true;
-        ret = TRUE;
+        ballMoves.push_back(new BallMove(direction, true, !opponentField2, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
       }
 
       else if (ball3 && opponentField1 && opponentField2
@@ -279,9 +259,7 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bo
       {
         opponentBall1 = opponentField1;
         opponentBall2 = opponentField2;
-        ejectsBall = !opponentField3;
-        isAttacking = true;
-        ret = TRUE;
+        ballMoves.push_back(new BallMove(direction, true, !opponentField3, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
       }
     }
     // sidesteps
@@ -305,22 +283,20 @@ BOOL GameManager::IsPossibleDirection(Direction direction, bool& isAttacking, bo
               if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))
                 && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))->GetBall() == BoardField::NO_BALL)
               {
-                  ret = TRUE;
+                ballMoves.push_back(new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
               }
             }
             else {
-              ret = TRUE;
+              ballMoves.push_back(new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
             }
           }
         }
         else {
-          ret = TRUE;
+          ballMoves.push_back(new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
         }
       }
     }
   }
-
-  return ret;
 }
 
 void GameManager::MoveBallsInDirection(Direction direction)
@@ -1292,69 +1268,120 @@ void GameManager::SetBallsCustomFormation(const CString& formation)
 
 void GameManager::CheckDirections(/*const ComputerPlayer* player, */BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const
 {
-  bool isAttacking = false;
-  bool ejectsBall = false;
-
-  BoardField* opponentBall1(0);
-  BoardField* opponentBall2(0);
-  BoardField* opponentBall3(0);
-
-  if (IsPossibleDirection(UPLEFT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3) /*&& player->IsMoveAllowed(UPLEFT, ballFields)*/) {
-    ballMoves.push_back(new BallMove(UPLEFT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
-  }
-  if (IsPossibleDirection(UPRIGHT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3) /*&& player->IsMoveAllowed(UPLEFT, ballFields)*/) {
-    ballMoves.push_back(new BallMove(UPRIGHT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
-  }
-  if (IsPossibleDirection(LEFT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3) /*&& player->IsMoveAllowed(UPLEFT, ballFields)*/) {
-    ballMoves.push_back(new BallMove(LEFT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
-  }
-  if (IsPossibleDirection(RIGHT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3) /*&& player->IsMoveAllowed(UPLEFT, ballFields)*/) {
-    ballMoves.push_back(new BallMove(RIGHT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
-  }
-  if (IsPossibleDirection(DOWNLEFT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3) /*&& player->IsMoveAllowed(UPLEFT, ballFields)*/) {
-    ballMoves.push_back(new BallMove(DOWNLEFT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
-  }
-  if (IsPossibleDirection(DOWNRIGHT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3) /*&& player->IsMoveAllowed(UPLEFT, ballFields)*/) {
-    ballMoves.push_back(new BallMove(DOWNRIGHT, isAttacking, ejectsBall, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3));
-  }
+  IsPossibleDirection(UPLEFT, ball1, ball2, ball3, ballMoves);
+  IsPossibleDirection(UPRIGHT, ball1, ball2, ball3, ballMoves);
+  IsPossibleDirection(LEFT, ball1, ball2, ball3, ballMoves);
+  IsPossibleDirection(RIGHT, ball1, ball2, ball3, ballMoves);
+  IsPossibleDirection(DOWNLEFT, ball1, ball2, ball3, ballMoves);
+  IsPossibleDirection(DOWNRIGHT, ball1, ball2, ball3, ballMoves);
 }
 
-BallMove* GameManager::CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const
+BOOL GameManager::IsPossibleDirection(Direction direction) const
 {
-  BallMove* ballMove = new BallMove();
+  BOOL ret = FALSE;
 
-  std::vector<BoardField*>::iterator i;
-  i = ballFields->begin();
+  CPoint fieldCoord1;
+  CPoint fieldCoord2;
+  CPoint fieldCoord3;
+  BoardField* opponentField1 = 0;
+  BoardField* opponentField2 = 0;
+  BoardField* opponentField3 = 0;
 
-  if (ballFields->size() >= 1) {
-    ballMove->AddBall(*i);
-  }
-  if (ballFields->size() >= 2) {
-    ++i;
-    ballMove->AddBall(*i);
-  }
-  if (ballFields->size() >= 3) {
-    ++i;
-    ballMove->AddBall(*i);
-  }
+  BoardField::Ball opponentBall = BoardField::NO_BALL;
 
-  i = opponentFields->begin();
+  BoardField* ball1(0);
+  BoardField* ball2(0);
+  BoardField* ball3(0);
 
-  if (opponentFields->size() >= 1) {
-    ballMove->AddOpponentBall(*i);
-  }
-  if (opponentFields->size() >= 2) {
-    ++i;
-    ballMove->AddOpponentBall(*i);
-  }
-  if (opponentFields->size() >= 3) {
-    ++i;
-    ballMove->AddOpponentBall(*i);
+  if (mySelectedBalls->size() >= 1) {
+    ball1 = *mySelectedBalls->begin();
+    if (mySelectedBalls->size() >= 2) {
+      ball2 = *(++mySelectedBalls->begin());
+    }
+    if (mySelectedBalls->size() >= 3) {
+      ball3 = *(++(++mySelectedBalls->begin()));
+    }
   }
 
-  ballMove->SetDirection(direction);
-  ballMove->SetIsAttacking(isAttacking);
-  ballMove->SetEjectsBall(ejectsBall);
+  BallAxis pushAxis = NO_VALID_AXIS;
+  switch (direction) {
+  case UPLEFT:
+  case DOWNRIGHT:
+    pushAxis = UPPERLEFT_TO_DOWNRIGHT;
+    break;
+  case UPRIGHT:
+  case DOWNLEFT:
+    pushAxis = DOWNLEFT_TO_UPPERRIGHT;
+    break;
+  case LEFT:
+  case RIGHT:
+    pushAxis = HORIZONTAL;
+    break;
+  }
 
-  return ballMove;
+  if (ball1) {
+    GetOpponentFields(direction, ball1, ball2, ball3, opponentField1, opponentField2, opponentField3);
+    opponentBall = BoardField::BLACK_BALL;
+    if (ball1->GetBall() == BoardField::BLACK_BALL) {
+      opponentBall = BoardField::WHITE_BALL;
+    }
+
+    if (GetAxisOfBalls(ball1, ball2) == pushAxis) {
+      // -> O|X or -> OO|X or -> OOO|X
+      if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL) {
+        ret = TRUE;
+      }
+
+      else if (ball2 && opponentField1 && opponentField1->GetBall() == opponentBall
+        && (!opponentField2 || opponentField2->GetBall() == BoardField::NO_BALL))
+        // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
+      {
+        ret = TRUE;
+      }
+
+      else if (ball3 && opponentField1 && opponentField2
+        && opponentField1->GetBall() == opponentBall && opponentField2->GetBall() == opponentBall
+        && (!opponentField3 || (opponentField3 && opponentField3->GetBall() == BoardField::NO_BALL)))
+        // -> OOO|00 or -> OOO|00X
+      {
+        ret = TRUE;
+      }
+    }
+    // sidesteps
+    else {
+      fieldCoord1 = ball1->GetFieldCoordinates();
+      if (ball2) {
+        fieldCoord2 = ball2->GetFieldCoordinates();
+      }
+      if (ball3) {
+        fieldCoord3 = ball3->GetFieldCoordinates();
+      }
+
+      if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord1, direction))
+        && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord1, direction))->GetBall() == BoardField::NO_BALL)
+      {
+        if (ball2) {
+          if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord2, direction))
+            && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord2, direction))->GetBall() == BoardField::NO_BALL)
+          {
+            if (ball3) {
+              if (myGameBoard->GetBoardFieldExist(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))
+                && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))->GetBall() == BoardField::NO_BALL)
+              {
+                ret = TRUE;
+              }
+            }
+            else {
+              ret = TRUE;
+            }
+          }
+        }
+        else {
+          ret = TRUE;
+        }
+      }
+    }
+  }
+
+  return ret;
 }

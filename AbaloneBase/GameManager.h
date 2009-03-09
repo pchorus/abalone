@@ -38,7 +38,8 @@ public:
   void SetGameStarted(bool started);
   void SetMaxNumberOfTurns(int maxTurns);
 
-  BOOL IsPossibleDirection(Direction direction, bool& isAttacking, bool& ejectsBall, const BoardField* ball1, const BoardField* ball2, const BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3) const;
+  void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const;
+  BOOL IsPossibleDirection(Direction direction) const;
   void MoveBallsInDirection(Direction direction);
   void DoMove(BallMove* move);
   void UndoMove(BallMove* move);
@@ -95,7 +96,6 @@ public:
 
 private:
   void CheckDirections(/*const ComputerPlayer* player, */BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const;
-  BallMove* CreateBallMove(Direction direction, bool isAttacking, bool ejectsBall, std::vector<BoardField*>* ballFields, std::vector<BoardField*>* opponentFields) const;
 
   // help methods
   BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2) const;
