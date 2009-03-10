@@ -16,7 +16,4 @@ public:
   // constructor / destructor
   HumanPlayer(const CString& name, BoardField::Ball ball);
   virtual ~HumanPlayer();
-
-  // getter and setter
-  virtual PlayerType GetType() const;
 };

@@ -2,9 +2,10 @@
 
 #include "Player.h"
 
-Player::Player(const CString& name, BoardField::Ball ball)
+Player::Player(const CString& name, BoardField::Ball ball, PlayerType playerType)
 : myName(name)
 , myBall(ball)
+, myType(playerType)
 {
 }
 

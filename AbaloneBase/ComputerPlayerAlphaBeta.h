@@ -18,8 +18,6 @@ public:
 
   virtual BallMove CalculateNextMove();
 
-  virtual PlayerType GetType() const;
-
 private:
   double Max(int depth, double alpha, double beta);
   double Min(int depth, double alpha, double beta);

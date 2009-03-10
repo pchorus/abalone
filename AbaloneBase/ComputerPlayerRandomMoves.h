@@ -19,7 +19,6 @@ public:
   virtual ~ComputerPlayerRandomMoves();
 
   virtual BallMove CalculateNextMove();
-  virtual PlayerType GetType() const;
 
 private:
   BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];

@@ -12,7 +12,7 @@ static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 200;
 
 
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-: ComputerPlayer(gameManager, name, ball)
+: ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO)
 , mySimGameManager(new GameManager)
 , myNoPossibleMoves(0)
 {
@@ -89,11 +89,6 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 //   Output::Message2(out, false, true);
 
   return ret;
-}
-
-Player::PlayerType ComputerPlayerMonteCarlo::GetType() const
-{
-  return PLAYER_TYPE_COMPUTER_MONTE_CARLO;
 }
 
 double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const

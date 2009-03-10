@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 ComputerPlayerRandomMoves::ComputerPlayerRandomMoves(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-: ComputerPlayer(gameManager, name, ball)
+: ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES)
 , myBallMovesSize(0)
 {
 }
@@ -32,9 +32,4 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
   myBallMovesSize = 0;
 
   return move;
-}
-
-Player::PlayerType ComputerPlayerRandomMoves::GetType() const
-{
-  return PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
 }

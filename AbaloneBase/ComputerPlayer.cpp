@@ -5,8 +5,8 @@
 #include "GameManager.h"
 #include "GameBoard.h"
 
-ComputerPlayer::ComputerPlayer(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-: Player(name, ball)
+ComputerPlayer::ComputerPlayer(GameManager* gameManager, const CString& name, BoardField::Ball ball, PlayerType playerType)
+: Player(name, ball, playerType)
 , myGameManager(gameManager)
 {
 }

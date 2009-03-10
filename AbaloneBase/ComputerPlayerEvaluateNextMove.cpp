@@ -8,7 +8,7 @@
 #include "Output.h"
 
 ComputerPlayerEvaluateNextMove::ComputerPlayerEvaluateNextMove(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-:ComputerPlayer(gameManager, name, ball)
+:ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE)
 , mySimGameManager(new GameManager)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
@@ -91,11 +91,6 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 //  Output::Message2(out, false, true);
 
   return ret;
-}
-
-Player::PlayerType ComputerPlayerEvaluateNextMove::GetType() const
-{
-  return PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE;
 }
 
 double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const

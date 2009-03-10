@@ -19,8 +19,6 @@ public:
 
   virtual BallMove CalculateNextMove();
 
-  virtual PlayerType GetType() const;
-
 private:
   double SimulateMove(BallMove* ballMove) const;
   double EvaluateMove() const;

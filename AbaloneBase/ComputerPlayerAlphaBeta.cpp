@@ -11,7 +11,7 @@ static const int TREE_DEPTH = 4;
 
 
 ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-: ComputerPlayer(gameManager, name, ball)
+: ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA)
 , mySimGameManager(new GameManager)
 , myMaxPlayer(0)
 , myMinPlayer(0)
@@ -34,11 +34,6 @@ ComputerPlayerAlphaBeta::~ComputerPlayerAlphaBeta()
     delete mySimGameManager;
     mySimGameManager = 0;
   }
-}
-
-Player::PlayerType ComputerPlayerAlphaBeta::GetType() const
-{
-  return PLAYER_TYPE_COMPUTER_ALPHA_BETA;
 }
 
 BallMove ComputerPlayerAlphaBeta::CalculateNextMove()

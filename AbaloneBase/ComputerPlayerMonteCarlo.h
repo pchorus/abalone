@@ -19,7 +19,6 @@ public:
   virtual ~ComputerPlayerMonteCarlo();
 
   virtual BallMove CalculateNextMove();
-  virtual PlayerType GetType() const;
 
 private:
   size_t GetGamesToSimulate() const;

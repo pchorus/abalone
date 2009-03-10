@@ -23,11 +23,11 @@ public:
   enum PlayerNumber { PLAYER_NONE, PLAYER_ONE, PLAYER_TWO };
 
   // contructor / destructor
-  Player(const CString& name, BoardField::Ball ball);
+  Player(const CString& name, BoardField::Ball ball, PlayerType playerType);
   virtual ~Player();
 
   // getter and setter
-  virtual PlayerType GetType() const = 0;
+  PlayerType GetType() const;
   CString GetName() const;
 
   void SetBall(BoardField::Ball ball);
@@ -36,7 +36,13 @@ public:
 private:
   CString myName;
   BoardField::Ball myBall;
+  PlayerType myType;
 };
+
+inline Player::PlayerType Player::GetType() const
+{
+  return myType;
+}
 
 inline CString Player::GetName() const
 {

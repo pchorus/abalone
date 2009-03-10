@@ -25,11 +25,10 @@ class ABALONE_BASE_DLLINTERFACE ComputerPlayer : public Player {
 
 public:
   // constructor / destructor
-  ComputerPlayer(GameManager* gameManager, const CString& name, BoardField::Ball ball);
+  ComputerPlayer(GameManager* gameManager, const CString& name, BoardField::Ball ball, PlayerType playerType);
   virtual ~ComputerPlayer();
 
   // getter and setter
-  virtual PlayerType GetType() const = 0;
   GameManager* GetGameManager() const;
 
   virtual BallMove CalculateNextMove() = 0;
