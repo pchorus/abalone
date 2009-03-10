@@ -19,11 +19,7 @@ public:
   virtual ~ComputerPlayerMonteCarlo();
 
   virtual BallMove CalculateNextMove();
-
   virtual PlayerType GetType() const;
-
-  // test if the move is allowed by the computer player
-  virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
 
 private:
   size_t GetGamesToSimulate() const;

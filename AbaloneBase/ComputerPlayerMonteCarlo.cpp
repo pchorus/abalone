@@ -30,8 +30,8 @@ ComputerPlayerMonteCarlo::~ComputerPlayerMonteCarlo()
 BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 {
   BallMove ret;
-  std::vector<BallMove*> ballMoves;
-  ballMoves.reserve(100);
+  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+  int ballMovesSize = 0;
 
   DWORD time = 0;
   DWORD start = 0;
@@ -45,30 +45,27 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   double bestRating = -1.;
   double newRating = -1.;
 
-  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves);
-
-  // destroy all BallMove objects which were created in the AddPossibleMoves methods
-  std::vector<BallMove*>::iterator ballMoveIterator;
+  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves, ballMovesSize);
 
   CString out;
   out = GetName() + ":\n";
   Output::Message(out, false, true);
 
-  myNoPossibleMoves = ballMoves.size();
-  for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
-    newRating = SimulateGamesWithMove(*ballMoveIterator);
+  myNoPossibleMoves = ballMovesSize;
+  for (int i = 0; i < ballMovesSize; ++i) {
+    newRating = SimulateGamesWithMove(ballMoves[i]);
     if (newRating > bestRating) {
       // TODO: improvement: assignment from pointer to pointer and after the loop,
       // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
-      ret = **ballMoveIterator;
+      ret = *ballMoves[i];
     }
   }
 
-  for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
-    delete *ballMoveIterator;
+  for (int i = 0; i < ballMovesSize; ++i) {
+    delete ballMoves[i];
   }
 
   ASSERT(ret.HasBalls());
@@ -81,7 +78,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
-  str.Format("  Possible Moves:    %d\n", ballMoves.size());
+  str.Format("  Possible Moves:    %d\n", ballMovesSize);
   out += str;
   str.Format("  Simulated Games:   %d\n", GetGamesToSimulate());
   out += str;
@@ -136,20 +133,6 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
   return ret;
 }
 
-bool ComputerPlayerMonteCarlo::IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const
-{
-  bool ret = true;
-
-  if (GetCenterDistanceRatio(direction, balls) > 0) {
-    ret = false;
-  }
-  else if (balls->size() == 1 && CheckSingleBallMoveForLoneliness(direction, balls)) {
-    ret = false;
-  }
-
-  return ret;
-}
-
 double ComputerPlayerMonteCarlo::EvaluateSimGame() const
 {
   ComputerPlayer* simGamePlayer = 0;
@@ -178,10 +161,18 @@ double ComputerPlayerMonteCarlo::EvaluateSimGame() const
 
   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
 
-  // TODO: take other attributes into account
-  double evaluation = LOST_BALLS_EVALUATION_WEIGHT      * lostBallsRating
-                    + CENTER_DISTANCE_EVALUATION_WEIGHT * centerDistanceRating
-                    + GROUPING_EVALUATION_WEIGHT        * groupingRating;
+  double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
+  // 0 attacks  = 1.0
+  // 10 attacks = 0.0
+  if (attackedByOpponent > 10.)
+    attackedByOpponent = 10.;
+  attackedByOpponent = (10. - attackedByOpponent) * 0.1;
+
+  double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
+    + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
+    + GROUPING_EVALUATION_WEIGHT                    * groupingRating
+    + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
+    + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
 
   return evaluation;
 }

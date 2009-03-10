@@ -21,8 +21,8 @@ ComputerPlayerEvaluateNextMove::~ComputerPlayerEvaluateNextMove()
 BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 {
   BallMove ret;
-  std::vector<BallMove*> ballMoves;
-  ballMoves.reserve(100);
+  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+  int ballMovesSize = 0;
 
   DWORD time = 0;
   DWORD start = 0;
@@ -38,12 +38,9 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 
   // TODO: perhaps first of all add the moves with three balls
   // because they are more promising
-  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves);
-
-  // destroy all BallMove objects which were created in the AddPossibleMoves methods
-  std::vector<BallMove*>::iterator ballMoveIterator;
+  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves, ballMovesSize);
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -62,19 +59,18 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   out = GetName() + ":\n";
   Output::Message(out, false, true);
 
-//  myNoPossibleMoves = ballMoves.size();
-  for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
-    newRating = SimulateMove(*ballMoveIterator);
+  for (int i = 0; i < ballMovesSize; ++i) {
+    newRating = SimulateMove(ballMoves[i]);
     if (newRating > bestRating) {
       // TODO: improvement: assignment from pointer to pointer and after the loop,
       // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
-      ret = **ballMoveIterator;
+      ret = *ballMoves[i];
     }
   }
 
-  for (ballMoveIterator = ballMoves.begin(); ballMoveIterator != ballMoves.end(); ++ballMoveIterator) {
-    delete *ballMoveIterator;
+  for (int i = 0; i < ballMovesSize; ++i) {
+    delete ballMoves[i];
   }
 
   ASSERT(ret.HasBalls());
@@ -87,7 +83,7 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
-  str.Format("  Possible Moves:    %d\n", ballMoves.size());
+  str.Format("  Possible Moves:    %d\n", ballMovesSize);
   out += str;
   Output::Message(out, false, true);
 

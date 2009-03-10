@@ -35,9 +35,6 @@ public:
   virtual BallMove CalculateNextMove() = 0;
   void TakeNextTurn();
 
-  // test if the move is allowed by the computer player
-  virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
-
 protected:
   // methods to check whether a move should be considered possible
   int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;

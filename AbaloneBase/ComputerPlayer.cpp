@@ -21,11 +21,6 @@ void ComputerPlayer::TakeNextTurn()
   GetGameManager()->DoMove(&move);
 }
 
-bool ComputerPlayer::IsMoveAllowed(Direction /*direction*/, std::vector<BoardField*>* /*balls*/) const
-{
-  return true;
-}
-
 bool ComputerPlayer::CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const
 {
   // TODO: improvement: only disallow such a move if the marble wasn't alone before the move

@@ -19,13 +19,9 @@ public:
   virtual ~ComputerPlayerRandomMoves();
 
   virtual BallMove CalculateNextMove();
-
   virtual PlayerType GetType() const;
 
-  // test if the move is allowed by the computer player
-//  virtual bool IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const;
-
 private:
-  std::vector<BallMove*> myBallMoves;
-  bool myAllowAllMoves;
+  BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];
+  int myBallMovesSize;
 };

@@ -8,9 +8,8 @@
 
 ComputerPlayerRandomMoves::ComputerPlayerRandomMoves(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball)
-, myAllowAllMoves(false)
+, myBallMovesSize(0)
 {
-  myBallMoves.reserve(100);
 }
 
 ComputerPlayerRandomMoves::~ComputerPlayerRandomMoves()
@@ -19,22 +18,18 @@ ComputerPlayerRandomMoves::~ComputerPlayerRandomMoves()
 
 BallMove ComputerPlayerRandomMoves::CalculateNextMove()
 {
-  BallMove move;
+  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves, myBallMovesSize);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
 
-  myBallMoves.clear();
+  int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMovesSize-1));
 
-  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves);
+  BallMove move = *myBallMoves[idx];
 
-  int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMoves.size()-1));
-
-  move = *myBallMoves.at(idx);
-
-  std::vector<BallMove*>::iterator ballMoveIterator;
-  for (ballMoveIterator = myBallMoves.begin(); ballMoveIterator != myBallMoves.end(); ++ballMoveIterator) {
-    delete *ballMoveIterator;
+  for (int i = 0; i < myBallMovesSize; ++i) {
+    delete myBallMoves[i];
   }
+  myBallMovesSize = 0;
 
   return move;
 }
@@ -43,22 +38,3 @@ Player::PlayerType ComputerPlayerRandomMoves::GetType() const
 {
   return PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
 }
-
-// TODO: for simPlayers in the Monte Carlo search, we have to implement this
-// method, but for the AlphaBeta simPlayers, moves should always be allowed
-// bool ComputerPlayerRandomMoves::IsMoveAllowed(Direction direction, std::vector<BoardField*>* balls) const
-// {
-//   if (myAllowAllMoves)
-//     return true;
-// 
-//   bool ret = true;
-// 
-//   if (GetCenterDistanceRatio(direction, balls) > 0) {
-//     ret = false;
-//   }
-//   else if (balls->size() == 1 && CheckSingleBallMoveForLoneliness(direction, balls)) {
-//     ret = false;
-//   }
-// 
-//   return ret;
-// }

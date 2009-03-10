@@ -38,7 +38,7 @@ public:
   void SetGameStarted(bool started);
   void SetMaxNumberOfTurns(int maxTurns);
 
-  void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const;
+  void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
   BOOL IsPossibleDirection(Direction direction) const;
   void MoveBallsInDirection(Direction direction);
   void DoMove(BallMove* move);
@@ -54,9 +54,9 @@ public:
 
   void TurnIsOver(LPVOID pParam = 0);
 
-  void AddPossibleMovesOneBall(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
-  void AddPossibleMovesTwoBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
-  void AddPossibleMovesThreeBalls(const ComputerPlayer* player, std::vector<BallMove*>& ballMoves) const;
+  void AddPossibleMovesOneBall(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
+  void AddPossibleMovesTwoBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
+  void AddPossibleMovesThreeBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
 
   int GetLostBallsPlayer1() const;
   void SetLostBallsPlayer1(int lostBalls);
@@ -95,7 +95,7 @@ public:
   int CalcGroupingField(const Player* player, CPoint coord) const;
 
 private:
-  void CheckDirections(/*const ComputerPlayer* player, */BoardField* ball1, BoardField* ball2, BoardField* ball3, std::vector<BallMove*>& ballMoves) const;
+  void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
 
   // help methods
   BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2) const;

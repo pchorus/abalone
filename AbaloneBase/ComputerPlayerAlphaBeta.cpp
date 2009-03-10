@@ -54,30 +54,28 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
 
-  std::vector<BallMove*> ballMoves;
-  ballMoves.reserve(100);
+  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+  int ballMovesSize = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, ballMoves);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, ballMoves);
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, ballMoves);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, ballMoves, ballMovesSize);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, ballMoves, ballMovesSize);
+  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, ballMoves, ballMovesSize);
 
-  std::vector<BallMove*>::iterator i;
-
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    mySimGameManager->DoMove(*i);
+  for (int i = 0; i < ballMovesSize; ++i) {
+    mySimGameManager->DoMove(ballMoves[i]);
     value = Min(TREE_DEPTH-1, alpha, beta);
-    mySimGameManager->UndoMove(*i);
+    mySimGameManager->UndoMove(ballMoves[i]);
     if (value >= beta) {
       break;
     }
     if (value > alpha) {
-      retMove = **i;
+      retMove = *ballMoves[i];
       alpha = value;
     }
   }
 
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    delete *i;
+  for (int i = 0; i < ballMovesSize; ++i) {
+    delete ballMoves[i];
   }
 
   return retMove;
@@ -91,19 +89,17 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
   if (depth == 0)
     return EvaluateBoard();
 
-  std::vector<BallMove*> ballMoves;
-  ballMoves.reserve(100);
+  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+  int ballMovesSize = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, ballMoves);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, ballMoves);
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, ballMoves);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, ballMoves, ballMovesSize);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, ballMoves, ballMovesSize);
+  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, ballMoves, ballMovesSize);
 
-  std::vector<BallMove*>::iterator i;
-
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    mySimGameManager->DoMove(*i);
+  for (int i = 0; i < ballMovesSize; ++i) {
+    mySimGameManager->DoMove(ballMoves[i]);
     value = Min(depth-1, alpha, beta);
-    mySimGameManager->UndoMove(*i);
+    mySimGameManager->UndoMove(ballMoves[i]);
     if (value >= beta) {
       ret = beta;
       break;
@@ -114,8 +110,8 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
     }
   }
 
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    delete *i;
+  for (int i = 0; i < ballMovesSize; ++i) {
+    delete ballMoves[i];
   }
 
   return ret;
@@ -127,19 +123,18 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
   double value = 0.;
   if (depth == 0)
     return EvaluateBoard();
-  std::vector<BallMove*> ballMoves;
-  ballMoves.reserve(100);
   
-  GetGameManager()->AddPossibleMovesOneBall(myMinPlayer, ballMoves);
-  GetGameManager()->AddPossibleMovesTwoBalls(myMinPlayer, ballMoves);
-  GetGameManager()->AddPossibleMovesThreeBalls(myMinPlayer, ballMoves);
+  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+  int ballMovesSize = 0;
+  
+  GetGameManager()->AddPossibleMovesOneBall(myMinPlayer, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesTwoBalls(myMinPlayer, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesThreeBalls(myMinPlayer, ballMoves, ballMovesSize);
 
-  std::vector<BallMove*>::iterator i;
-
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    mySimGameManager->DoMove(*i);
+  for (int i = 0; i < ballMovesSize; ++i) {
+    mySimGameManager->DoMove(ballMoves[i]);
     value = Max(depth-1, alpha, beta);
-    mySimGameManager->UndoMove(*i);
+    mySimGameManager->UndoMove(ballMoves[i]);
     if (value <= alpha) {
       ret = alpha;
       break;
@@ -150,8 +145,8 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
     }
   }
 
-  for (i = ballMoves.begin(); i != ballMoves.end(); ++i) {
-    delete *i;
+  for (int i = 0; i < ballMovesSize; ++i) {
+    delete ballMoves[i];
   }
 
   return ret;
