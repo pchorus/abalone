@@ -112,7 +112,6 @@ bool GameManager::CanSelectBall(BoardField* field) const
     }
     // only one selected ball
     else if (!mySelectedBall2) {
-      std::vector<BoardField*>::const_iterator iter;
       selectedField1 = mySelectedBall1;
       selectedFieldPoint1 = selectedField1->GetFieldCoordinates();
       if ((selectedFieldPoint1.x - fieldPoint.x == 0 && abs(selectedFieldPoint1.y - fieldPoint.y) == 1)
@@ -391,9 +390,6 @@ void GameManager::MoveBallsInDirection(Direction direction)
       AddLostBall(opponentBall);
     }
   }
-
-  std::vector<BoardField*>::iterator i;
-  std::vector<BoardField*>::reverse_iterator ri;
 
   switch (direction) {
   case UPLEFT:

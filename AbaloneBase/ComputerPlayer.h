@@ -36,8 +36,8 @@ public:
 
 protected:
   // methods to check whether a move should be considered possible
-  int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;
-  bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
+//   int GetCenterDistanceRatio(Direction direction, std::vector<BoardField*>* balls) const;
+//   bool CheckSingleBallMoveForLoneliness(Direction direction, std::vector<BoardField*>* balls) const;
 
 private:
   GameManager* myGameManager;
