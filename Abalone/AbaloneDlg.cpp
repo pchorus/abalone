@@ -497,8 +497,8 @@ void CAbaloneDlg::OnLButtonDown(UINT /*nFlags*/, CPoint point)
 
     for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
       for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-        if (gameBoard->GetBoardFieldExist(x, y)) {
-          field = gameBoard->GetBoardField(x, y);
+        field = gameBoard->GetBoardField(x, y);
+        if (field) {
           fieldPoint = field->GetGUICoordinates();
 
           if (pow(double(point.x - fieldPoint.x), 2) + pow(double(point.y - fieldPoint.y), 2) < pow(ballRadius, 2) && field->GetBall() != BoardField::NO_BALL)
@@ -620,8 +620,8 @@ void CAbaloneDlg::DrawBalls()
 
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-      if (gameBoard->GetBoardFieldExist(x, y)) {
-        field = gameBoard->GetBoardField(x, y);
+      field = gameBoard->GetBoardField(x, y);
+      if (field) {
         if (field->GetBall() == BoardField::BLACK_BALL) {
           DrawBall(x, y, field->IsSelected() ? BALL_COLOR_BLACK_SELECTED : BALL_COLOR_BLACK);
         }
