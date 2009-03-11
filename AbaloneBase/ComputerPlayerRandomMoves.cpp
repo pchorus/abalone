@@ -24,11 +24,11 @@ ComputerPlayerRandomMoves::~ComputerPlayerRandomMoves()
 
 BallMove ComputerPlayerRandomMoves::CalculateNextMove()
 {
+  myBallMovesSize = 0;
   GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves, myBallMovesSize);
   GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
   GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
 
   int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMovesSize-1));
-  myBallMovesSize = 0;
   return *myBallMoves[idx];
 }

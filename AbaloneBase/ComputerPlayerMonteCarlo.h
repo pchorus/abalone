@@ -27,7 +27,9 @@ private:
   double EvaluateSimGame() const;
 
   GameManager* mySimGameManager;
-  size_t myNoPossibleMoves;
+
+  BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];
+  int myBallMovesSize;
 };
 
 inline size_t ComputerPlayerMonteCarlo::GetGamesToSimulate() const

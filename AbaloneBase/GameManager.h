@@ -83,9 +83,9 @@ public:
   // put them into one to improve performance
   double CalcAvgGrouping(const Player* player) const;
   // calculates the attacking power on the opponent
-  double CalcAttackingPowerOnOpponent(const Player* player) const;
+  double CalcAttackingPowerOnOpponent(const Player* player);
   // calculates how strong the player is attacked by the other player
-  double CalcAttackedByOpponent(const Player* player) const;
+  double CalcAttackedByOpponent(const Player* player);
 
 
   // returns the Manhattan distance of the passed coordinates to the center
@@ -128,6 +128,11 @@ private:
   BoardField* mySelectedBall2;
   BoardField* mySelectedBall3;
   int myMaxNumberOfTurns;
+
+  // this collection is used for evaluating the game situation
+  // so we avoid too many constructor calls
+  BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];
+  int myBallMovesSize;
 };
 
 inline GameBoard* GameManager::GetGameBoard() const

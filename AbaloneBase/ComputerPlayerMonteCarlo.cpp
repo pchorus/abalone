@@ -14,9 +14,13 @@ static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 200;
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO)
 , mySimGameManager(new GameManager)
-, myNoPossibleMoves(0)
+, myBallMovesSize(0)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
+
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    myBallMoves[i] = new BallMove;
+  }
 }
 
 ComputerPlayerMonteCarlo::~ComputerPlayerMonteCarlo()
@@ -25,18 +29,17 @@ ComputerPlayerMonteCarlo::~ComputerPlayerMonteCarlo()
     delete mySimGameManager;
     mySimGameManager = 0;
   }
+
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    delete myBallMoves[i];
+  }
 }
 
 BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 {
   BallMove ret;
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
 
-  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
-    ballMoves[i] = new BallMove;
-  }
-
-  int ballMovesSize = 0;
+  myBallMovesSize = 0;
 
   DWORD time = 0;
   DWORD start = 0;
@@ -50,37 +53,31 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   double bestRating = -1.;
   double newRating = -1.;
 
-  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves, ballMovesSize);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves, ballMovesSize);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves, myBallMovesSize);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
 
-  myNoPossibleMoves = ballMovesSize;
-  for (int i = 0; i < ballMovesSize; ++i) {
-    newRating = SimulateGamesWithMove(ballMoves[i]);
+  for (int i = 0; i < myBallMovesSize; ++i) {
+    newRating = SimulateGamesWithMove(myBallMoves[i]);
     if (newRating > bestRating) {
       // TODO: improvement: assignment from pointer to pointer and after the loop,
       // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
-      ret = *ballMoves[i];
+      ret = *myBallMoves[i];
     }
-  }
-
-  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
-    delete ballMoves[i];
   }
 
   ASSERT(ret.HasBalls());
   ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
 
   end = GetTickCount();
-
   time = end - start;
 
-  CString out;
+  CString out("MonteCarlo\n");
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
-  str.Format("  Possible Moves:    %d\n", ballMovesSize);
+  str.Format("  Possible Moves:    %d\n", myBallMovesSize);
   out += str;
   str.Format("  Simulated Games:   %d\n", GetGamesToSimulate());
   out += str;

@@ -52,6 +52,12 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 {
   BallMove retMove;
 
+  DWORD time = 0;
+  DWORD start = 0;
+  DWORD end = 0;
+
+  start = GetTickCount();
+
   double alpha = -10.;
   double beta = 10.;
   double value = 0.;
@@ -79,6 +85,17 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
       alpha = value;
     }
   }
+
+  end = GetTickCount();
+  time = end - start;
+
+  CString out("AlphaBeta\n");
+  CString str;
+  str.Format("  CalculateNextMove: %d\n", time);
+  out += str;
+  str.Format("  Possible Moves:    %d\n", myBallMovesSize[TREE_DEPTH-1]);
+  out += str;
+  Output::Message(out, false, true);
 
   return retMove;
 }

@@ -27,7 +27,11 @@ GameManager::GameManager()
 , mySelectedBall2(0)
 , mySelectedBall3(0)
 , myMaxNumberOfTurns(0)
+, myBallMovesSize(0)
 {
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    myBallMoves[i] = new BallMove;
+  }
 }
 
 GameManager::~GameManager()
@@ -37,6 +41,9 @@ GameManager::~GameManager()
   }
   if (myPlayer2) {
     delete myPlayer2;
+  }
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    delete myBallMoves[i];
   }
 }
 
@@ -864,51 +871,36 @@ double GameManager::CalcAvgGrouping(const Player* player) const
   return ret;
 }
 
-double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
+double GameManager::CalcAttackingPowerOnOpponent(const Player* player)
 {
   double ret = 0.;
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
 
-  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
-    ballMoves[i] = new BallMove;
-  }
-
-  int ballMovesSize = 0;
+  myBallMovesSize = 0;
 
   BallMove* currentMove = 0;
   const ComputerPlayer* computerPlayer = dynamic_cast<const ComputerPlayer*>(player);
 
-  AddPossibleMovesTwoBalls(computerPlayer, ballMoves, ballMovesSize);
-  AddPossibleMovesThreeBalls(computerPlayer, ballMoves, ballMovesSize);
+  AddPossibleMovesTwoBalls(computerPlayer, myBallMoves, myBallMovesSize);
+  AddPossibleMovesThreeBalls(computerPlayer, myBallMoves, myBallMovesSize);
 
-  for (int i = 0; i < ballMovesSize; ++i) {
-    currentMove = ballMoves[i];
+  for (int i = 0; i < myBallMovesSize; ++i) {
+    currentMove = myBallMoves[i];
 
     if (currentMove->IsAttacking()) {
       ++ret;
     }
   }
 
-  ret = ret / (double)ballMovesSize;
-
-  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
-    delete ballMoves[i];
-  }
+  ret = ret / (double)myBallMovesSize;
 
   return ret;
 }
 
-double GameManager::CalcAttackedByOpponent(const Player* player) const
+double GameManager::CalcAttackedByOpponent(const Player* player)
 {
   double ret = 0.;
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
 
-  // TODO: use member array instead of local array
-  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
-    ballMoves[i] = new BallMove;
-  }
-
-  int ballMovesSize = 0;
+  myBallMovesSize = 0;
 
   BallMove* currentMove = 0;
   const ComputerPlayer* computerPlayer = 0;
@@ -921,11 +913,11 @@ double GameManager::CalcAttackedByOpponent(const Player* player) const
     computerPlayer = dynamic_cast<const ComputerPlayer*>(myPlayer1);
   }
 
-  AddPossibleMovesTwoBalls(computerPlayer, ballMoves, ballMovesSize);
-  AddPossibleMovesThreeBalls(computerPlayer, ballMoves, ballMovesSize);
+  AddPossibleMovesTwoBalls(computerPlayer, myBallMoves, myBallMovesSize);
+  AddPossibleMovesThreeBalls(computerPlayer, myBallMoves, myBallMovesSize);
 
-  for (int i = 0; i < ballMovesSize; ++i) {
-    currentMove = ballMoves[i];
+  for (int i = 0; i < myBallMovesSize; ++i) {
+    currentMove = myBallMoves[i];
 
     if (currentMove->IsAttacking()) {
       ++ret;
@@ -934,11 +926,7 @@ double GameManager::CalcAttackedByOpponent(const Player* player) const
 
   // TODO: the absolute number of the opponent's attacking moves
   // is returned
-//  ret = ret / (double)ballMoves.size();
-
-  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
-    delete ballMoves[i];
-  }
+//  ret = ret / (double)myBallMovesSize;
 
   return ret;
 }
