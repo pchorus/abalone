@@ -10,10 +10,16 @@ ComputerPlayerRandomMoves::ComputerPlayerRandomMoves(GameManager* gameManager, c
 : ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES)
 , myBallMovesSize(0)
 {
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    myBallMoves[i] = new BallMove;
+  }
 }
 
 ComputerPlayerRandomMoves::~ComputerPlayerRandomMoves()
 {
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    delete myBallMoves[i];
+  }
 }
 
 BallMove ComputerPlayerRandomMoves::CalculateNextMove()
@@ -23,13 +29,6 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
   GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
 
   int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMovesSize-1));
-
-  BallMove move = *myBallMoves[idx];
-
-  for (int i = 0; i < myBallMovesSize; ++i) {
-    delete myBallMoves[i];
-  }
   myBallMovesSize = 0;
-
-  return move;
+  return *myBallMoves[idx];
 }

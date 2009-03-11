@@ -23,6 +23,8 @@ public:
   BallMove(const BallMove& other);
   ~BallMove();
 
+  void Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3);
+
   void GetBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
   void AddBall(BoardField* field);
   void ClearBalls();
@@ -145,4 +147,17 @@ inline void BallMove::SetEjectsBall(bool ejectsBall)
 inline bool BallMove::HasBalls() const
 {
   return !!myBall1;
+}
+
+inline void BallMove::Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3)
+{
+  myBall1 = ball1;
+  myBall2 = ball2;
+  myBall3 = ball3;
+  myOpponentBall1 = opponentBall1;
+  myOpponentBall2 = opponentBall2;
+  myOpponentBall3 = opponentBall3;
+  myDirection = direction;
+  myIsAttacking = isAttacking;
+  myEjectsBall = ejectsBall;
 }

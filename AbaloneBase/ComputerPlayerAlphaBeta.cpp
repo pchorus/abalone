@@ -7,8 +7,6 @@
 
 #include "Output.h"
 
-static const int TREE_DEPTH = 4;
-
 
 ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA)
@@ -16,6 +14,13 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myMaxPlayer(0)
 , myMinPlayer(0)
 {
+  for (int i = 0; i < TREE_DEPTH; ++i) {
+    for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
+      myBallMoves[i][j] = new BallMove;
+    }
+    myBallMovesSize[i] = 0;
+  }
+
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
   if (GetGameManager()->IsFirstPlayersTurn()) {
@@ -34,6 +39,13 @@ ComputerPlayerAlphaBeta::~ComputerPlayerAlphaBeta()
     delete mySimGameManager;
     mySimGameManager = 0;
   }
+
+  for (int i = 0; i < TREE_DEPTH; ++i) {
+    for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
+      myBallMoves[i][j] = new BallMove;
+    }
+    myBallMovesSize[i] = 0;
+  }
 }
 
 BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
@@ -49,28 +61,23 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
 
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
-  int ballMovesSize = 0;
+  myBallMovesSize[TREE_DEPTH-1] = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, ballMoves, ballMovesSize);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, ballMoves, ballMovesSize);
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, ballMoves, ballMovesSize);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[TREE_DEPTH-1], myBallMovesSize[TREE_DEPTH-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[TREE_DEPTH-1], myBallMovesSize[TREE_DEPTH-1]);
+  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[TREE_DEPTH-1], myBallMovesSize[TREE_DEPTH-1]);
 
-  for (int i = 0; i < ballMovesSize; ++i) {
-    mySimGameManager->DoMove(ballMoves[i]);
+  for (int i = 0; i < myBallMovesSize[TREE_DEPTH-1]; ++i) {
+    mySimGameManager->DoMove(myBallMoves[TREE_DEPTH-1][i]);
     value = Min(TREE_DEPTH-1, alpha, beta);
-    mySimGameManager->UndoMove(ballMoves[i]);
+    mySimGameManager->UndoMove(myBallMoves[TREE_DEPTH-1][i]);
     if (value >= beta) {
       break;
     }
     if (value > alpha) {
-      retMove = *ballMoves[i];
+      retMove = *myBallMoves[TREE_DEPTH-1][i];
       alpha = value;
     }
-  }
-
-  for (int i = 0; i < ballMovesSize; ++i) {
-    delete ballMoves[i];
   }
 
   return retMove;
@@ -84,17 +91,16 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
   if (depth == 0)
     return EvaluateBoard();
 
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
-  int ballMovesSize = 0;
+  myBallMovesSize[depth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, ballMoves, ballMovesSize);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, ballMoves, ballMovesSize);
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, ballMoves, ballMovesSize);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  for (int i = 0; i < ballMovesSize; ++i) {
-    mySimGameManager->DoMove(ballMoves[i]);
+  for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
+    mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Min(depth-1, alpha, beta);
-    mySimGameManager->UndoMove(ballMoves[i]);
+    mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value >= beta) {
       ret = beta;
       break;
@@ -103,10 +109,6 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
       alpha = value;
       ret = alpha;
     }
-  }
-
-  for (int i = 0; i < ballMovesSize; ++i) {
-    delete ballMoves[i];
   }
 
   return ret;
@@ -118,18 +120,17 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
   double value = 0.;
   if (depth == 0)
     return EvaluateBoard();
-  
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
-  int ballMovesSize = 0;
-  
-  GetGameManager()->AddPossibleMovesOneBall(myMinPlayer, ballMoves, ballMovesSize);
-  GetGameManager()->AddPossibleMovesTwoBalls(myMinPlayer, ballMoves, ballMovesSize);
-  GetGameManager()->AddPossibleMovesThreeBalls(myMinPlayer, ballMoves, ballMovesSize);
 
-  for (int i = 0; i < ballMovesSize; ++i) {
-    mySimGameManager->DoMove(ballMoves[i]);
+  myBallMovesSize[depth-1] = 0;
+  
+  GetGameManager()->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  GetGameManager()->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  GetGameManager()->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+
+  for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
+    mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Max(depth-1, alpha, beta);
-    mySimGameManager->UndoMove(ballMoves[i]);
+    mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value <= alpha) {
       ret = alpha;
       break;
@@ -138,10 +139,6 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
       beta = value;
       ret = beta;
     }
-  }
-
-  for (int i = 0; i < ballMovesSize; ++i) {
-    delete ballMoves[i];
   }
 
   return ret;

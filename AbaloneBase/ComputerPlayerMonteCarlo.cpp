@@ -31,6 +31,11 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 {
   BallMove ret;
   BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    ballMoves[i] = new BallMove;
+  }
+
   int ballMovesSize = 0;
 
   DWORD time = 0;
@@ -49,10 +54,6 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves, ballMovesSize);
   GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves, ballMovesSize);
 
-  CString out;
-  out = GetName() + ":\n";
-  Output::Message(out, false, true);
-
   myNoPossibleMoves = ballMovesSize;
   for (int i = 0; i < ballMovesSize; ++i) {
     newRating = SimulateGamesWithMove(ballMoves[i]);
@@ -64,7 +65,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
     }
   }
 
-  for (int i = 0; i < ballMovesSize; ++i) {
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     delete ballMoves[i];
   }
 
@@ -75,6 +76,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 
   time = end - start;
 
+  CString out;
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
@@ -83,10 +85,6 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   str.Format("  Simulated Games:   %d\n", GetGamesToSimulate());
   out += str;
   Output::Message(out, false, true);
-
-//   out = GetGameManager()->GetGameBoard()->ToString();
-//   out += GetName() + ":\n";
-//   Output::Message2(out, false, true);
 
   return ret;
 }

@@ -258,7 +258,7 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
     if (GetAxisOfBalls(ball1, ball2) == pushAxis) {
       // -> O|X or -> OO|X or -> OOO|X
       if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL) {
-        ballMoves[ballMovesSize] = new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
+        ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
         ++ballMovesSize;
       }
 
@@ -267,7 +267,7 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
         // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
       {
         opponentBall1 = opponentField1;
-        ballMoves[ballMovesSize] = new BallMove(direction, true, !opponentField2, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
+        ballMoves[ballMovesSize]->Init(direction, true, !opponentField2, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
         ++ballMovesSize;
       }
 
@@ -278,7 +278,7 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
       {
         opponentBall1 = opponentField1;
         opponentBall2 = opponentField2;
-        ballMoves[ballMovesSize] = new BallMove(direction, true, !opponentField3, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
+        ballMoves[ballMovesSize]->Init(direction, true, !opponentField3, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
         ++ballMovesSize;
       }
     }
@@ -303,18 +303,18 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
               if (myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))
                 && myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord3, direction))->GetBall() == BoardField::NO_BALL)
               {
-                ballMoves[ballMovesSize] = new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
+                ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
                 ++ballMovesSize;
               }
             }
             else {
-              ballMoves[ballMovesSize] = new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
+              ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
               ++ballMovesSize;
             }
           }
         }
         else {
-          ballMoves[ballMovesSize] = new BallMove(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
+          ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, opponentBall1, opponentBall2, opponentBall3);
           ++ballMovesSize;
         }
       }
@@ -868,6 +868,11 @@ double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
 {
   double ret = 0.;
   BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    ballMoves[i] = new BallMove;
+  }
+
   int ballMovesSize = 0;
 
   BallMove* currentMove = 0;
@@ -886,7 +891,7 @@ double GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
 
   ret = ret / (double)ballMovesSize;
 
-  for (int i = 0; i < ballMovesSize; ++i) {
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     delete ballMoves[i];
   }
 
@@ -897,6 +902,12 @@ double GameManager::CalcAttackedByOpponent(const Player* player) const
 {
   double ret = 0.;
   BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
+
+  // TODO: use member array instead of local array
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    ballMoves[i] = new BallMove;
+  }
+
   int ballMovesSize = 0;
 
   BallMove* currentMove = 0;
@@ -925,7 +936,7 @@ double GameManager::CalcAttackedByOpponent(const Player* player) const
   // is returned
 //  ret = ret / (double)ballMoves.size();
 
-  for (int i = 0; i < ballMovesSize; ++i) {
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     delete ballMoves[i];
   }
 
