@@ -1094,30 +1094,31 @@ void GameManager::AddPossibleMovesTwoBalls(const ComputerPlayer* player, BallMov
   // downright, so every combination of balls is checked only once
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      if (gameBoard->GetBoardFieldExist(x, y)) {
+        field1 = gameBoard->GetBoardField(x, y);
+        if (field1->GetBall() == player->GetBall()) {
+          // check balls from downleft to upright
+          if (gameBoard->GetBoardFieldExist(x+1, y+1)) {
+            field2 = gameBoard->GetBoardField(x+1, y+1);
+            if (field2->GetBall() == player->GetBall()) {
+              CheckDirections(field1, field2, 0, ballMoves, ballMovesSize);
+            }
+          }
 
-      // check balls from downleft to upright
-      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y+1)) {
-        field1 = gameBoard->GetBoardField(x, y);
-        field2 = gameBoard->GetBoardField(x+1, y+1);
-        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall()) {
-          CheckDirections(field1, field2, 0, ballMoves, ballMovesSize);
-        }
-      }
-
-      // check balls from left to right
-      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y)) {
-        field1 = gameBoard->GetBoardField(x, y);
-        field2 = gameBoard->GetBoardField(x+1, y);
-        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall()) {
-          CheckDirections(field1, field2, 0, ballMoves, ballMovesSize);
-        }
-      }
-      // check balls from up left to downright
-      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x, y-1)) {
-        field1 = gameBoard->GetBoardField(x, y);
-        field2 = gameBoard->GetBoardField(x, y-1);
-        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall()) {
-          CheckDirections(field1, field2, 0, ballMoves, ballMovesSize);
+          // check balls from left to right
+          if (gameBoard->GetBoardFieldExist(x+1, y)) {
+            field2 = gameBoard->GetBoardField(x+1, y);
+            if (field2->GetBall() == player->GetBall()) {
+              CheckDirections(field1, field2, 0, ballMoves, ballMovesSize);
+            }
+          }
+          // check balls from up left to downright
+          if (gameBoard->GetBoardFieldExist(x, y-1)) {
+            field2 = gameBoard->GetBoardField(x, y-1);
+            if (field2->GetBall() == player->GetBall()) {
+              CheckDirections(field1, field2, 0, ballMoves, ballMovesSize);
+            }
+          }
         }
       }
     }
@@ -1135,35 +1136,47 @@ void GameManager::AddPossibleMovesThreeBalls(const ComputerPlayer* player, BallM
   // downright, so every combination of balls is checked only once
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-
-      // check balls from downleft to upright
-      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y+1) && gameBoard->GetBoardFieldExist(x+2, y+2)) {
+      if (gameBoard->GetBoardFieldExist(x, y)) {
         field1 = gameBoard->GetBoardField(x, y);
-        field2 = gameBoard->GetBoardField(x+1, y+1);
-        field3 = gameBoard->GetBoardField(x+2, y+2);
-        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall() && field3->GetBall() == player->GetBall()) {
-          CheckDirections(field1, field2, field3, ballMoves, ballMovesSize);
-        }
-      }
+        if (field1->GetBall() == player->GetBall()) {
+          // check balls from downleft to upright
+          if (gameBoard->GetBoardFieldExist(x+1, y+1)) {
+            field2 = gameBoard->GetBoardField(x+1, y+1);
+            if (field2->GetBall() == player->GetBall()) {
+              if (gameBoard->GetBoardFieldExist(x+2, y+2)) {
+                field3 = gameBoard->GetBoardField(x+2, y+2);
+                if (field3->GetBall() == player->GetBall()) {
+                  CheckDirections(field1, field2, field3, ballMoves, ballMovesSize);
+                }
+              }
+            }
+          }
 
-      // check balls from left to right
-      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x+1, y) && gameBoard->GetBoardFieldExist(x+2, y)) {
-        field1 = gameBoard->GetBoardField(x, y);
-        field2 = gameBoard->GetBoardField(x+1, y);
-        field3 = gameBoard->GetBoardField(x+2, y);
+          // check balls from left to right
+          if (gameBoard->GetBoardFieldExist(x+1, y)) {
+            field2 = gameBoard->GetBoardField(x+1, y);
+            if (field2->GetBall() == player->GetBall()) {
+              if (gameBoard->GetBoardFieldExist(x+2, y)) {
+                field3 = gameBoard->GetBoardField(x+2, y);
+                if (field3->GetBall() == player->GetBall()) {
+                  CheckDirections(field1, field2, field3, ballMoves, ballMovesSize);
+                }
+              }
+            }
+          }
 
-        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall() && field3->GetBall() == player->GetBall()) {
-          CheckDirections(field1, field2, field3, ballMoves, ballMovesSize);
-        }
-      }
-      // check balls from upleft to downright
-      if (gameBoard->GetBoardFieldExist(x, y) && gameBoard->GetBoardFieldExist(x, y-1) && gameBoard->GetBoardFieldExist(x, y-2)) {
-        field1 = gameBoard->GetBoardField(x, y);
-        field2 = gameBoard->GetBoardField(x, y-1);
-        field3 = gameBoard->GetBoardField(x, y-2);
-
-        if (field1->GetBall() == player->GetBall() && field2->GetBall() == player->GetBall() && field3->GetBall() == player->GetBall()) {
-          CheckDirections(field1, field2, field3, ballMoves, ballMovesSize);
+          // check balls from upleft to downright
+          if (gameBoard->GetBoardFieldExist(x, y-1)) {
+            field2 = gameBoard->GetBoardField(x, y-1);
+            if (field2->GetBall() == player->GetBall()) {
+              if (gameBoard->GetBoardFieldExist(x, y-2)) {
+                field3 = gameBoard->GetBoardField(x, y-2);
+                if (field3->GetBall() == player->GetBall()) {
+                  CheckDirections(field1, field2, field3, ballMoves, ballMovesSize);
+                }
+              }
+            }
+          }
         }
       }
     }
