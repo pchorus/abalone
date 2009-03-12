@@ -10,7 +10,6 @@
 #include "ComputerPlayerEvaluateNextMove.h"
 #include "BallMove.h"
 
-#include <algorithm>
 #include <fstream>
 #include <string>
 
@@ -26,7 +25,7 @@ GameManager::GameManager()
 , mySelectedBall1(0)
 , mySelectedBall2(0)
 , mySelectedBall3(0)
-, myMaxNumberOfTurns(0)
+, myMaxNumberOfTurns(INT_MAX)
 , myBallMovesSize(0)
 {
   for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
@@ -984,8 +983,8 @@ void GameManager::TurnIsOver()
   mySelectedBall3 = 0;
   int turnCount = 0;
 
-  while (myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN && (myMaxNumberOfTurns == 0 || turnCount < myMaxNumberOfTurns)
-    && myLostBallsPlayer1 < 6 && myLostBallsPlayer2 < 6)
+  while (turnCount < myMaxNumberOfTurns
+    && myLostBallsPlayer1 < 6 && myLostBallsPlayer2 < 6 && myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN)
   {
     computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
     computerPlayer->TakeNextTurn();

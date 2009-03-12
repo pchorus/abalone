@@ -139,6 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateDebugInformation="true"
 				SubSystem="0"
 				LinkTimeCodeGeneration="1"
 				RandomizedBaseAddress="1"
