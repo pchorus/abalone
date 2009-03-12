@@ -115,17 +115,11 @@ GameBoard& GameBoard::operator=(const GameBoard& other)
 
 void GameBoard::CopyBoardFields(const GameBoard* other)
 {
-  BoardField* myField = 0;
-  BoardField* othersField = 0;
-
   for (int x = 0; x < BOARD_FIELDS_COLUMN+6; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW+6; ++y) {
-      myField = myFieldPoints[x][y];
-      othersField = other->myFieldPoints[x][y];
-
-      if (myField && othersField) {
-        myField->SetBall(othersField->GetBall());
-        myField->SetFieldCoordinates(othersField->GetFieldCoordinates());
+      if (myFieldPoints[x][y] && other->myFieldPoints[x][y]) {
+        myFieldPoints[x][y]->SetBall(other->myFieldPoints[x][y]->GetBall());
+        myFieldPoints[x][y]->SetFieldCoordinates(other->myFieldPoints[x][y]->GetFieldCoordinates());
       }
 // the following two assignments need not be executed, because
 // for the simManager, the gui coordinates are of no interest and
