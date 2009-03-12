@@ -24,4 +24,7 @@ private:
   double EvaluateMove() const;
 
   GameManager* mySimGameManager;
+
+  BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];
+  int myBallMovesSize;
 };

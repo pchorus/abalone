@@ -10,19 +10,32 @@
 ComputerPlayerEvaluateNextMove::ComputerPlayerEvaluateNextMove(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 :ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE)
 , mySimGameManager(new GameManager)
+, myBallMovesSize(0)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
+
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    myBallMoves[i] = new BallMove;
+  }
 }
 
 ComputerPlayerEvaluateNextMove::~ComputerPlayerEvaluateNextMove()
 {
+  if (mySimGameManager) {
+    delete mySimGameManager;
+    mySimGameManager = 0;
+  }
+
+  for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
+    delete myBallMoves[i];
+  }
 }
 
 BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 {
   BallMove ret;
-  BallMove* ballMoves[BALL_MOVES_ARRAY_SIZE];
-  int ballMovesSize = 0;
+
+  myBallMovesSize = 0;
 
   DWORD time = 0;
   DWORD start = 0;
@@ -38,9 +51,9 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 
   // TODO: perhaps first of all add the moves with three balls
   // because they are more promising
-  GetGameManager()->AddPossibleMovesOneBall(this, ballMoves, ballMovesSize);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, ballMoves, ballMovesSize);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, ballMoves, ballMovesSize);
+  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves, myBallMovesSize);
+  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
+  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -57,20 +70,16 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 
   CString out;
   out = GetName() + ":\n";
-  Output::Message(out, false, true);
+//  Output::Message(out, false, true);
 
-  for (int i = 0; i < ballMovesSize; ++i) {
-    newRating = SimulateMove(ballMoves[i]);
+  for (int i = 0; i < myBallMovesSize; ++i) {
+    newRating = SimulateMove(myBallMoves[i]);
     if (newRating > bestRating) {
       // TODO: improvement: assignment from pointer to pointer and after the loop,
       // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
-      ret = *ballMoves[i];
+      ret = *myBallMoves[i];
     }
-  }
-
-  for (int i = 0; i < ballMovesSize; ++i) {
-    delete ballMoves[i];
   }
 
   ASSERT(ret.HasBalls());
@@ -83,12 +92,12 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
-  str.Format("  Possible Moves:    %d\n", ballMovesSize);
+  str.Format("  Possible Moves:    %d\n", myBallMovesSize);
   out += str;
   Output::Message(out, false, true);
 
   out = GetGameManager()->GetGameBoard()->ToString();
-//  Output::Message2(out, false, true);
+  Output::Message2(out, false, true);
 
   return ret;
 }
@@ -159,6 +168,6 @@ double ComputerPlayerEvaluateNextMove::EvaluateMove() const
   str.Format("  Attacked By Opponent:   %f\n\n", attackingPowerRating);
   out += str;
 
-  Output::Message(out, false, true);
+//  Output::Message(out, false, true);
   return evaluation;
 }
