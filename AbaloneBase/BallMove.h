@@ -11,8 +11,6 @@
 
 #include "AbaloneBase.h"
 
-#include <vector>
-
 class BoardField;
 
 class ABALONE_BASE_DLLINTERFACE BallMove {

@@ -543,26 +543,26 @@ void GameManager::UndoMove(BallMove* move)
   case DOWNRIGHT:
     // own balls
     
-    field = ball1;
-    coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
-    myGameBoard->GetBoardField(field->GetFieldCoordinates())->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
-    myGameBoard->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
-    myGameBoard->GetBoardField(coord)->SetIsSelected(false);
+    coord = GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), move->GetDirection());
+    field = myGameBoard->GetBoardField(coord);
+    myGameBoard->GetBoardField(ball1->GetFieldCoordinates())->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
+    field->SetBall(BoardField::NO_BALL);
+    field->SetIsSelected(false);
 
     if (ball2) {
-      field = ball2;
-      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
-      myGameBoard->GetBoardField(field->GetFieldCoordinates())->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
-      myGameBoard->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
-      myGameBoard->GetBoardField(coord)->SetIsSelected(false);
+      coord = GetNextFieldCoordinatesInDirection(ball2->GetFieldCoordinates(), move->GetDirection());
+      field = myGameBoard->GetBoardField(coord);
+      myGameBoard->GetBoardField(ball2->GetFieldCoordinates())->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
+      field->SetBall(BoardField::NO_BALL);
+      field->SetIsSelected(false);
     }
 
     if (ball3) {
-      field = ball3;
-      coord = GetNextFieldCoordinatesInDirection(field->GetFieldCoordinates(), move->GetDirection());
-      myGameBoard->GetBoardField(field->GetFieldCoordinates())->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
-      myGameBoard->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
-      myGameBoard->GetBoardField(coord)->SetIsSelected(false);
+      coord = GetNextFieldCoordinatesInDirection(ball3->GetFieldCoordinates(), move->GetDirection());
+      field = myGameBoard->GetBoardField(coord);
+      myGameBoard->GetBoardField(ball3->GetFieldCoordinates())->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
+      field->SetBall(BoardField::NO_BALL);
+      field->SetIsSelected(false);
     }
 
     // opponent balls
@@ -772,8 +772,8 @@ CPoint GameManager::GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord,
 
 double GameManager::CalcLostBallsRatio(const Player* player) const
 {
-  double ret = GetLostBallsPlayer1() - GetLostBallsPlayer2();
-  if (player == GetPlayer1()) {
+  double ret = myLostBallsPlayer1 - myLostBallsPlayer2;
+  if (player == myPlayer1) {
     ret *= -1;
   }
 
@@ -802,10 +802,10 @@ double GameManager::CalcAvgCenterDistance(const Player* player) const
   // we return the average center distance of each ball on the board,
   // so we have to exclude the balls which are already lost
   if (player == GetPlayer1()) {
-    ret = centerDistance / double(14 - GetLostBallsPlayer1());
+    ret = centerDistance / double(14 - myLostBallsPlayer1);
   }
   else {
-    ret = centerDistance / double(14 - GetLostBallsPlayer2());
+    ret = centerDistance / double(14 - myLostBallsPlayer2);
   }
   return ret;
 }
@@ -831,11 +831,11 @@ double GameManager::CalcAvgGrouping(const Player* player) const
 
   // we return the average center distance of each ball on the board,
   // so we have to exclude the balls which are already lost
-  if (player == GetPlayer1()) {
-    ret = grouping / double(14 - GetLostBallsPlayer1());
+  if (player == myPlayer1) {
+    ret = grouping / double(14 - myLostBallsPlayer1);
   }
   else {
-    ret = grouping / double(14 - GetLostBallsPlayer2());
+    ret = grouping / double(14 - myLostBallsPlayer2);
   }
   return ret;
 }
@@ -860,9 +860,7 @@ double GameManager::CalcAttackingPowerOnOpponent(const Player* player)
     }
   }
 
-  ret = ret / (double)myBallMovesSize;
-
-  return ret;
+  return ret / (double)myBallMovesSize;
 }
 
 double GameManager::CalcAttackedByOpponent(const Player* player)

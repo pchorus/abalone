@@ -9,7 +9,6 @@
 
 #include "Player.h"
 #include "BoardField.h"
-#include <vector>
 
 #define WM_COMPUTER_CALC_FINISHED     WM_USER + 23
 
@@ -106,7 +105,7 @@ private:
   void AddLostBall(BoardField::Ball ball);
   void RemoveLostBall(BoardField::Ball ball);
 
-  // sorts the vector of selected balls, such that they are
+  // sorts the selected balls, such that they are
   // in the array as on the board from left to right
   void SortSelectedBalls();
   // sorts the passed collection of balls
