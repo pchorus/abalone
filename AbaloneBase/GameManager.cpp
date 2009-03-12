@@ -313,31 +313,16 @@ void GameManager::MoveBallsInDirection(Direction direction)
 {
   BoardField* field = 0;
 
-  BoardField* selectedField1 = 0;
-  BoardField* selectedField2 = 0;
-  BoardField* selectedField3 = 0;
   BoardField* opponentField1 = 0;
   BoardField* opponentField2 = 0;
   BoardField* opponentField3 = 0;
 
   BoardField::Ball opponentBall = BoardField::NO_BALL;
 
-  if (!selectedField1 && !selectedField2 && !selectedField3) {
-    if (mySelectedBall1) {
-      selectedField1 = mySelectedBall1;
-      if (mySelectedBall2) {
-        selectedField2 = mySelectedBall2;
-      }
-      if (mySelectedBall3) {
-        selectedField3 = mySelectedBall3;
-      }
-    }
-  }
-
-  GetOpponentFields(direction, selectedField1, selectedField2, selectedField3,
+  GetOpponentFields(direction, mySelectedBall1, mySelectedBall2, mySelectedBall3,
                                opponentField1, opponentField2, opponentField3);
   opponentBall = BoardField::BLACK_BALL;
-  if (selectedField1->GetBall() == BoardField::BLACK_BALL) {
+  if (mySelectedBall1->GetBall() == BoardField::BLACK_BALL) {
     opponentBall = BoardField::WHITE_BALL;
   }
 
