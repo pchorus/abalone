@@ -20,8 +20,10 @@ public:
 
   virtual BallMove CalculateNextMove();
 
-private:
   size_t GetGamesToSimulate() const;
+
+private:
+  size_t myGamesToSimulate;
   double SimulateGamesWithMove(BallMove* ballMove) const;
   // evaluates the outcome of a simulated game
   double EvaluateSimGame() const;
@@ -36,7 +38,5 @@ private:
 
 inline size_t ComputerPlayerMonteCarlo::GetGamesToSimulate() const
 {
-//  return 8 * (100 - myNoPossibleMoves) / 10;
-//  return 15 * (100 - myNoPossibleMoves) / 10;
-  return 100;
+  return myGamesToSimulate;
 }

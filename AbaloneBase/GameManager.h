@@ -51,8 +51,7 @@ public:
   void RemoveSelectedBall(BoardField* field);
   void ClearSelectedBalls();
 
-  void TurnIsOver(LPVOID pParam);
-  void TurnIsOver();
+  void TurnIsOver(LPVOID pParam = 0);
 
   void AddPossibleMovesOneBall(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddPossibleMovesTwoBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;

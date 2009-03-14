@@ -7,7 +7,6 @@
 #include "Output.h"
 
 
-static const size_t GAMES_TO_SIMULATE = 25;
 static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 200;
 
 
@@ -16,6 +15,7 @@ ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, con
 , mySimGameManager(new GameManager)
 , myBallMovesSize(0)
 , myCurrentPlayer(0)
+, myGamesToSimulate(100)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
@@ -116,7 +116,7 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
   double ret = 0.;
   double rating = 0.;
   // generic number of simulated games
-  size_t gamesToSimulate = GetGamesToSimulate();
+  size_t gamesToSimulate = myGamesToSimulate;
   // alternative: fixed number of simulated games
 //  size_t gamesToSimulate = GAMES_TO_SIMULATE;
 
