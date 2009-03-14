@@ -458,9 +458,6 @@ void GameManager::UndoMove(BallMove* move)
     opponentBall = BoardField::WHITE_BALL;
   }
 
-  // TODO: perhaps we don't need that
-  SortBalls(ball1, ball2, ball3);
-
   switch (move->GetDirection()) {
   case UPLEFT:
   case LEFT:
