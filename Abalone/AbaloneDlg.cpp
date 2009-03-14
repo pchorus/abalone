@@ -276,8 +276,6 @@ void CAbaloneDlg::DrawBoard()
   // Außenlinien zeichnen
 
   // links unten nach rechts unten (1A nach 5A)
-  pDC->MoveTo(bottomLeft);
-  pDC->LineTo(bottomRight);
   currentPoint.y = bottomLeft.y;
   // Punkte berechnen
   for (int i = 0; i < 5; ++i) {
@@ -293,8 +291,6 @@ void CAbaloneDlg::DrawBoard()
   }
 
   // rechts unten nach rechts mitte (5A nach 9E)
-  pDC->MoveTo(bottomRight);
-  pDC->LineTo(middleRight);
   // Punkte berechnen
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = bottomRight.x + i * radius / 8;
@@ -310,8 +306,6 @@ void CAbaloneDlg::DrawBoard()
   }
 
   // rechts mitte nach rechts oben (9E nach 9I)
-  pDC->MoveTo(middleRight);
-  pDC->LineTo(topRight);
   // Punkte berechnen
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = middleRight.x - i * radius / 8;
@@ -322,8 +316,6 @@ void CAbaloneDlg::DrawBoard()
   }
 
   // links oben nach rechts oben (5I nach 9I)
-  pDC->MoveTo(topLeft);
-  pDC->LineTo(topRight);
   currentPoint.y = topLeft.y;
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = topLeft.x + i * radius / 4;
@@ -333,8 +325,6 @@ void CAbaloneDlg::DrawBoard()
   }
 
   // links mitte nach links oben (1E nach 5I)
-  pDC->MoveTo(middleLeft);
-  pDC->LineTo(topLeft);
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = middleLeft.x + i * radius / 8;
     currentPoint.y = middleLeft.y - i * triangleHeight / 4;
@@ -349,8 +339,6 @@ void CAbaloneDlg::DrawBoard()
   }
 
   // links unten nach links mitte
-  pDC->MoveTo(bottomLeft);
-  pDC->LineTo(middleLeft);
   for (int i = 0; i < 5; ++i) {
     currentPoint.x = bottomLeft.x - i * radius / 8;
     currentPoint.y = bottomLeft.y - i * triangleHeight / 4;

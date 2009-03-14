@@ -6,6 +6,9 @@
 #include "NewGameDlg.h"
 
 #include "AbaloneBase/GameManager.h"
+#include "AbaloneBase/ComputerPlayerMonteCarlo.h"
+#include "AbaloneBase/ComputerPlayerAlphaBeta.h"
+#include "AbaloneBase/Output.h"
 
 
 // NewGameDlg-Dialogfeld
@@ -26,11 +29,34 @@ void NewGameDlg::DoDataExchange(CDataExchange* pDX)
 {
   CDialog::DoDataExchange(pDX);
   DDX_Control(pDX, IDC_COMBO_START_FORMATION, myStartFormationComboBox);
+  DDX_Control(pDX, IDC_STATIC_PLAYER1_SIM_GAMES, myStaticPlayer1MCSimGames);
+  DDX_Control(pDX, IDC_STATIC_PLAYER1_NO_OF_TURNS_PER_SIM_GAME, myStaticPlayer1MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_STATIC_PLAYER1_TREE_DEPTH, myStaticPlayer1ABTreeDepth);
+  DDX_Control(pDX, IDC_EDIT_PLAYER1_SIM_GAMES, myEditPlayer1MCSimGames);
+  DDX_Control(pDX, IDC_EDIT_PLAYER1_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer1MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_EDIT_PLAYER1_TREE_DEPTH, myEditPlayer1ABTreeDepth);
+  DDX_Control(pDX, IDC_STATIC_PLAYER2_SIM_GAMES, myStaticPlayer2MCSimGames);
+  DDX_Control(pDX, IDC_STATIC_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myStaticPlayer2MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_STATIC_PLAYER2_TREE_DEPTH, myStaticPlayer2ABTreeDepth);
+  DDX_Control(pDX, IDC_EDIT_PLAYER2_SIM_GAMES, myEditPlayer2MCSimGames);
+  DDX_Control(pDX, IDC_EDIT_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer2MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_EDIT_PLAYER2_TREE_DEPTH, myEditPlayer2ABTreeDepth);
+  CStatic myStaticPlayer1ABTreeDepth;
 }
 
 
 BEGIN_MESSAGE_MAP(NewGameDlg, CDialog)
   ON_CBN_SELCHANGE(IDC_COMBO_START_FORMATION, &NewGameDlg::OnSelchangeComboStartFormation)
+  ON_BN_CLICKED(IDC_RADIO_HUMAN_PLAYER1, &NewGameDlg::OnRadioPlayer1Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER1, &NewGameDlg::OnRadioPlayer1Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1, &NewGameDlg::OnRadioPlayer1Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER1, &NewGameDlg::OnRadioPlayer1Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1, &NewGameDlg::OnRadioPlayer1Changed)
+  ON_BN_CLICKED(IDC_RADIO_HUMAN_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
+  ON_BN_CLICKED(IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
 END_MESSAGE_MAP()
 
 BOOL NewGameDlg::OnInitDialog()
@@ -59,6 +85,26 @@ BOOL NewGameDlg::OnInitDialog()
   myStartFormationComboBox.SetCurSel(myStartFormationComboBox.FindString(-1, START_FORMATION_STR_STANDARD));
   myStartFormationStr = START_FORMATION_STR_STANDARD;
 
+  myStaticPlayer1MCSimGames.EnableWindow(FALSE);
+  myStaticPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
+  myStaticPlayer1ABTreeDepth.EnableWindow(FALSE);
+  myEditPlayer1MCSimGames.EnableWindow(FALSE);
+  myEditPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
+  myEditPlayer1ABTreeDepth.EnableWindow(FALSE);
+  myEditPlayer1MCSimGames.SetWindowText("100");
+  myEditPlayer1MCTurnsPerSimGame.SetWindowText("200");
+  myEditPlayer1ABTreeDepth.SetWindowText("5");
+
+  myStaticPlayer2MCSimGames.EnableWindow(FALSE);
+  myStaticPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
+  myStaticPlayer2ABTreeDepth.EnableWindow(FALSE);
+  myEditPlayer2MCSimGames.EnableWindow(FALSE);
+  myEditPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
+  myEditPlayer2ABTreeDepth.EnableWindow(FALSE);
+  myEditPlayer2MCSimGames.SetWindowText("100");
+  myEditPlayer2MCTurnsPerSimGame.SetWindowText("200");
+  myEditPlayer2ABTreeDepth.SetWindowText("5");
+
   return ret;
 }
 
@@ -71,6 +117,8 @@ void NewGameDlg::OnSelchangeComboStartFormation()
 
 void NewGameDlg::OnOK()
 {
+  bool ok = true;
+
   // initialize the players
   CString namePlayer1;
   CString namePlayer2;
@@ -78,8 +126,8 @@ void NewGameDlg::OnOK()
   GetDlgItem(IDC_EDIT_NAME1)->GetWindowText(namePlayer1);
   GetDlgItem(IDC_EDIT_NAME2)->GetWindowText(namePlayer2);
 
-  int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER1);
-  int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER2);
+  int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1);
+  int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2);
 
   Player::PlayerType typePlayer1 = Player::PLAYER_TYPE_NONE;
   Player::PlayerType typePlayer2 = Player::PLAYER_TYPE_NONE;
@@ -122,5 +170,133 @@ void NewGameDlg::OnOK()
 
   myGameManager->SetPlayers(namePlayer1, typePlayer1, namePlayer2, typePlayer2);
 
-  CDialog::OnOK();
+  // check the information about the players
+  if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
+    ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(myGameManager->GetPlayer1());
+    CString str;
+    myEditPlayer1MCSimGames.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      mcPlayer->SetGamesToSimulate(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the no. of simulated games for player 1.", true, false);
+    }
+    myEditPlayer1MCTurnsPerSimGame.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      mcPlayer->SetTurnsPerSimGame(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the no. of turns per simulated game for player 1.", true, false);
+    }
+  }
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+    ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(myGameManager->GetPlayer1());
+    CString str;
+    myEditPlayer1ABTreeDepth.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      if (_ttoi(str) != DEFAULT_TREE_DEPTH) {
+        abPlayer->SetTreeDepth(_ttoi(str));
+      }
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the no. of simulated games for player 2.", true, false);
+    }
+  }
+
+  if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
+    ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(myGameManager->GetPlayer2());
+    CString str;
+    myEditPlayer2MCSimGames.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      mcPlayer->SetGamesToSimulate(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the no. of simulated games for player 2.", true, false);
+    }
+    myEditPlayer2MCTurnsPerSimGame.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      mcPlayer->SetTurnsPerSimGame(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the no. of turns per simulated game for player 2.", true, false);
+    }
+  }
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+    ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(myGameManager->GetPlayer2());
+    CString str;
+    myEditPlayer2ABTreeDepth.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      if (_ttoi(str) != DEFAULT_TREE_DEPTH) {
+        abPlayer->SetTreeDepth(_ttoi(str));
+      }
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the no. of simulated games for player 2.", true, false);
+    }
+  }
+
+
+  if (ok) {
+    CDialog::OnOK();
+  }
+}
+
+void NewGameDlg::OnRadioPlayer1Changed()
+{
+  int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1);
+
+  if (radioTypePlayer1 == IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER1) {
+    myStaticPlayer1MCSimGames.EnableWindow(TRUE);
+    myStaticPlayer1MCTurnsPerSimGame.EnableWindow(TRUE);
+    myEditPlayer1MCSimGames.EnableWindow(TRUE);
+    myEditPlayer1MCTurnsPerSimGame.EnableWindow(TRUE);
+  }
+  else {
+    myStaticPlayer1MCSimGames.EnableWindow(FALSE);
+    myStaticPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
+    myEditPlayer1MCSimGames.EnableWindow(FALSE);
+    myEditPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
+  }
+
+  if (radioTypePlayer1 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1) {
+    myStaticPlayer1ABTreeDepth.EnableWindow(TRUE);
+    myEditPlayer1ABTreeDepth.EnableWindow(TRUE);
+  }
+  else {
+    myStaticPlayer1ABTreeDepth.EnableWindow(FALSE);
+    myEditPlayer1ABTreeDepth.EnableWindow(FALSE);
+  }
+}
+
+void NewGameDlg::OnRadioPlayer2Changed()
+{
+  int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2);
+
+  if (radioTypePlayer2 == IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER2) {
+    myStaticPlayer2MCSimGames.EnableWindow(TRUE);
+    myStaticPlayer2MCTurnsPerSimGame.EnableWindow(TRUE);
+    myEditPlayer2MCSimGames.EnableWindow(TRUE);
+    myEditPlayer2MCTurnsPerSimGame.EnableWindow(TRUE);
+  }
+  else {
+    myStaticPlayer2MCSimGames.EnableWindow(FALSE);
+    myStaticPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
+    myEditPlayer2MCSimGames.EnableWindow(FALSE);
+    myEditPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
+  }
+
+  if (radioTypePlayer2 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2) {
+    myStaticPlayer2ABTreeDepth.EnableWindow(TRUE);
+    myEditPlayer2ABTreeDepth.EnableWindow(TRUE);
+  }
+  else {
+    myStaticPlayer2ABTreeDepth.EnableWindow(FALSE);
+    myEditPlayer2ABTreeDepth.EnableWindow(FALSE);
+  }
 }

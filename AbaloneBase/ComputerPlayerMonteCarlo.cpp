@@ -7,15 +7,16 @@
 #include "Output.h"
 
 
-static const int MAX_NUMBER_OF_TURNS_PER_SIM_GAME = 200;
-
+static const int DEFAULT_GAMES_TO_SIMULATE = 100;
+static const int DEFAULT_TURNS_PER_SIM_GAME = 200;
 
 ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO)
 , mySimGameManager(new GameManager)
 , myBallMovesSize(0)
 , myCurrentPlayer(0)
-, myGamesToSimulate(100)
+, myGamesToSimulate(DEFAULT_GAMES_TO_SIMULATE)
+, myTurnsPerSimGame(DEFAULT_TURNS_PER_SIM_GAME)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
@@ -116,7 +117,7 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
   double ret = 0.;
   double rating = 0.;
   // generic number of simulated games
-  size_t gamesToSimulate = myGamesToSimulate;
+  int gamesToSimulate = myGamesToSimulate;
   // alternative: fixed number of simulated games
 //  size_t gamesToSimulate = GAMES_TO_SIMULATE;
 
@@ -126,9 +127,9 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     startPlayer = Player::PLAYER_TWO;
   }
 
-  mySimGameManager->SetMaxNumberOfTurns(MAX_NUMBER_OF_TURNS_PER_SIM_GAME);
+  mySimGameManager->SetMaxNumberOfTurns(myTurnsPerSimGame);
 
-  for (size_t run = 0; run < gamesToSimulate; ++run) {
+  for (int run = 0; run < gamesToSimulate; ++run) {
     // copy current real situation to the gameboard for simulation
     mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
 

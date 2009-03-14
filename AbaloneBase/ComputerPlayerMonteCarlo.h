@@ -20,10 +20,14 @@ public:
 
   virtual BallMove CalculateNextMove();
 
-  size_t GetGamesToSimulate() const;
+  int GetGamesToSimulate() const;
+  void SetGamesToSimulate(int gamesToSimulate);
+  int GetTurnsPerSimGame() const;
+  void SetTurnsPerSimGame(int turnsPerSimGame);
 
 private:
-  size_t myGamesToSimulate;
+  int myGamesToSimulate;
+  int myTurnsPerSimGame;
   double SimulateGamesWithMove(BallMove* ballMove) const;
   // evaluates the outcome of a simulated game
   double EvaluateSimGame() const;
@@ -36,7 +40,22 @@ private:
   ComputerPlayer* myCurrentPlayer;
 };
 
-inline size_t ComputerPlayerMonteCarlo::GetGamesToSimulate() const
+inline int ComputerPlayerMonteCarlo::GetGamesToSimulate() const
 {
   return myGamesToSimulate;
+}
+
+inline void ComputerPlayerMonteCarlo::SetGamesToSimulate(int gamesToSimulate)
+{
+  myGamesToSimulate = gamesToSimulate;
+}
+
+inline int ComputerPlayerMonteCarlo::GetTurnsPerSimGame() const
+{
+  return myTurnsPerSimGame;
+}
+
+inline void ComputerPlayerMonteCarlo::SetTurnsPerSimGame(int turnsPerSimGame)
+{
+  myTurnsPerSimGame = turnsPerSimGame;
 }

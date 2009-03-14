@@ -8,19 +8,17 @@
 #include "Output.h"
 
 
+
 ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA)
 , mySimGameManager(new GameManager)
 , myMaxPlayer(0)
 , myMinPlayer(0)
+, myTreeDepth(DEFAULT_TREE_DEPTH)
+, myBallMoves(0)
+, myBallMovesSize(0)
 {
-  for (int i = 0; i < TREE_DEPTH; ++i) {
-    for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
-      myBallMoves[i][j] = new BallMove;
-    }
-    myBallMovesSize[i] = 0;
-  }
-
+  SetTreeDepth(myTreeDepth);
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
   if (GetGameManager()->IsFirstPlayersTurn()) {
@@ -40,11 +38,38 @@ ComputerPlayerAlphaBeta::~ComputerPlayerAlphaBeta()
     mySimGameManager = 0;
   }
 
-  for (int i = 0; i < TREE_DEPTH; ++i) {
+  DeleteBallMoves();
+}
+
+void ComputerPlayerAlphaBeta::SetTreeDepth(int treeDepth)
+{
+  DeleteBallMoves();
+
+  myTreeDepth = treeDepth;
+  myBallMovesSize = new int[myTreeDepth];
+  myBallMoves = new BallMove**[myTreeDepth];
+
+  for (int i = 0; i < myTreeDepth; ++i) {
+    myBallMoves[i] = new BallMove* [BALL_MOVES_ARRAY_SIZE];
     for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
       myBallMoves[i][j] = new BallMove;
     }
     myBallMovesSize[i] = 0;
+  }
+}
+
+void ComputerPlayerAlphaBeta::DeleteBallMoves()
+{
+  if (myBallMovesSize) {
+    delete[] myBallMovesSize;
+
+    for (int i = 0; i < myTreeDepth; ++i) {
+      for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
+        delete myBallMoves[i][j];
+      }
+      delete[] myBallMoves[i];
+    }
+    delete[] myBallMoves;
   }
 }
 
@@ -67,21 +92,21 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
 
-  myBallMovesSize[TREE_DEPTH-1] = 0;
+  myBallMovesSize[myTreeDepth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[TREE_DEPTH-1], myBallMovesSize[TREE_DEPTH-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[TREE_DEPTH-1], myBallMovesSize[TREE_DEPTH-1]);
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[TREE_DEPTH-1], myBallMovesSize[TREE_DEPTH-1]);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
+  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
 
-  for (int i = 0; i < myBallMovesSize[TREE_DEPTH-1]; ++i) {
-    mySimGameManager->DoMove(myBallMoves[TREE_DEPTH-1][i]);
-    value = Min(TREE_DEPTH-1, alpha, beta);
-    mySimGameManager->UndoMove(myBallMoves[TREE_DEPTH-1][i]);
+  for (int i = 0; i < myBallMovesSize[myTreeDepth-1]; ++i) {
+    mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
+    value = Min(myTreeDepth-1, alpha, beta);
+    mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
     if (value >= beta) {
       break;
     }
     if (value > alpha) {
-      retMove = *myBallMoves[TREE_DEPTH-1][i];
+      retMove = *myBallMoves[myTreeDepth-1][i];
       alpha = value;
     }
   }
@@ -93,7 +118,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
-  str.Format("  Possible Moves:    %d\n", myBallMovesSize[TREE_DEPTH-1]);
+  str.Format("  Possible Moves:    %d\n", myBallMovesSize[myTreeDepth-1]);
   out += str;
   Output::Message(out, false, true);
 

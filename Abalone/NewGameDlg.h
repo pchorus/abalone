@@ -28,8 +28,24 @@ protected:
 
 private:
   afx_msg void OnSelchangeComboStartFormation();
+  afx_msg void OnRadioPlayer1Changed();
+  afx_msg void OnRadioPlayer2Changed();
 
   GameManager* myGameManager;
+  CStatic myStaticPlayer1MCSimGames;
+  CStatic myStaticPlayer1MCTurnsPerSimGame;
+  CStatic myStaticPlayer1ABTreeDepth;
+  CEdit myEditPlayer1MCSimGames;
+  CEdit myEditPlayer1MCTurnsPerSimGame;
+  CEdit myEditPlayer1ABTreeDepth;
+
+  CStatic myStaticPlayer2MCSimGames;
+  CStatic myStaticPlayer2MCTurnsPerSimGame;
+  CStatic myStaticPlayer2ABTreeDepth;
+  CEdit myEditPlayer2MCSimGames;
+  CEdit myEditPlayer2MCTurnsPerSimGame;
+  CEdit myEditPlayer2ABTreeDepth;
+
   CComboBox myStartFormationComboBox;
   CString myStartFormationStr;
 };
