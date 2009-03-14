@@ -17,20 +17,18 @@ class ABALONE_BASE_DLLINTERFACE BallMove {
 public:
   // constructor / destructor
   BallMove();
-  BallMove(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3);
+  BallMove(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, int opponentBalls);
   BallMove(const BallMove& other);
   ~BallMove();
 
-  void Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3);
+  void Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, int opponentBalls);
 
   void GetBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
   void SetBalls(BoardField* ball1, BoardField* ball2, BoardField* ball3);
   void AddBall(BoardField* field);
   void ClearBalls();
-  void GetOpponentBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
-  void AddOpponentBall(BoardField* field);
-  void ClearOpponentBalls();
 
+  int GetOpponentBalls() const;
   Direction GetDirection() const;
   void SetDirection(Direction direction);
 
@@ -48,9 +46,8 @@ private:
   BoardField* myBall1;
   BoardField* myBall2;
   BoardField* myBall3;
-  BoardField* myOpponentBall1;
-  BoardField* myOpponentBall2;
-  BoardField* myOpponentBall3;
+
+  int myOpponentBalls;
   // direction of the move
   Direction myDirection;
   // true, if the move pushes opponent's balls
@@ -71,13 +68,6 @@ inline void BallMove::SetBalls(BoardField* ball1, BoardField* ball2, BoardField*
   myBall1 = ball1;
   myBall2 = ball2;
   myBall3 = ball3;
-}
-
-inline void BallMove::GetOpponentBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const
-{
-  ball1 = myOpponentBall1;
-  ball2 = myOpponentBall2;
-  ball3 = myOpponentBall3;
 }
 
 inline Direction BallMove::GetDirection() const
@@ -110,24 +100,9 @@ inline void BallMove::ClearBalls()
   myBall3 = 0;
 }
 
-inline void BallMove::AddOpponentBall(BoardField* field)
+inline int BallMove::GetOpponentBalls() const
 {
-  if (!myOpponentBall1) {
-    myOpponentBall1 = field;
-  }
-  else if (!myOpponentBall2) {
-    myOpponentBall2 = field;
-  }
-  else if (!myOpponentBall3) {
-    myOpponentBall3 = field;
-  }
-}
-
-inline void BallMove::ClearOpponentBalls()
-{
-  myOpponentBall1 = 0;
-  myOpponentBall2 = 0;
-  myOpponentBall3 = 0;
+  return myOpponentBalls;
 }
 
 inline bool BallMove::IsAttacking() const
@@ -155,14 +130,12 @@ inline bool BallMove::HasBalls() const
   return !!myBall1;
 }
 
-inline void BallMove::Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3)
+inline void BallMove::Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, int opponentBalls)
 {
   myBall1 = ball1;
   myBall2 = ball2;
   myBall3 = ball3;
-  myOpponentBall1 = opponentBall1;
-  myOpponentBall2 = opponentBall2;
-  myOpponentBall3 = opponentBall3;
+  myOpponentBalls = opponentBalls;
   myDirection = direction;
   myIsAttacking = isAttacking;
   myEjectsBall = ejectsBall;
