@@ -116,6 +116,9 @@ private:
   void SetBallsBelgianDaisyFormation();
   void SetBallsCustomFormation(const CString& formation);
 
+  // returns the next field in the given direction
+  BoardField* GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const;
+
   // members
   GameBoard* myGameBoard;
   bool myIsGameStarted;

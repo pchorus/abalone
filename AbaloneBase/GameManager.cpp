@@ -279,15 +279,15 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
   // sidesteps
   else {
     // since we use the opponentField1 as help variable since it is not used otherwise in this else block
-    opponentField1 = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), direction));
+    opponentField1 = GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
     if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL)
     {
       if (ball2) {
-        opponentField1 = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball2->GetFieldCoordinates(), direction));
+        opponentField1 = GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction);
         if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL)
         {
           if (ball3) {
-            opponentField1 = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball3->GetFieldCoordinates(), direction));
+            opponentField1 = GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction);
             if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL)
             {
               ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
@@ -321,20 +321,6 @@ void GameManager::MoveBallsInDirection(Direction direction)
 
 void GameManager::DoMove(BallMove* move)
 {
-//   BoardField* ball1 = 0;
-//   BoardField* ball2 = 0;
-//   BoardField* ball3 = 0;
-//   move->GetBalls(ball1, ball2, ball3);
-// 
-//   mySelectedBall1 = myGameBoard->GetBoardField(ball1->GetFieldCoordinates());
-//   if (ball2)
-//     mySelectedBall2 = myGameBoard->GetBoardField(ball2->GetFieldCoordinates());
-// 
-//   if (ball3)
-//     mySelectedBall3 = myGameBoard->GetBoardField(ball3->GetFieldCoordinates());
-// 
-//   MoveBallsInDirection(move->GetDirection());
-
   BoardField* ball1 = 0;
   BoardField* ball2 = 0;
   BoardField* ball3 = 0;
@@ -359,18 +345,7 @@ void GameManager::DoMove(BallMove* move)
   // first, opponent balls are moved
   if (opponentField1 && opponentField1->GetBall() == opponentBall) {
     if (opponentField2 && opponentField2->GetBall() == opponentBall) {
-      if (opponentField3 && opponentField3->GetBall() == opponentBall) {
-        field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(opponentField3->GetFieldCoordinates(), direction));
-        if (field) {
-          field->SetBall(opponentField3->GetBall());
-          opponentField3->SetBall(BoardField::NO_BALL);
-          opponentField3->SetIsSelected(false);
-        }
-        else {
-          AddLostBall(opponentBall);
-        }
-      }
-      field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(opponentField2->GetFieldCoordinates(), direction));
+      field = GetNextFieldInDirection(opponentField2->GetFieldCoordinates(), direction);
       if (field) {
         field->SetBall(opponentField2->GetBall());
         opponentField2->SetBall(BoardField::NO_BALL);
@@ -380,7 +355,7 @@ void GameManager::DoMove(BallMove* move)
         AddLostBall(opponentBall);
       }
     }
-    field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(opponentField1->GetFieldCoordinates(), direction));
+    field = GetNextFieldInDirection(opponentField1->GetFieldCoordinates(), direction);
     if (field) {
       field->SetBall(opponentField1->GetBall());
       opponentField1->SetBall(BoardField::NO_BALL);
@@ -395,18 +370,18 @@ void GameManager::DoMove(BallMove* move)
   case UPLEFT:
   case LEFT:
   case DOWNLEFT:
-    myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), direction))->SetBall(ball1->GetBall());
+    GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction)->SetBall(ball1->GetBall());
     ball1->SetBall(BoardField::NO_BALL);
     ball1->SetIsSelected(false);
 
     if (ball2) {
-      myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball2->GetFieldCoordinates(), direction))->SetBall(ball2->GetBall());
+      GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction)->SetBall(ball2->GetBall());
       ball2->SetBall(BoardField::NO_BALL);
       ball2->SetIsSelected(false);
     }
 
     if (ball3) {
-      myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball3->GetFieldCoordinates(), direction))->SetBall(ball3->GetBall());
+      GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction)->SetBall(ball3->GetBall());
       ball3->SetBall(BoardField::NO_BALL);
       ball3->SetIsSelected(false);
     }
@@ -415,18 +390,18 @@ void GameManager::DoMove(BallMove* move)
   case RIGHT:
   case DOWNRIGHT:
     if (ball3) {
-      myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball3->GetFieldCoordinates(), direction))->SetBall(ball3->GetBall());
+      GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction)->SetBall(ball3->GetBall());
       ball3->SetBall(BoardField::NO_BALL);
       ball3->SetIsSelected(false);
     }
 
     if (ball2) {
-      myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball2->GetFieldCoordinates(), direction))->SetBall(ball2->GetBall());
+      GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction)->SetBall(ball2->GetBall());
       ball2->SetBall(BoardField::NO_BALL);
       ball2->SetIsSelected(false);
     }
 
-    myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), direction))->SetBall(ball1->GetBall());
+    GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction)->SetBall(ball1->GetBall());
     ball1->SetBall(BoardField::NO_BALL);
     ball1->SetIsSelected(false);
 
@@ -453,58 +428,53 @@ void GameManager::UndoMove(BallMove* move)
   BoardField::Ball opponentBall = BoardField::NO_BALL;
 
   opponentBall = BoardField::BLACK_BALL;
-  coord = GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), move->GetDirection());
-  if (myGameBoard->GetBoardField(coord)->GetBall() == BoardField::BLACK_BALL) {
+  if (GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction)->GetBall() == BoardField::BLACK_BALL) {
     opponentBall = BoardField::WHITE_BALL;
   }
 
-  switch (move->GetDirection()) {
+  switch (direction) {
   case UPLEFT:
   case LEFT:
   case DOWNLEFT:
     // own balls
     if (ball3) {
-      coord = GetNextFieldCoordinatesInDirection(ball3->GetFieldCoordinates(), move->GetDirection());
-      ball3->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
-      myGameBoard->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
-      myGameBoard->GetBoardField(coord)->SetIsSelected(false);
+      field = GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction);
+      ball3->SetBall(field->GetBall());
+      field->SetBall(BoardField::NO_BALL);
+      field->SetIsSelected(false);
     }
 
     if (ball2) {
-      coord = GetNextFieldCoordinatesInDirection(ball2->GetFieldCoordinates(), move->GetDirection());
-      ball2->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
-      myGameBoard->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
-      myGameBoard->GetBoardField(coord)->SetIsSelected(false);
+      field = GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction);
+      ball2->SetBall(field->GetBall());
+      field->SetBall(BoardField::NO_BALL);
+      field->SetIsSelected(false);
     }
 
-    coord = GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), move->GetDirection());
-    ball1->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
-    myGameBoard->GetBoardField(coord)->SetBall(BoardField::NO_BALL);
-    myGameBoard->GetBoardField(coord)->SetIsSelected(false);
+    field = GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
+    ball1->SetBall(field->GetBall());
+    field->SetBall(BoardField::NO_BALL);
+    field->SetIsSelected(false);
     break;
   case UPRIGHT:
   case RIGHT:
   case DOWNRIGHT:
     // own balls
-    
-    coord = GetNextFieldCoordinatesInDirection(ball1->GetFieldCoordinates(), move->GetDirection());
-    field = myGameBoard->GetBoardField(coord);
-    ball1->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
+    field = GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
+    ball1->SetBall(field->GetBall());
     field->SetBall(BoardField::NO_BALL);
     field->SetIsSelected(false);
 
     if (ball2) {
-      coord = GetNextFieldCoordinatesInDirection(ball2->GetFieldCoordinates(), move->GetDirection());
-      field = myGameBoard->GetBoardField(coord);
-      ball2->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
+      field = GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction);
+      ball2->SetBall(field->GetBall());
       field->SetBall(BoardField::NO_BALL);
       field->SetIsSelected(false);
     }
 
     if (ball3) {
-      coord = GetNextFieldCoordinatesInDirection(ball3->GetFieldCoordinates(), move->GetDirection());
-      field = myGameBoard->GetBoardField(coord);
-      ball3->SetBall(myGameBoard->GetBoardField(coord)->GetBall());
+      field = GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction);
+      ball3->SetBall(field->GetBall());
       field->SetBall(BoardField::NO_BALL);
       field->SetIsSelected(false);
     }
@@ -513,10 +483,8 @@ void GameManager::UndoMove(BallMove* move)
 
   // opponent balls
   if (opponentBalls >= 1) {
-    coord = GetNextFieldCoordinatesInDirection(opponentBall1->GetFieldCoordinates(), move->GetDirection());
     opponentBall1->SetBall(opponentBall);
-
-    field = myGameBoard->GetBoardField(coord);
+    field = GetNextFieldInDirection(opponentBall1->GetFieldCoordinates(), direction);
     if (field) {
       field->SetBall(BoardField::NO_BALL);
       field->SetIsSelected(false);
@@ -527,25 +495,8 @@ void GameManager::UndoMove(BallMove* move)
   }
 
   if (opponentBalls >= 2) {
-    coord = GetNextFieldCoordinatesInDirection(opponentBall2->GetFieldCoordinates(), move->GetDirection());
     opponentBall2->SetBall(opponentBall);
-
-    field = myGameBoard->GetBoardField(coord);
-    if (field) {
-      field->SetBall(BoardField::NO_BALL);
-      field->SetIsSelected(false);
-    }
-    else {
-      RemoveLostBall(opponentBall);
-    }
-  }
-
-  if (opponentBalls >= 3) {
-    field = opponentBall3;
-    coord = GetNextFieldCoordinatesInDirection(opponentBall3->GetFieldCoordinates(), move->GetDirection());
-    opponentBall3->SetBall(opponentBall);
-
-    field = myGameBoard->GetBoardField(coord);
+    field = GetNextFieldInDirection(opponentBall2->GetFieldCoordinates(), direction);
     if (field) {
       field->SetBall(BoardField::NO_BALL);
       field->SetIsSelected(false);
@@ -868,27 +819,27 @@ int GameManager::CalcGroupingField(const Player* player, CPoint coord) const
 
   BoardField* field = 0;
   // check the fields around the new field for fellow balls
-  field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(coord, UPLEFT));
+  field = GetNextFieldInDirection(coord, UPLEFT);
   if (field && field->GetBall() == player->GetBall()) {
     ++ret;
   }
-  field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(coord, UPRIGHT));
+  field = GetNextFieldInDirection(coord,UPRIGHT);
   if (field && field->GetBall() == player->GetBall()) {
     ++ret;
   }
-  field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(coord, LEFT));
+  field = GetNextFieldInDirection(coord, LEFT);
   if (field && field->GetBall() == player->GetBall()) {
     ++ret;
   }
-  field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(coord, RIGHT));
+  field = GetNextFieldInDirection(coord, RIGHT);
   if (field && field->GetBall() == player->GetBall()) {
     ++ret;
   }
-  field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(coord, DOWNLEFT));
+  field = GetNextFieldInDirection(coord, DOWNLEFT);
   if (field && field->GetBall() == player->GetBall()) {
     ++ret;
   }
-  field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(coord, DOWNRIGHT));
+  field = GetNextFieldInDirection(coord, DOWNRIGHT);
   if (field && field->GetBall() == player->GetBall()) {
     ++ret;
   }
@@ -1306,15 +1257,15 @@ BOOL GameManager::IsPossibleDirection(Direction direction) const
         fieldCoord3 = ball3->GetFieldCoordinates();
       }
 
-      field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord1, direction));
+      field = GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
       if (field && field->GetBall() == BoardField::NO_BALL)
       {
         if (ball2) {
-          field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord2, direction));
+          field = GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction);
           if (field && field->GetBall() == BoardField::NO_BALL)
           {
             if (ball3) {
-              field = myGameBoard->GetBoardField(GetNextFieldCoordinatesInDirection(fieldCoord3, direction));
+              field = GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction);
               if (field && field->GetBall() == BoardField::NO_BALL)
               {
                 ret = TRUE;
@@ -1333,4 +1284,38 @@ BOOL GameManager::IsPossibleDirection(Direction direction) const
   }
 
   return ret;
+}
+
+inline BoardField* GameManager::GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const
+{
+  switch (direction) {
+  case UPLEFT:
+    return myGameBoard->GetBoardField(fieldCoord.x, fieldCoord.y+1);
+  case UPRIGHT:
+    return myGameBoard->GetBoardField(fieldCoord.x+1, fieldCoord.y+1);
+  case LEFT:
+    return myGameBoard->GetBoardField(fieldCoord.x-1, fieldCoord.y);
+  case RIGHT:
+    return myGameBoard->GetBoardField(fieldCoord.x+1, fieldCoord.y);
+  case DOWNLEFT:
+    return myGameBoard->GetBoardField(fieldCoord.x-1, fieldCoord.y-1);
+  case DOWNRIGHT:
+    return myGameBoard->GetBoardField(fieldCoord.x, fieldCoord.y-1);
+  }
+
+//   switch (direction) {
+//   case UPLEFT:
+//     return myFieldPoints[coord.x+3][coord.y+4];
+//   case UPRIGHT:
+//     return myFieldPoints[coord.x+4][coord.y+4];
+//   case LEFT:
+//     return myFieldPoints[coord.x+2][coord.y+3];
+//   case RIGHT:
+//     return myFieldPoints[coord.x+4][coord.y+3];
+//   case DOWNLEFT:
+//     return myFieldPoints[coord.x+2][coord.y+2];
+//   case DOWNRIGHT:
+//     return myFieldPoints[coord.x+3][coord.y+2];
+//   }
+  return 0;
 }
