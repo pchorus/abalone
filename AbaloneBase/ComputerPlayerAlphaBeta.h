@@ -10,7 +10,7 @@
 
 #include "ComputerPlayer.h"
 
-static const int TREE_DEPTH = 4;
+static const int TREE_DEPTH = 5;
 
 class ABALONE_BASE_DLLINTERFACE ComputerPlayerAlphaBeta : public ComputerPlayer {
 public:

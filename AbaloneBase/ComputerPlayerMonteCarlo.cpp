@@ -149,20 +149,21 @@ double ComputerPlayerMonteCarlo::EvaluateSimGame() const
   // 0.0  = 0.0 : no marble has any neighboring fellow marbles
   groupingRating /= 4.1;
 
-  double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
-
-  double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
-  // 0 attacks  = 1.0
-  // 10 attacks = 0.0
-  if (attackedByOpponent > 10.)
-    attackedByOpponent = 10.;
-  attackedByOpponent = (10. - attackedByOpponent) * 0.1;
+  // TODO: attacking powers should be calculated without calling AddPossibleMoves
+//   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
+// 
+//   double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
+//   // 0 attacks  = 1.0
+//   // 10 attacks = 0.0
+//   if (attackedByOpponent > 10.)
+//     attackedByOpponent = 10.;
+//   attackedByOpponent = (10. - attackedByOpponent) * 0.1;
 
   double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
     + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
-    + GROUPING_EVALUATION_WEIGHT                    * groupingRating
-    + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
-    + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
+    + GROUPING_EVALUATION_WEIGHT                    * groupingRating;
+//     + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
+//     + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
 
   return evaluation;
 }

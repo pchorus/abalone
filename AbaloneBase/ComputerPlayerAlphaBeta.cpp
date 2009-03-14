@@ -97,6 +97,21 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   out += str;
   Output::Message(out, false, true);
 
+  // retMove contains the ballfields from the simGameManager,
+  // to do the move on the real game board, we have to give it the boardfields from the
+  // real game manager
+
+  BoardField* ball1 = 0;
+  BoardField* ball2 = 0;
+  BoardField* ball3 = 0;
+  retMove.GetBalls(ball1, ball2, ball3);
+  ball1 = GetGameManager()->GetGameBoard()->GetBoardField(ball1->GetFieldCoordinates());
+  if (ball2)
+    ball2 = GetGameManager()->GetGameBoard()->GetBoardField(ball2->GetFieldCoordinates());
+  if (ball3)
+    ball3 = GetGameManager()->GetGameBoard()->GetBoardField(ball3->GetFieldCoordinates());
+  retMove.SetBalls(ball1, ball2, ball3);
+
   return retMove;
 }
 
@@ -178,21 +193,22 @@ double ComputerPlayerAlphaBeta::EvaluateBoard() const
   // 0.0  = 0.0 : no marble has any neighboring fellow marbles
   groupingRating /= 4.1;
 
-  double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(myMaxPlayer);
-  double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(myMaxPlayer);
-  // 0 attacks  = 1.0
-  // 10 attacks = 0.0
-  if (attackedByOpponent > 10.)
-    attackedByOpponent = 10.;
-  attackedByOpponent = (10. - attackedByOpponent) * 0.1;
+  // TODO: attacking powers should be calculated without calling AddPossibleMoves
+//   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(myMaxPlayer);
+//   double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(myMaxPlayer);
+//   // 0 attacks  = 1.0
+//   // 10 attacks = 0.0
+//   if (attackedByOpponent > 10.)
+//     attackedByOpponent = 10.;
+//   attackedByOpponent = (10. - attackedByOpponent) * 0.1;
 
   // TODO: another evaluation: if you can win the game with your next move,
   // you should take it anyway
   double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
     + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
-    + GROUPING_EVALUATION_WEIGHT                    * groupingRating
-    + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
-    + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
+    + GROUPING_EVALUATION_WEIGHT                    * groupingRating;
+//     + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
+//     + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
 
 //   CString out;
 //   CString str;

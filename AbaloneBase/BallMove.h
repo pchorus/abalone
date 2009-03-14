@@ -24,6 +24,7 @@ public:
   void Init(Direction direction, bool isAttacking, bool ejectsBall, BoardField* ball1, BoardField* ball2, BoardField* ball3, BoardField* opponentBall1, BoardField* opponentBall2, BoardField* opponentBall3);
 
   void GetBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
+  void SetBalls(BoardField* ball1, BoardField* ball2, BoardField* ball3);
   void AddBall(BoardField* field);
   void ClearBalls();
   void GetOpponentBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const;
@@ -63,6 +64,13 @@ inline void BallMove::GetBalls(BoardField*& ball1, BoardField*& ball2, BoardFiel
   ball1 = myBall1;
   ball2 = myBall2;
   ball3 = myBall3;
+}
+
+inline void BallMove::SetBalls(BoardField* ball1, BoardField* ball2, BoardField* ball3)
+{
+  myBall1 = ball1;
+  myBall2 = ball2;
+  myBall3 = ball3;
 }
 
 inline void BallMove::GetOpponentBalls(BoardField*& ball1, BoardField*& ball2, BoardField*& ball3) const
