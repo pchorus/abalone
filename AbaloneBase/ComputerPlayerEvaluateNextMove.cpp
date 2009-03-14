@@ -11,11 +11,19 @@ ComputerPlayerEvaluateNextMove::ComputerPlayerEvaluateNextMove(GameManager* game
 :ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE)
 , mySimGameManager(new GameManager)
 , myBallMovesSize(0)
+, myCurrentPlayer(0)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
   for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     myBallMoves[i] = new BallMove;
+  }
+
+  if (GetGameManager()->IsFirstPlayersTurn()) {
+    myCurrentPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
+  }
+  else {
+    myCurrentPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
   }
 }
 
@@ -33,7 +41,7 @@ ComputerPlayerEvaluateNextMove::~ComputerPlayerEvaluateNextMove()
 
 BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
 {
-  BallMove ret;
+  BallMove retMove;
 
   myBallMovesSize = 0;
 
@@ -49,12 +57,6 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   double bestRating = -1.;
   double newRating = -1.;
 
-  // TODO: perhaps first of all add the moves with three balls
-  // because they are more promising
-  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves, myBallMovesSize);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
-
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
 
@@ -68,9 +70,11 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
   mySimGameManager->SetStartPlayer(startPlayer);
 
-  CString out;
-  out = GetName() + ":\n";
-//  Output::Message(out, false, true);
+  // TODO: perhaps first of all add the moves with three balls
+  // because they are more promising
+  mySimGameManager->AddPossibleMovesOneBall(myCurrentPlayer, myBallMoves, myBallMovesSize);
+  mySimGameManager->AddPossibleMovesTwoBalls(myCurrentPlayer, myBallMoves, myBallMovesSize);
+  mySimGameManager->AddPossibleMovesThreeBalls(myCurrentPlayer, myBallMoves, myBallMovesSize);
 
   for (int i = 0; i < myBallMovesSize; ++i) {
     newRating = SimulateMove(myBallMoves[i]);
@@ -78,17 +82,33 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
       // TODO: improvement: assignment from pointer to pointer and after the loop,
       // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
-      ret = *myBallMoves[i];
+      retMove = *myBallMoves[i];
     }
   }
 
-  ASSERT(ret.HasBalls());
-  ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
+  ASSERT(retMove.HasBalls());
+  ASSERT(retMove.GetDirection() != NO_VALID_DIRECTION);
+
+  // retMove contains the ballfields from the simGameManager,
+  // to do the move on the real game board, we have to give it the boardfields from the
+  // real game manager
+  BoardField* ball1 = 0;
+  BoardField* ball2 = 0;
+  BoardField* ball3 = 0;
+  retMove.GetBalls(ball1, ball2, ball3);
+  ball1 = GetGameManager()->GetGameBoard()->GetBoardField(ball1->GetFieldCoordinates());
+  if (ball2)
+    ball2 = GetGameManager()->GetGameBoard()->GetBoardField(ball2->GetFieldCoordinates());
+  if (ball3)
+    ball3 = GetGameManager()->GetGameBoard()->GetBoardField(ball3->GetFieldCoordinates());
+  retMove.SetBalls(ball1, ball2, ball3);
+
 
   end = GetTickCount();
 
   time = end - start;
 
+  CString out("EvaluateNextMove\n");
   CString str;
   str.Format("  CalculateNextMove: %d\n", time);
   out += str;
@@ -96,10 +116,10 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   out += str;
   Output::Message(out, false, true);
 
-  out = GetGameManager()->GetGameBoard()->ToString();
-  Output::Message2(out, false, true);
+//   out = GetGameManager()->GetGameBoard()->ToString();
+//   Output::Message2(out, false, true);
 
-  return ret;
+  return retMove;
 }
 
 double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
@@ -139,34 +159,35 @@ double ComputerPlayerEvaluateNextMove::EvaluateMove() const
   // 0.0  = 0.0 : no marble has any neighboring fellow marbles
   groupingRating /= 4.1;
 
-  double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
-  double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
-  // 0 attacks  = 1.0
-  // 10 attacks = 0.0
-  if (attackedByOpponent > 10.)
-    attackedByOpponent = 10.;
-  attackedByOpponent = (10. - attackedByOpponent) * 0.1;
+  // TODO: attacking powers should be calculated without calling AddPossibleMoves
+//   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
+//   double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
+//   // 0 attacks  = 1.0
+//   // 10 attacks = 0.0
+//   if (attackedByOpponent > 10.)
+//     attackedByOpponent = 10.;
+//   attackedByOpponent = (10. - attackedByOpponent) * 0.1;
 
   // TODO: another evaluation: if you can win the game with your next move,
   // you should take it anyway
   double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
     + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
-    + GROUPING_EVALUATION_WEIGHT                    * groupingRating
-    + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
-    + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
+    + GROUPING_EVALUATION_WEIGHT                    * groupingRating;
+//     + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
+//     + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
 
-  CString out;
-  CString str;
-  str.Format("  Lost Balls:             %f\n", lostBallsRating);
-  out += str;
-  str.Format("  Center Distance:        %f\n", centerDistanceRating);
-  out += str;
-  str.Format("  Grouping:               %f\n", groupingRating);
-  out += str;
-  str.Format("  Attacking Power:        %f\n\n", attackingPowerRating);
-  out += str;
-  str.Format("  Attacked By Opponent:   %f\n\n", attackingPowerRating);
-  out += str;
+//   CString out;
+//   CString str;
+//   str.Format("  Lost Balls:             %f\n", lostBallsRating);
+//   out += str;
+//   str.Format("  Center Distance:        %f\n", centerDistanceRating);
+//   out += str;
+//   str.Format("  Grouping:               %f\n", groupingRating);
+//   out += str;
+//   str.Format("  Attacking Power:        %f\n\n", attackingPowerRating);
+//   out += str;
+//   str.Format("  Attacked By Opponent:   %f\n\n", attackingPowerRating);
+//   out += str;
 
 //  Output::Message(out, false, true);
   return evaluation;

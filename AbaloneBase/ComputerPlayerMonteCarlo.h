@@ -30,6 +30,8 @@ private:
 
   BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];
   int myBallMovesSize;
+  // current player on the sim game board
+  ComputerPlayer* myCurrentPlayer;
 };
 
 inline size_t ComputerPlayerMonteCarlo::GetGamesToSimulate() const

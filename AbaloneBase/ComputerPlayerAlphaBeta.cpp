@@ -100,7 +100,6 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   // retMove contains the ballfields from the simGameManager,
   // to do the move on the real game board, we have to give it the boardfields from the
   // real game manager
-
   BoardField* ball1 = 0;
   BoardField* ball2 = 0;
   BoardField* ball3 = 0;
@@ -155,9 +154,9 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
 
   myBallMovesSize[depth-1] = 0;
   
-  GetGameManager()->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
-  GetGameManager()->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
-  GetGameManager()->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
   for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);

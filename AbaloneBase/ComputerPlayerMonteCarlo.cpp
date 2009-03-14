@@ -15,11 +15,19 @@ ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, con
 : ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO)
 , mySimGameManager(new GameManager)
 , myBallMovesSize(0)
+, myCurrentPlayer(0)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
   for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     myBallMoves[i] = new BallMove;
+  }
+
+  if (GetGameManager()->IsFirstPlayersTurn()) {
+    myCurrentPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
+  }
+  else {
+    myCurrentPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
   }
 }
 
@@ -37,7 +45,7 @@ ComputerPlayerMonteCarlo::~ComputerPlayerMonteCarlo()
 
 BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 {
-  BallMove ret;
+  BallMove retMove;
 
   myBallMovesSize = 0;
 
@@ -53,9 +61,12 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   double bestRating = -1.;
   double newRating = -1.;
 
-  GetGameManager()->AddPossibleMovesOneBall(this, myBallMoves, myBallMovesSize);
-  GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
-  GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
+  // copy current real situation to the gameboard for simulation
+  mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
+  
+  mySimGameManager->AddPossibleMovesOneBall(myCurrentPlayer, myBallMoves, myBallMovesSize);
+  mySimGameManager->AddPossibleMovesTwoBalls(myCurrentPlayer, myBallMoves, myBallMovesSize);
+  mySimGameManager->AddPossibleMovesThreeBalls(myCurrentPlayer, myBallMoves, myBallMovesSize);
 
   for (int i = 0; i < myBallMovesSize; ++i) {
     newRating = SimulateGamesWithMove(myBallMoves[i]);
@@ -63,12 +74,26 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
       // TODO: improvement: assignment from pointer to pointer and after the loop,
       // one assignment by value, so we have only one copy of a BallMove
       bestRating = newRating;
-      ret = *myBallMoves[i];
+      retMove = *myBallMoves[i];
     }
   }
 
-  ASSERT(ret.HasBalls());
-  ASSERT(ret.GetDirection() != NO_VALID_DIRECTION);
+  ASSERT(retMove.HasBalls());
+  ASSERT(retMove.GetDirection() != NO_VALID_DIRECTION);
+
+  // retMove contains the ballfields from the simGameManager,
+  // to do the move on the real game board, we have to give it the boardfields from the
+  // real game manager
+  BoardField* ball1 = 0;
+  BoardField* ball2 = 0;
+  BoardField* ball3 = 0;
+  retMove.GetBalls(ball1, ball2, ball3);
+  ball1 = GetGameManager()->GetGameBoard()->GetBoardField(ball1->GetFieldCoordinates());
+  if (ball2)
+    ball2 = GetGameManager()->GetGameBoard()->GetBoardField(ball2->GetFieldCoordinates());
+  if (ball3)
+    ball3 = GetGameManager()->GetGameBoard()->GetBoardField(ball3->GetFieldCoordinates());
+  retMove.SetBalls(ball1, ball2, ball3);
 
   end = GetTickCount();
   time = end - start;
@@ -83,7 +108,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   out += str;
   Output::Message(out, false, true);
 
-  return ret;
+  return retMove;
 }
 
 double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
