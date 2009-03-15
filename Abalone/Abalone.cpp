@@ -13,6 +13,8 @@
 #include "AbaloneBase/Output.h"
 #include "AbaloneBase/GameManager.h"
 #include "AbaloneBase/GameBoard.h"
+#include "AbaloneBase/ComputerPlayerMonteCarlo.h"
+#include "AbaloneBase/ComputerPlayerAlphaBeta.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -122,7 +124,7 @@ void CAbaloneApp::ParseParam()
       value = token.Tokenize("=", idxEq);
       myCmdLineParams[key] = value;
     }
-    else if (token == "batch") {
+    else if (token == "Batch") {
       myIsBatch = true;
     }
     else if (token == "?") {
@@ -135,29 +137,70 @@ void CAbaloneApp::ParseParam()
 
 void CAbaloneApp::PlayBatchGame()
 {
+  CString hlp;
   CString msg;
   CString header;
-  CString namePlayer1 = "Player1 (" + myCmdLineParams["player1"] + ")";
-  CString namePlayer2 = "Player2 (" + myCmdLineParams["player2"] + ")";
+  CString namePlayer1 = "Player1 (" + myCmdLineParams["Player1"] + ")";
+  CString namePlayer2 = "Player2 (" + myCmdLineParams["Player2"] + ")";
 
   GameManager gameManager;
 
   // new game starts
   GameBoard* gameBoard = gameManager.GetGameBoard();
-
-  if (FormationFileExists()) {
+  
+  hlp = myCmdLineParams["Formation"];
+  if (hlp == START_FORMATION_STR_STANDARD || hlp == START_FORMATION_STR_BELGIAN_DAISY || FormationFileExists()) {
     gameBoard->Reset();
-    gameManager.SetBallFormation(myCmdLineParams["formation"]);
+    gameManager.SetBallFormation(hlp);
 
     Player::PlayerType typePlayer1 = Player::PLAYER_TYPE_NONE;
     Player::PlayerType typePlayer2 = Player::PLAYER_TYPE_NONE;
 
-    typePlayer1 = GetPlayerType(myCmdLineParams["player1"]);
-    typePlayer2 = GetPlayerType(myCmdLineParams["player2"]);
+    typePlayer1 = GetPlayerType(myCmdLineParams["Player1"]);
+    typePlayer2 = GetPlayerType(myCmdLineParams["Player2"]);
 
     if (typePlayer1 != Player::PLAYER_TYPE_NONE && typePlayer2 != Player::PLAYER_TYPE_NONE) {
       gameManager.SetPlayers(namePlayer1, typePlayer1,
                              namePlayer2, typePlayer2);
+
+      // set the players' configuration
+      if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
+        ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer1());
+        hlp = myCmdLineParams["SimGames1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
+          mcPlayer->SetGamesToSimulate(_ttoi(hlp));
+        }
+        hlp = myCmdLineParams["TurnsPerSim1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
+          mcPlayer->SetTurnsPerSimGame(_ttoi(hlp));
+        }
+      }
+      else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+        ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer1());
+        hlp = myCmdLineParams["TreeDepth1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
+          abPlayer->SetTreeDepth(_ttoi(hlp));
+        }
+      }
+
+      if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
+        ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer2());
+        hlp = myCmdLineParams["SimGames2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
+          mcPlayer->SetGamesToSimulate(_ttoi(hlp));
+        }
+        hlp = myCmdLineParams["TurnsPerSim2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
+          mcPlayer->SetTurnsPerSimGame(_ttoi(hlp));
+        }
+      }
+      else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
+        ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer2());
+        hlp = myCmdLineParams["TreeDepth2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
+          abPlayer->SetTreeDepth(_ttoi(hlp));
+        }
+      }
 
       gameManager.SetGameStarted(true);
       gameManager.SetMaxNumberOfTurns(300);
@@ -208,7 +251,7 @@ Player::PlayerType CAbaloneApp::GetPlayerType(const CString& playerType)
 bool CAbaloneApp::FormationFileExists()
 {
   bool ret = true;
-  CString file = "formations\\" + myCmdLineParams["formation"] += ".txt";
+  CString file = "formations\\" + myCmdLineParams["Formation"] += ".txt";
   std::ifstream input;
   input.open(file, std::ios_base::in);
 
@@ -230,10 +273,10 @@ bool CAbaloneApp::FormationFileExists()
 void CAbaloneApp::ShowHelpText()
 {
   CString msg("Please use the following parameters to run the program in batch mode:\n\n");
-  msg += "  -batch\t\tenables the batch mode\n";
-  msg += "  -player1=XX\tsets the player type for player1\n";
-  msg += "  -player2=XX\tsets the player type for player2\n";
-  msg += "  -formation=XXX\tsets the start formation for the game\n";
+  msg += "  -Batch\t\tenables the batch mode\n";
+  msg += "  -Player1=XX\tsets the player type for player1\n";
+  msg += "  -Player2=XX\tsets the player type for player2\n";
+  msg += "  -Formation=XXX\tsets the start formation for the game\n";
   msg += "\n";
   msg += "\n";
   msg += "Player types:\n";
