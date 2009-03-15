@@ -35,6 +35,7 @@ public:
 
   void SetStartPlayer(Player::PlayerNumber startPlayer);
   void SetGameStarted(bool started);
+  int GetMaxNumberOfTurns() const;
   void SetMaxNumberOfTurns(int maxTurns);
 
   void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
@@ -196,6 +197,11 @@ inline void GameManager::ResetLostBalls()
 {
   myLostBallsPlayer1 = 0;
   myLostBallsPlayer2 = 0;
+}
+
+inline int GameManager::GetMaxNumberOfTurns() const
+{
+  return myMaxNumberOfTurns;
 }
 
 inline void GameManager::SetMaxNumberOfTurns(int maxTurns)

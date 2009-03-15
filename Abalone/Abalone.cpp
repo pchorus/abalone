@@ -142,6 +142,8 @@ void CAbaloneApp::PlayBatchGame()
   CString header;
   CString namePlayer1 = "Player1 (" + myCmdLineParams["Player1"] + ")";
   CString namePlayer2 = "Player2 (" + myCmdLineParams["Player2"] + ")";
+  CString headerPlayer1(namePlayer1);
+  CString headerPlayer2(namePlayer2);
 
   GameManager gameManager;
 
@@ -174,6 +176,10 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           mcPlayer->SetTurnsPerSimGame(_ttoi(hlp));
         }
+        headerPlayer1.Format("%s SimGames: %d TurnsPerSim: %d",
+                              namePlayer1,
+                              mcPlayer->GetGamesToSimulate(),
+                              mcPlayer->GetTurnsPerSimGame());
       }
       else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer1());
@@ -181,6 +187,9 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
           abPlayer->SetTreeDepth(_ttoi(hlp));
         }
+        headerPlayer1.Format("%s TreeDepth: %d",
+                              namePlayer1,
+                              abPlayer->GetTreeDepth());
       }
 
       if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
@@ -193,6 +202,10 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           mcPlayer->SetTurnsPerSimGame(_ttoi(hlp));
         }
+        headerPlayer2.Format("%s SimGames: %d TurnsPerSim: %d",
+          namePlayer2,
+          mcPlayer->GetGamesToSimulate(),
+          mcPlayer->GetTurnsPerSimGame());
       }
       else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer2());
@@ -200,22 +213,38 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
           abPlayer->SetTreeDepth(_ttoi(hlp));
         }
+        headerPlayer2.Format("%s TreeDepth: %d",
+          namePlayer2,
+          abPlayer->GetTreeDepth());
       }
 
       gameManager.SetGameStarted(true);
-      gameManager.SetMaxNumberOfTurns(300);
+      int maxNoOfTurns = 300;
+      if (myCmdLineParams["NoOfTurns"] != "" && _ttoi(myCmdLineParams["NoOfTurns"]) != 0) {
+        maxNoOfTurns = _ttoi(myCmdLineParams["NoOfTurns"]);
+      }
+      gameManager.SetMaxNumberOfTurns(maxNoOfTurns);
       gameManager.TurnIsOver();
 
-      header =  "=========================\n";
-      header += "===== Game is over! =====\n";
-      header += "=========================\n";
+      header.Format("=========================\n"
+                    "===== Game is over!\n"
+                    "=========================\n"
+                    "===== MaxTurns: %d\n"
+                    "===== Formation: %s\n"
+                    "===== %s\n"
+                    "===== %s\n"
+                    "=========================\n"
+                    , gameManager.GetMaxNumberOfTurns()
+                    , myCmdLineParams["Formation"]
+                    , headerPlayer1
+                    , headerPlayer2);
 
       msg.Format("%s  Lost Balls %s:\t%d\n  Lost Balls %s:\t%d\n",
         header,
         namePlayer1, gameManager.GetLostBallsPlayer1(),
         namePlayer2, gameManager.GetLostBallsPlayer2());
       Output::Message(msg, false, true);
-      Output::Message2(gameManager.GetGameBoard()->ToString(), false, true);
+      Output::Message(gameManager.GetGameBoard()->ToString(), false, true);
     }
     else {
       header =  "=============================================\n";

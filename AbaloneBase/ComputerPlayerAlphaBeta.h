@@ -22,6 +22,7 @@ public:
 
   virtual BallMove CalculateNextMove();
 
+  int GetTreeDepth() const;
   void SetTreeDepth(int treeDepth);
   void DeleteBallMoves();
 
@@ -39,3 +40,8 @@ private:
   BallMove*** myBallMoves;
   int* myBallMovesSize;
 };
+
+inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
+{
+  return myTreeDepth;
+}
