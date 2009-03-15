@@ -62,4 +62,4 @@ enum Direction { NO_VALID_DIRECTION, UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOW
 static const CString START_FORMATION_STR_STANDARD = "Standard";
 static const CString START_FORMATION_STR_BELGIAN_DAISY = "Belgian Daisy";
 
-static const int BALL_MOVES_ARRAY_SIZE = 130;
+static const int BALL_MOVES_ARRAY_SIZE = 160;

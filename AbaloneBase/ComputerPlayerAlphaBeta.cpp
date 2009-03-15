@@ -114,13 +114,13 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   end = GetTickCount();
   time = end - start;
 
-  CString out("AlphaBeta\n");
-  CString str;
-  str.Format("  CalculateNextMove: %d\n", time);
-  out += str;
-  str.Format("  Possible Moves:    %d\n", myBallMovesSize[myTreeDepth-1]);
-  out += str;
-  Output::Message(out, false, true);
+//   CString out("AlphaBeta\n");
+//   CString str;
+//   str.Format("  CalculateNextMove: %d\n", time);
+//   out += str;
+//   str.Format("  Possible Moves:    %d\n", myBallMovesSize[myTreeDepth-1]);
+//   out += str;
+//  Output::Message(out, false, true);
 
   // retMove contains the ballfields from the simGameManager,
   // to do the move on the real game board, we have to give it the boardfields from the
