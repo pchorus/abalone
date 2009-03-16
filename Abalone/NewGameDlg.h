@@ -35,16 +35,20 @@ private:
   CStatic myStaticPlayer1MCSimGames;
   CStatic myStaticPlayer1MCTurnsPerSimGame;
   CStatic myStaticPlayer1ABTreeDepth;
+  CStatic myStaticPlayer1Evaluation;
   CEdit myEditPlayer1MCSimGames;
   CEdit myEditPlayer1MCTurnsPerSimGame;
   CEdit myEditPlayer1ABTreeDepth;
+  CEdit myEditPlayer1Evaluation;
 
   CStatic myStaticPlayer2MCSimGames;
   CStatic myStaticPlayer2MCTurnsPerSimGame;
   CStatic myStaticPlayer2ABTreeDepth;
+  CStatic myStaticPlayer2Evaluation;
   CEdit myEditPlayer2MCSimGames;
   CEdit myEditPlayer2MCTurnsPerSimGame;
   CEdit myEditPlayer2ABTreeDepth;
+  CEdit myEditPlayer2Evaluation;
 
   CComboBox myStartFormationComboBox;
   CString myStartFormationStr;

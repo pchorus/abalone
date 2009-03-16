@@ -32,16 +32,19 @@ void NewGameDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Control(pDX, IDC_STATIC_PLAYER1_SIM_GAMES, myStaticPlayer1MCSimGames);
   DDX_Control(pDX, IDC_STATIC_PLAYER1_NO_OF_TURNS_PER_SIM_GAME, myStaticPlayer1MCTurnsPerSimGame);
   DDX_Control(pDX, IDC_STATIC_PLAYER1_TREE_DEPTH, myStaticPlayer1ABTreeDepth);
+  DDX_Control(pDX, IDC_STATIC_PLAYER1_EVALUATION, myStaticPlayer1Evaluation);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_SIM_GAMES, myEditPlayer1MCSimGames);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer1MCTurnsPerSimGame);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_TREE_DEPTH, myEditPlayer1ABTreeDepth);
+  DDX_Control(pDX, IDC_EDIT_PLAYER1_EVALUATION, myEditPlayer1Evaluation);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_SIM_GAMES, myStaticPlayer2MCSimGames);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myStaticPlayer2MCTurnsPerSimGame);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_TREE_DEPTH, myStaticPlayer2ABTreeDepth);
+  DDX_Control(pDX, IDC_STATIC_PLAYER2_EVALUATION, myStaticPlayer2Evaluation);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_SIM_GAMES, myEditPlayer2MCSimGames);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer2MCTurnsPerSimGame);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_TREE_DEPTH, myEditPlayer2ABTreeDepth);
-  CStatic myStaticPlayer1ABTreeDepth;
+  DDX_Control(pDX, IDC_EDIT_PLAYER2_EVALUATION, myEditPlayer2Evaluation);
 }
 
 
@@ -88,22 +91,30 @@ BOOL NewGameDlg::OnInitDialog()
   myStaticPlayer1MCSimGames.EnableWindow(FALSE);
   myStaticPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
   myStaticPlayer1ABTreeDepth.EnableWindow(FALSE);
+  myStaticPlayer1Evaluation.EnableWindow(FALSE);
+
   myEditPlayer1MCSimGames.EnableWindow(FALSE);
   myEditPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
   myEditPlayer1ABTreeDepth.EnableWindow(FALSE);
   myEditPlayer1MCSimGames.SetWindowText("100");
   myEditPlayer1MCTurnsPerSimGame.SetWindowText("200");
   myEditPlayer1ABTreeDepth.SetWindowText("5");
+  myEditPlayer1Evaluation.EnableWindow(FALSE);
+  myEditPlayer1Evaluation.SetWindowText("1");
 
   myStaticPlayer2MCSimGames.EnableWindow(FALSE);
   myStaticPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
   myStaticPlayer2ABTreeDepth.EnableWindow(FALSE);
+  myStaticPlayer2Evaluation.EnableWindow(FALSE);
+
   myEditPlayer2MCSimGames.EnableWindow(FALSE);
   myEditPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
   myEditPlayer2ABTreeDepth.EnableWindow(FALSE);
   myEditPlayer2MCSimGames.SetWindowText("100");
   myEditPlayer2MCTurnsPerSimGame.SetWindowText("200");
   myEditPlayer2ABTreeDepth.SetWindowText("5");
+  myEditPlayer2Evaluation.EnableWindow(FALSE);
+  myEditPlayer2Evaluation.SetWindowText("1");
 
   return ret;
 }
@@ -190,6 +201,14 @@ void NewGameDlg::OnOK()
       ok = false;
       Output::Message("Please enter the no. of turns per simulated game for player 1.", true, false);
     }
+    myEditPlayer1Evaluation.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      mcPlayer->SetUsedEvaluation(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the evaluation function for player 1.", true, false);
+    }
   }
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(myGameManager->GetPlayer1());
@@ -204,6 +223,15 @@ void NewGameDlg::OnOK()
       ok = false;
       Output::Message("Please enter the no. of simulated games for player 2.", true, false);
     }
+    myEditPlayer1Evaluation.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      abPlayer->SetUsedEvaluation(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the evaluation function for player 1.", true, false);
+    }
+
   }
 
   if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
@@ -225,6 +253,15 @@ void NewGameDlg::OnOK()
       ok = false;
       Output::Message("Please enter the no. of turns per simulated game for player 2.", true, false);
     }
+    myEditPlayer2Evaluation.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      mcPlayer->SetUsedEvaluation(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the evaluation function for player 2.", true, false);
+    }
+
   }
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(myGameManager->GetPlayer2());
@@ -239,6 +276,14 @@ void NewGameDlg::OnOK()
       ok = false;
       Output::Message("Please enter the no. of simulated games for player 2.", true, false);
     }
+    myEditPlayer2Evaluation.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      abPlayer->SetUsedEvaluation(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the evaluation function for player 2.", true, false);
+    }
   }
 
 
@@ -250,6 +295,15 @@ void NewGameDlg::OnOK()
 void NewGameDlg::OnRadioPlayer1Changed()
 {
   int radioTypePlayer1 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER1, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1);
+
+  if (radioTypePlayer1 == IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER1 || radioTypePlayer1 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1) {
+    myStaticPlayer1Evaluation.EnableWindow(TRUE);
+    myEditPlayer1Evaluation.EnableWindow(TRUE);
+  }
+  else {
+    myStaticPlayer1Evaluation.EnableWindow(FALSE);
+    myEditPlayer1Evaluation.EnableWindow(FALSE);
+  }
 
   if (radioTypePlayer1 == IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER1) {
     myStaticPlayer1MCSimGames.EnableWindow(TRUE);
@@ -277,6 +331,15 @@ void NewGameDlg::OnRadioPlayer1Changed()
 void NewGameDlg::OnRadioPlayer2Changed()
 {
   int radioTypePlayer2 = GetCheckedRadioButton(IDC_RADIO_HUMAN_PLAYER2, IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2);
+
+  if (radioTypePlayer2 == IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER2 || radioTypePlayer2 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2) {
+    myStaticPlayer2Evaluation.EnableWindow(TRUE);
+    myEditPlayer2Evaluation.EnableWindow(TRUE);
+  }
+  else {
+    myStaticPlayer2Evaluation.EnableWindow(FALSE);
+    myEditPlayer2Evaluation.EnableWindow(FALSE);
+  }
 
   if (radioTypePlayer2 == IDC_RADIO_COMPUTER_MONTE_CARLO_PLAYER2) {
     myStaticPlayer2MCSimGames.EnableWindow(TRUE);
