@@ -29,8 +29,6 @@ private:
   int myGamesToSimulate;
   int myTurnsPerSimGame;
   double SimulateGamesWithMove(BallMove* ballMove) const;
-  // evaluates the outcome of a simulated game
-  double EvaluateSimGame() const;
 
   GameManager* mySimGameManager;
 

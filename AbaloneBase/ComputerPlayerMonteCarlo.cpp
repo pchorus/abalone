@@ -116,15 +116,19 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
 {
   double ret = 0.;
   double rating = 0.;
-  // generic number of simulated games
+
   int gamesToSimulate = myGamesToSimulate;
-  // alternative: fixed number of simulated games
-//  size_t gamesToSimulate = GAMES_TO_SIMULATE;
 
   Player::PlayerNumber startPlayer = Player::PLAYER_ONE;
 
+  ComputerPlayer* simGamePlayer = 0;
+
   if (GetGameManager()->IsFirstPlayersTurn()) {
+    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
     startPlayer = Player::PLAYER_TWO;
+  }
+  else {
+    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
   }
 
   mySimGameManager->SetMaxNumberOfTurns(myTurnsPerSimGame);
@@ -142,54 +146,9 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
 
-    rating = EvaluateSimGame();
+    rating = mySimGameManager->EvaluateBoard(simGamePlayer);
     ret += rating;
   }
 
   return ret;
-}
-
-double ComputerPlayerMonteCarlo::EvaluateSimGame() const
-{
-  ComputerPlayer* simGamePlayer = 0;
-
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
-  }
-  else {
-    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
-  }
-
-  double lostBallsRating = mySimGameManager->CalcLostBallsRatio(simGamePlayer);
-  // best ratio:  +6
-  // worst ratio: -6
-  lostBallsRating = (lostBallsRating + 6.) / 12.;
-
-  double centerDistanceRating = mySimGameManager->CalcAvgCenterDistance(simGamePlayer);
-  // 1.3 = 1.0 (1.357 is the best value to achieve with all 14 marbles)
-  // 4.0 =  0.0 (4.0 => every marble is on the game board's border)
-  centerDistanceRating = 1. - ((centerDistanceRating - 1.3) / 2.7);
-
-  double groupingRating = mySimGameManager->CalcAvgGrouping(simGamePlayer);
-  // 4.14 = 1.0 : all marbles are in a huge single group
-  // 0.0  = 0.0 : no marble has any neighboring fellow marbles
-  groupingRating /= 4.1;
-
-  // TODO: attacking powers should be calculated without calling AddPossibleMoves
-//   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
-// 
-//   double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
-//   // 0 attacks  = 1.0
-//   // 10 attacks = 0.0
-//   if (attackedByOpponent > 10.)
-//     attackedByOpponent = 10.;
-//   attackedByOpponent = (10. - attackedByOpponent) * 0.1;
-
-  double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
-    + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
-    + GROUPING_EVALUATION_WEIGHT                    * groupingRating;
-//     + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
-//     + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
-
-  return evaluation;
 }

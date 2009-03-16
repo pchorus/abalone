@@ -30,8 +30,6 @@ private:
   double Max(int depth, double alpha, double beta);
   double Min(int depth, double alpha, double beta);
 
-  double EvaluateBoard() const;
-
   GameManager* mySimGameManager;
 
   ComputerPlayer* myMaxPlayer;

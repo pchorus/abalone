@@ -72,6 +72,7 @@ public:
 
   CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const;
 
+  double EvaluateBoard(Player* player) const;
   // methods for evaluation of the current game board situation
   // calculates the ratio of lost balls
   double CalcLostBallsRatio(const Player* player) const;
