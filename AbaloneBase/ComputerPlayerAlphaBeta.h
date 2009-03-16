@@ -24,9 +24,12 @@ public:
 
   int GetTreeDepth() const;
   void SetTreeDepth(int treeDepth);
-  void DeleteBallMoves();
+  int GetUsedEvaluation() const;
+  void SetUsedEvaluation(int eval);
 
 private:
+  void DeleteBallMoves();
+
   double Max(int depth, double alpha, double beta);
   double Min(int depth, double alpha, double beta);
 
@@ -35,6 +38,8 @@ private:
   ComputerPlayer* myMaxPlayer;
   ComputerPlayer* myMinPlayer;
   int myTreeDepth;
+  int myUsedEvaluation;
+
   BallMove*** myBallMoves;
   int* myBallMovesSize;
 };
@@ -42,4 +47,14 @@ private:
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
 {
   return myTreeDepth;
+}
+
+inline int ComputerPlayerAlphaBeta::GetUsedEvaluation() const
+{
+  return myUsedEvaluation;
+}
+
+inline void ComputerPlayerAlphaBeta::SetUsedEvaluation(int eval)
+{
+  myUsedEvaluation = eval;
 }

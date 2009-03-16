@@ -17,6 +17,7 @@ ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, con
 , myCurrentPlayer(0)
 , myGamesToSimulate(DEFAULT_GAMES_TO_SIMULATE)
 , myTurnsPerSimGame(DEFAULT_TURNS_PER_SIM_GAME)
+, myUsedEvaluation(1)
 {
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
@@ -146,7 +147,7 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
 
-    rating = mySimGameManager->EvaluateBoard(simGamePlayer);
+    rating = mySimGameManager->EvaluateBoard(simGamePlayer, myUsedEvaluation);
     ret += rating;
   }
 

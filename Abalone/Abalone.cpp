@@ -161,7 +161,9 @@ void CAbaloneApp::PlayBatchGame()
     typePlayer1 = GetPlayerType(myCmdLineParams["Player1"]);
     typePlayer2 = GetPlayerType(myCmdLineParams["Player2"]);
 
-    if (typePlayer1 != Player::PLAYER_TYPE_NONE && typePlayer2 != Player::PLAYER_TYPE_NONE) {
+    if (typePlayer1 != Player::PLAYER_TYPE_NONE && typePlayer2 != Player::PLAYER_TYPE_NONE &&
+        typePlayer1 != Player::PLAYER_TYPE_HUMAN && typePlayer2 != Player::PLAYER_TYPE_HUMAN)
+    {
       gameManager.SetPlayers(namePlayer1, typePlayer1,
                              namePlayer2, typePlayer2);
 
@@ -176,10 +178,16 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           mcPlayer->SetTurnsPerSimGame(_ttoi(hlp));
         }
-        headerPlayer1.Format("%s SimGames: %d TurnsPerSim: %d",
+        hlp = myCmdLineParams["Evaluation1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
+          mcPlayer->SetUsedEvaluation(_ttoi(hlp));
+        }
+
+        headerPlayer1.Format("%s SimGames: %d, TurnsPerSim: %d, Value Function: %d",
                               namePlayer1,
                               mcPlayer->GetGamesToSimulate(),
-                              mcPlayer->GetTurnsPerSimGame());
+                              mcPlayer->GetTurnsPerSimGame(),
+                              mcPlayer->GetUsedEvaluation());
       }
       else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer1());
@@ -187,9 +195,15 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
           abPlayer->SetTreeDepth(_ttoi(hlp));
         }
-        headerPlayer1.Format("%s TreeDepth: %d",
+        hlp = myCmdLineParams["Evaluation1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
+          abPlayer->SetUsedEvaluation(_ttoi(hlp));
+        }
+
+        headerPlayer1.Format("%s TreeDepth: %d, Value Function: %d",
                               namePlayer1,
-                              abPlayer->GetTreeDepth());
+                              abPlayer->GetTreeDepth(),
+                              abPlayer->GetUsedEvaluation());
       }
 
       if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
@@ -202,10 +216,16 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           mcPlayer->SetTurnsPerSimGame(_ttoi(hlp));
         }
-        headerPlayer2.Format("%s SimGames: %d TurnsPerSim: %d",
+        hlp = myCmdLineParams["Evaluation2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
+          mcPlayer->SetUsedEvaluation(_ttoi(hlp));
+        }
+
+        headerPlayer2.Format("%s SimGames: %d, TurnsPerSim: %d, Value Function: %d",
           namePlayer2,
           mcPlayer->GetGamesToSimulate(),
-          mcPlayer->GetTurnsPerSimGame());
+          mcPlayer->GetTurnsPerSimGame(),
+          mcPlayer->GetUsedEvaluation());
       }
       else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer2());
@@ -213,9 +233,15 @@ void CAbaloneApp::PlayBatchGame()
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
           abPlayer->SetTreeDepth(_ttoi(hlp));
         }
-        headerPlayer2.Format("%s TreeDepth: %d",
+        hlp = myCmdLineParams["Evaluation2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
+          abPlayer->SetUsedEvaluation(_ttoi(hlp));
+        }
+
+        headerPlayer2.Format("%s TreeDepth: %d, Value Function: %d",
           namePlayer2,
-          abPlayer->GetTreeDepth());
+          abPlayer->GetTreeDepth(),
+          abPlayer->GetUsedEvaluation());
       }
 
       gameManager.SetGameStarted(true);

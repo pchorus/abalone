@@ -24,10 +24,13 @@ public:
   void SetGamesToSimulate(int gamesToSimulate);
   int GetTurnsPerSimGame() const;
   void SetTurnsPerSimGame(int turnsPerSimGame);
+  int GetUsedEvaluation() const;
+  void SetUsedEvaluation(int eval);
 
 private:
   int myGamesToSimulate;
   int myTurnsPerSimGame;
+  int myUsedEvaluation;
   double SimulateGamesWithMove(BallMove* ballMove) const;
 
   GameManager* mySimGameManager;
@@ -56,4 +59,14 @@ inline int ComputerPlayerMonteCarlo::GetTurnsPerSimGame() const
 inline void ComputerPlayerMonteCarlo::SetTurnsPerSimGame(int turnsPerSimGame)
 {
   myTurnsPerSimGame = turnsPerSimGame;
+}
+
+inline int ComputerPlayerMonteCarlo::GetUsedEvaluation() const
+{
+  return myUsedEvaluation;
+}
+
+inline void ComputerPlayerMonteCarlo::SetUsedEvaluation(int eval)
+{
+  myUsedEvaluation = eval;
 }

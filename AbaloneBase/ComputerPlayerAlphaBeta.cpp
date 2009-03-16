@@ -15,6 +15,7 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myMaxPlayer(0)
 , myMinPlayer(0)
 , myTreeDepth(DEFAULT_TREE_DEPTH)
+, myUsedEvaluation(1)
 , myBallMoves(0)
 , myBallMovesSize(0)
 {
@@ -111,9 +112,9 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
     }
   }
 
-  end = GetTickCount();
-  time = end - start;
-
+//   end = GetTickCount();
+//   time = end - start;
+// 
 //   CString out("AlphaBeta\n");
 //   CString str;
 //   str.Format("  CalculateNextMove: %d\n", time);
@@ -145,7 +146,7 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
   double value = 0.;
 
   if (depth == 0)
-    return mySimGameManager->EvaluateBoard(myMaxPlayer);
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
 
   myBallMovesSize[depth-1] = 0;
 
@@ -175,7 +176,7 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
   double ret = beta;
   double value = 0.;
   if (depth == 0)
-    return mySimGameManager->EvaluateBoard(myMaxPlayer);
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
 
   myBallMovesSize[depth-1] = 0;
   
