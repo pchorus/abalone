@@ -29,6 +29,9 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
   GetGameManager()->AddPossibleMovesTwoBalls(this, myBallMoves, myBallMovesSize);
   GetGameManager()->AddPossibleMovesThreeBalls(this, myBallMoves, myBallMovesSize);
 
-  int idx = static_cast<int>((double)rand() / (double)RAND_MAX * (myBallMovesSize-1));
+  time_t sec;
+  time(&sec);
+  srand( (unsigned) sec);
+  int idx = (rand() % myBallMovesSize);
   return *myBallMoves[idx];
 }
