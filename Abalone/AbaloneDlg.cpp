@@ -579,7 +579,6 @@ void CAbaloneDlg::OnNewGame()
     myStaticPlayersTurn.SetWindowText("It is " + myGameManager->GetPlayer1()->GetName() + "'s turn!");
 
     myGameManager->SetGameStarted(true);
-    myGameManager->SetMaxNumberOfTurns(300);
 
     AfxBeginThread(TurnIsOver, GetSafeHwnd());
     Invalidate();

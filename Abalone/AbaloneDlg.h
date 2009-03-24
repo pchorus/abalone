@@ -8,6 +8,11 @@
 
 class GameManager;
 
+
+// TODO: if the maximum number of turns is reached, the game should
+// stop and show up a message, right now that only works if two
+// computer players are playing against each other
+
 // CAbaloneDlg-Dialogfeld
 class CAbaloneDlg : public CDialog
 {

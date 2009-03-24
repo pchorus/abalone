@@ -45,6 +45,7 @@ void NewGameDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Control(pDX, IDC_EDIT_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer2MCTurnsPerSimGame);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_TREE_DEPTH, myEditPlayer2ABTreeDepth);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_EVALUATION, myEditPlayer2Evaluation);
+  DDX_Control(pDX, IDC_EDIT_MAX_NO_OF_MOVES, myEditMaxNoOfMoves);
 }
 
 
@@ -115,6 +116,8 @@ BOOL NewGameDlg::OnInitDialog()
   myEditPlayer2ABTreeDepth.SetWindowText("5");
   myEditPlayer2Evaluation.EnableWindow(FALSE);
   myEditPlayer2Evaluation.SetWindowText("1");
+
+  myEditMaxNoOfMoves.SetWindowText("300");
 
   return ret;
 }
@@ -286,6 +289,15 @@ void NewGameDlg::OnOK()
     }
   }
 
+  CString str;
+  myEditMaxNoOfMoves.GetWindowText(str);
+  if (!str.IsEmpty() && _ttoi(str) != 0) {
+    myGameManager->SetMaxNumberOfTurns(_ttoi(str));
+  }
+  else {
+    ok = false;
+    Output::Message("Please enter the maximum no. of moves.", true, false);
+  }
 
   if (ok) {
     CDialog::OnOK();

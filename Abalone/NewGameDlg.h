@@ -50,6 +50,7 @@ private:
   CEdit myEditPlayer2ABTreeDepth;
   CEdit myEditPlayer2Evaluation;
 
+  CEdit myEditMaxNoOfMoves;
   CComboBox myStartFormationComboBox;
   CString myStartFormationStr;
 };
