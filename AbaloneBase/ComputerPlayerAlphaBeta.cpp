@@ -22,7 +22,7 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
   SetTreeDepth(myTreeDepth);
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
 
-  if (GetGameManager()->IsFirstPlayersTurn()) {
+  if (ball == BoardField::BLACK_BALL) {
     myMaxPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
     myMinPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
   }

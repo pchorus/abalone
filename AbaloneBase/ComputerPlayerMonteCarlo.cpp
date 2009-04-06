@@ -25,7 +25,7 @@ ComputerPlayerMonteCarlo::ComputerPlayerMonteCarlo(GameManager* gameManager, con
     myBallMoves[i] = new BallMove;
   }
 
-  if (GetGameManager()->IsFirstPlayersTurn()) {
+  if (ball == BoardField::BLACK_BALL) {
     myCurrentPlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
   }
   else {
