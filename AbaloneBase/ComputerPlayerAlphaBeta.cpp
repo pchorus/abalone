@@ -9,8 +9,8 @@
 
 
 
-ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-: ComputerPlayer(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA)
+ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball, Player::PlayerType type)
+: ComputerPlayer(gameManager, name, ball, type)
 , mySimGameManager(new GameManager)
 , myMaxPlayer(0)
 , myMinPlayer(0)

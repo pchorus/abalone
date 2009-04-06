@@ -548,6 +548,9 @@ void CAbaloneDlg::OnNewGame()
     else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
       namePlayer += " (Alpha Beta)";
     }
+    else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+      namePlayer += " (Alpha Beta IterDeep)";
+    }
     else if (myGameManager->GetPlayer1()->GetType() == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
       namePlayer += " (Random Moves)";
     }
@@ -563,6 +566,9 @@ void CAbaloneDlg::OnNewGame()
     }
     else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
       namePlayer += " (Alpha Beta)";
+    }
+    else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+      namePlayer += " (Alpha Beta IterDeep)";
     }
     else if (myGameManager->GetPlayer2()->GetType() == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
       namePlayer += " (Random Moves)";

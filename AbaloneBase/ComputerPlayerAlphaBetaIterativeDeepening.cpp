@@ -3,12 +3,14 @@
 
 #include "GameManager.h"
 #include "GameBoard.h"
+#include "Output.h"
 
 static const int MAX_TREE_DEPTH = 10;
-static const int MILLISECONDS_PER_MOVE = 20000;
+static const int DEFAULT_MILLISECONDS_PER_MOVE = 20000;
 
 ComputerPlayerAlphaBetaIterativeDeepening::ComputerPlayerAlphaBetaIterativeDeepening(GameManager* gameManager, const CString& name, BoardField::Ball ball)
-: ComputerPlayerAlphaBeta(gameManager, name, ball)
+: ComputerPlayerAlphaBeta(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING)
+, myMilliSecondsPerMove(DEFAULT_MILLISECONDS_PER_MOVE)
 {
   SetTreeDepth(MAX_TREE_DEPTH);
 }
@@ -31,6 +33,8 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   double alpha = -10.;
   double beta = 10.;
   double value = 0.;
+
+  myTreeDepth = 2;
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -62,10 +66,15 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
         alpha = value;
         foundMove = true;
       }
+      end = GetTickCount();
+      if ((end - start) > myMilliSecondsPerMove) {
+        stop = true;
+        break;
+      }
     }
 
     end = GetTickCount();
-    if ((end - start) < MILLISECONDS_PER_MOVE) {
+    if ((end - start) < myMilliSecondsPerMove) {
       ++myTreeDepth;
     }
     else {

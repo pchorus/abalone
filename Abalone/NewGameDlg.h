@@ -30,25 +30,34 @@ private:
   afx_msg void OnSelchangeComboStartFormation();
   afx_msg void OnRadioPlayer1Changed();
   afx_msg void OnRadioPlayer2Changed();
+  afx_msg void OnCheckIterativeDeepeningPlayer1Changed();
+  afx_msg void OnCheckIterativeDeepeningPlayer2Changed();
 
   GameManager* myGameManager;
   CStatic myStaticPlayer1MCSimGames;
   CStatic myStaticPlayer1MCTurnsPerSimGame;
+  CStatic myStaticPlayer1ABTimePerMove;
   CStatic myStaticPlayer1ABTreeDepth;
   CStatic myStaticPlayer1Evaluation;
   CEdit myEditPlayer1MCSimGames;
   CEdit myEditPlayer1MCTurnsPerSimGame;
+  CEdit myEditPlayer1ABTimePerMove;
   CEdit myEditPlayer1ABTreeDepth;
   CEdit myEditPlayer1Evaluation;
 
   CStatic myStaticPlayer2MCSimGames;
   CStatic myStaticPlayer2MCTurnsPerSimGame;
+  CStatic myStaticPlayer2ABTimePerMove;
   CStatic myStaticPlayer2ABTreeDepth;
   CStatic myStaticPlayer2Evaluation;
   CEdit myEditPlayer2MCSimGames;
   CEdit myEditPlayer2MCTurnsPerSimGame;
+  CEdit myEditPlayer2ABTimePerMove;
   CEdit myEditPlayer2ABTreeDepth;
   CEdit myEditPlayer2Evaluation;
+
+  CButton myCheckPlayer1IterativeDeepening;
+  CButton myCheckPlayer2IterativeDeepening;
 
   CEdit myEditMaxNoOfMoves;
   CComboBox myStartFormationComboBox;

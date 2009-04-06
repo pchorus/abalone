@@ -8,6 +8,7 @@
 #include "AbaloneBase/GameManager.h"
 #include "AbaloneBase/ComputerPlayerMonteCarlo.h"
 #include "AbaloneBase/ComputerPlayerAlphaBeta.h"
+#include "AbaloneBase/ComputerPlayerAlphaBetaIterativeDeepening.h"
 #include "AbaloneBase/Output.h"
 
 
@@ -32,20 +33,26 @@ void NewGameDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Control(pDX, IDC_STATIC_PLAYER1_SIM_GAMES, myStaticPlayer1MCSimGames);
   DDX_Control(pDX, IDC_STATIC_PLAYER1_NO_OF_TURNS_PER_SIM_GAME, myStaticPlayer1MCTurnsPerSimGame);
   DDX_Control(pDX, IDC_STATIC_PLAYER1_TREE_DEPTH, myStaticPlayer1ABTreeDepth);
+  DDX_Control(pDX, IDC_STATIC_PLAYER1_AB_TIME_PER_MOVE, myStaticPlayer1ABTimePerMove);
   DDX_Control(pDX, IDC_STATIC_PLAYER1_EVALUATION, myStaticPlayer1Evaluation);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_SIM_GAMES, myEditPlayer1MCSimGames);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer1MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_EDIT_PLAYER1_TIME_PER_MOVE, myEditPlayer1ABTimePerMove);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_TREE_DEPTH, myEditPlayer1ABTreeDepth);
   DDX_Control(pDX, IDC_EDIT_PLAYER1_EVALUATION, myEditPlayer1Evaluation);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_SIM_GAMES, myStaticPlayer2MCSimGames);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myStaticPlayer2MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_STATIC_PLAYER2_AB_TIME_PER_MOVE, myStaticPlayer2ABTimePerMove);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_TREE_DEPTH, myStaticPlayer2ABTreeDepth);
   DDX_Control(pDX, IDC_STATIC_PLAYER2_EVALUATION, myStaticPlayer2Evaluation);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_SIM_GAMES, myEditPlayer2MCSimGames);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_NO_OF_TURNS_PER_SIM_GAME, myEditPlayer2MCTurnsPerSimGame);
+  DDX_Control(pDX, IDC_EDIT_PLAYER2_TIME_PER_MOVE, myEditPlayer2ABTimePerMove);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_TREE_DEPTH, myEditPlayer2ABTreeDepth);
   DDX_Control(pDX, IDC_EDIT_PLAYER2_EVALUATION, myEditPlayer2Evaluation);
   DDX_Control(pDX, IDC_EDIT_MAX_NO_OF_MOVES, myEditMaxNoOfMoves);
+  DDX_Control(pDX, IDC_CHECK_ITERATIVE_DEEPENING1, myCheckPlayer1IterativeDeepening);
+  DDX_Control(pDX, IDC_CHECK_ITERATIVE_DEEPENING2, myCheckPlayer2IterativeDeepening);
 }
 
 
@@ -61,6 +68,8 @@ BEGIN_MESSAGE_MAP(NewGameDlg, CDialog)
   ON_BN_CLICKED(IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
   ON_BN_CLICKED(IDC_RADIO_COMPUTER_EVALUATE_NEXT_MOVE_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
   ON_BN_CLICKED(IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2, &NewGameDlg::OnRadioPlayer2Changed)
+  ON_BN_CLICKED(IDC_CHECK_ITERATIVE_DEEPENING1, &NewGameDlg::OnCheckIterativeDeepeningPlayer1Changed)
+  ON_BN_CLICKED(IDC_CHECK_ITERATIVE_DEEPENING2, &NewGameDlg::OnCheckIterativeDeepeningPlayer2Changed)
 END_MESSAGE_MAP()
 
 BOOL NewGameDlg::OnInitDialog()
@@ -91,31 +100,42 @@ BOOL NewGameDlg::OnInitDialog()
 
   myStaticPlayer1MCSimGames.EnableWindow(FALSE);
   myStaticPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
+  myStaticPlayer1ABTimePerMove.EnableWindow(FALSE);
   myStaticPlayer1ABTreeDepth.EnableWindow(FALSE);
   myStaticPlayer1Evaluation.EnableWindow(FALSE);
 
   myEditPlayer1MCSimGames.EnableWindow(FALSE);
   myEditPlayer1MCTurnsPerSimGame.EnableWindow(FALSE);
+  myEditPlayer1ABTimePerMove.EnableWindow(FALSE);
   myEditPlayer1ABTreeDepth.EnableWindow(FALSE);
   myEditPlayer1MCSimGames.SetWindowText("100");
   myEditPlayer1MCTurnsPerSimGame.SetWindowText("200");
+  myEditPlayer1ABTimePerMove.SetWindowText("20");
   myEditPlayer1ABTreeDepth.SetWindowText("5");
   myEditPlayer1Evaluation.EnableWindow(FALSE);
   myEditPlayer1Evaluation.SetWindowText("1");
 
   myStaticPlayer2MCSimGames.EnableWindow(FALSE);
   myStaticPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
+  myStaticPlayer2ABTimePerMove.EnableWindow(FALSE);
   myStaticPlayer2ABTreeDepth.EnableWindow(FALSE);
   myStaticPlayer2Evaluation.EnableWindow(FALSE);
 
   myEditPlayer2MCSimGames.EnableWindow(FALSE);
   myEditPlayer2MCTurnsPerSimGame.EnableWindow(FALSE);
+  myEditPlayer2ABTimePerMove.EnableWindow(FALSE);
   myEditPlayer2ABTreeDepth.EnableWindow(FALSE);
   myEditPlayer2MCSimGames.SetWindowText("100");
   myEditPlayer2MCTurnsPerSimGame.SetWindowText("200");
+  myEditPlayer2ABTimePerMove.SetWindowText("20");
   myEditPlayer2ABTreeDepth.SetWindowText("5");
   myEditPlayer2Evaluation.EnableWindow(FALSE);
   myEditPlayer2Evaluation.SetWindowText("1");
+
+  myCheckPlayer1IterativeDeepening.SetCheck(BST_CHECKED);
+  myCheckPlayer2IterativeDeepening.SetCheck(BST_CHECKED);
+  myCheckPlayer1IterativeDeepening.EnableWindow(FALSE);
+  myCheckPlayer2IterativeDeepening.EnableWindow(FALSE);
 
   myEditMaxNoOfMoves.SetWindowText("300");
 
@@ -154,7 +174,12 @@ void NewGameDlg::OnOK()
       typePlayer1 = Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO;
       break;
     case IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1:
-      typePlayer1 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+      if (myCheckPlayer1IterativeDeepening.GetCheck() == BST_CHECKED) {
+        typePlayer1 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING;
+      }
+      else {
+        typePlayer1 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+      }
       break;
     case IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER1:
       typePlayer1 = Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
@@ -172,7 +197,12 @@ void NewGameDlg::OnOK()
       typePlayer2 = Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO;
       break;
     case IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2:
-      typePlayer2 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+      if (myCheckPlayer2IterativeDeepening.GetCheck() == BST_CHECKED) {
+        typePlayer2 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING;
+      }
+      else {
+        typePlayer2 = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+      }
       break;
     case IDC_RADIO_COMPUTER_RANDOM_MOVES_PLAYER2:
       typePlayer2 = Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
@@ -236,6 +266,26 @@ void NewGameDlg::OnOK()
     }
 
   }
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+    ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(myGameManager->GetPlayer1());
+    CString str;
+    myEditPlayer1ABTimePerMove.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      abPlayer->SetSecondsPerMove(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the allowed no. of seconds per move for player 1.", true, false);
+    }
+    myEditPlayer1Evaluation.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      abPlayer->SetUsedEvaluation(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the evaluation function for player 1.", true, false);
+    }
+  }
 
   if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
     ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(myGameManager->GetPlayer2());
@@ -278,6 +328,26 @@ void NewGameDlg::OnOK()
     else {
       ok = false;
       Output::Message("Please enter the no. of simulated games for player 2.", true, false);
+    }
+    myEditPlayer2Evaluation.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      abPlayer->SetUsedEvaluation(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the evaluation function for player 2.", true, false);
+    }
+  }
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+    ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(myGameManager->GetPlayer2());
+    CString str;
+    myEditPlayer2ABTimePerMove.GetWindowText(str);
+    if (!str.IsEmpty() && _ttoi(str) != 0) {
+      abPlayer->SetSecondsPerMove(_ttoi(str));
+    }
+    else {
+      ok = false;
+      Output::Message("Please enter the allowed no. of seconds per move for player 2.", true, false);
     }
     myEditPlayer2Evaluation.GetWindowText(str);
     if (!str.IsEmpty() && _ttoi(str) != 0) {
@@ -331,10 +401,13 @@ void NewGameDlg::OnRadioPlayer1Changed()
   }
 
   if (radioTypePlayer1 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1) {
-    myStaticPlayer1ABTreeDepth.EnableWindow(TRUE);
-    myEditPlayer1ABTreeDepth.EnableWindow(TRUE);
+    myCheckPlayer1IterativeDeepening.EnableWindow(TRUE);
+    OnCheckIterativeDeepeningPlayer1Changed();
   }
   else {
+    myCheckPlayer1IterativeDeepening.EnableWindow(FALSE);
+    myStaticPlayer1ABTimePerMove.EnableWindow(FALSE);
+    myEditPlayer1ABTimePerMove.EnableWindow(FALSE);
     myStaticPlayer1ABTreeDepth.EnableWindow(FALSE);
     myEditPlayer1ABTreeDepth.EnableWindow(FALSE);
   }
@@ -367,11 +440,46 @@ void NewGameDlg::OnRadioPlayer2Changed()
   }
 
   if (radioTypePlayer2 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2) {
-    myStaticPlayer2ABTreeDepth.EnableWindow(TRUE);
-    myEditPlayer2ABTreeDepth.EnableWindow(TRUE);
+    myCheckPlayer2IterativeDeepening.EnableWindow(TRUE);
+    OnCheckIterativeDeepeningPlayer2Changed();
   }
   else {
+    myCheckPlayer2IterativeDeepening.EnableWindow(FALSE);
+    myStaticPlayer2ABTimePerMove.EnableWindow(FALSE);
+    myEditPlayer2ABTimePerMove.EnableWindow(FALSE);
     myStaticPlayer2ABTreeDepth.EnableWindow(FALSE);
     myEditPlayer2ABTreeDepth.EnableWindow(FALSE);
+  }
+}
+
+void NewGameDlg::OnCheckIterativeDeepeningPlayer1Changed()
+{
+  if (myCheckPlayer1IterativeDeepening.GetCheck() == BST_CHECKED) {
+    myStaticPlayer1ABTimePerMove.EnableWindow(TRUE);
+    myEditPlayer1ABTimePerMove.EnableWindow(TRUE);
+    myStaticPlayer1ABTreeDepth.EnableWindow(FALSE);
+    myEditPlayer1ABTreeDepth.EnableWindow(FALSE);
+  }
+  else {
+    myStaticPlayer1ABTimePerMove.EnableWindow(FALSE);
+    myEditPlayer1ABTimePerMove.EnableWindow(FALSE);
+    myStaticPlayer1ABTreeDepth.EnableWindow(TRUE);
+    myEditPlayer1ABTreeDepth.EnableWindow(TRUE);
+  }
+}
+
+void NewGameDlg::OnCheckIterativeDeepeningPlayer2Changed()
+{
+  if (myCheckPlayer2IterativeDeepening.GetCheck() == BST_CHECKED) {
+    myStaticPlayer2ABTimePerMove.EnableWindow(TRUE);
+    myEditPlayer2ABTimePerMove.EnableWindow(TRUE);
+    myStaticPlayer2ABTreeDepth.EnableWindow(FALSE);
+    myEditPlayer2ABTreeDepth.EnableWindow(FALSE);
+  }
+  else {
+    myStaticPlayer2ABTimePerMove.EnableWindow(FALSE);
+    myEditPlayer2ABTimePerMove.EnableWindow(FALSE);
+    myStaticPlayer2ABTreeDepth.EnableWindow(TRUE);
+    myEditPlayer2ABTreeDepth.EnableWindow(TRUE);
   }
 }

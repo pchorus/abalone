@@ -17,6 +17,7 @@ public:
                     PLAYER_TYPE_HUMAN,
                     PLAYER_TYPE_COMPUTER_MONTE_CARLO,
                     PLAYER_TYPE_COMPUTER_ALPHA_BETA,
+                    PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING,
                     PLAYER_TYPE_COMPUTER_RANDOM_MOVES,
                     PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE
                   };

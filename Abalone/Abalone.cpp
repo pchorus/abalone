@@ -15,6 +15,7 @@
 #include "AbaloneBase/GameBoard.h"
 #include "AbaloneBase/ComputerPlayerMonteCarlo.h"
 #include "AbaloneBase/ComputerPlayerAlphaBeta.h"
+#include "AbaloneBase/ComputerPlayerAlphaBetaIterativeDeepening.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -205,6 +206,22 @@ void CAbaloneApp::PlayBatchGame()
                               abPlayer->GetTreeDepth(),
                               abPlayer->GetUsedEvaluation());
       }
+      else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+        ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
+        hlp = myCmdLineParams["SecPerMove1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
+          abPlayer->SetSecondsPerMove(_ttoi(hlp));
+        }
+        hlp = myCmdLineParams["Evaluation1"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
+          abPlayer->SetUsedEvaluation(_ttoi(hlp));
+        }
+
+        headerPlayer1.Format("%s Seconds per Move: %d, Value Function: %d",
+          namePlayer1,
+          abPlayer->GetSecondsPerMove(),
+          abPlayer->GetUsedEvaluation());
+      }
 
       if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
         ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer2());
@@ -241,6 +258,22 @@ void CAbaloneApp::PlayBatchGame()
         headerPlayer2.Format("%s TreeDepth: %d, Value Function: %d",
           namePlayer2,
           abPlayer->GetTreeDepth(),
+          abPlayer->GetUsedEvaluation());
+      }
+      else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+        ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
+        hlp = myCmdLineParams["SecPerMove2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
+          abPlayer->SetSecondsPerMove(_ttoi(hlp));
+        }
+        hlp = myCmdLineParams["Evaluation2"];
+        if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
+          abPlayer->SetUsedEvaluation(_ttoi(hlp));
+        }
+
+        headerPlayer2.Format("%s Seconds per Move: %d, Value Function: %d",
+          namePlayer2,
+          abPlayer->GetSecondsPerMove(),
           abPlayer->GetUsedEvaluation());
       }
 
@@ -291,6 +324,9 @@ Player::PlayerType CAbaloneApp::GetPlayerType(const CString& playerType)
   }
   else if (playerType == "AB") {
     ret = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA;
+  }
+  else if (playerType == "ABID") {
+    ret = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING;
   }
   else if (playerType == "RM") {
     ret = Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES;

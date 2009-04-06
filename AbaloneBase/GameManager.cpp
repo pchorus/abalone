@@ -6,6 +6,7 @@
 #include "HumanPlayer.h"
 #include "ComputerPlayerMonteCarlo.h"
 #include "ComputerPlayerAlphaBeta.h"
+#include "ComputerPlayerAlphaBetaIterativeDeepening.h"
 #include "ComputerPlayerRandomMoves.h"
 #include "ComputerPlayerEvaluateNextMove.h"
 #include "BallMove.h"
@@ -66,6 +67,9 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     myPlayer1 = new ComputerPlayerAlphaBeta(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
+  else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+    myPlayer1 = new ComputerPlayerAlphaBetaIterativeDeepening(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
+  }
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
     myPlayer1 = new ComputerPlayerRandomMoves(this, namePlayer1 != "" ? namePlayer1 : "Player 1", BoardField::BLACK_BALL);
   }
@@ -81,6 +85,9 @@ void GameManager::SetPlayers(const CString& namePlayer1, Player::PlayerType type
   }
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     myPlayer2 = new ComputerPlayerAlphaBeta(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
+  }
+  else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
+    myPlayer2 = new ComputerPlayerAlphaBetaIterativeDeepening(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);
   }
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES) {
     myPlayer2 = new ComputerPlayerRandomMoves(this, namePlayer2 != "" ? namePlayer2 : "Player 2", BoardField::WHITE_BALL);

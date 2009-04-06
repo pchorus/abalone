@@ -17,7 +17,7 @@ static const int DEFAULT_TREE_DEPTH = 5;
 class ABALONE_BASE_DLLINTERFACE ComputerPlayerAlphaBeta : public ComputerPlayer {
 public:
   // constructor / destructor
-  ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball);
+  ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball, Player::PlayerType type = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA);
   virtual ~ComputerPlayerAlphaBeta();
 
   virtual BallMove CalculateNextMove();
