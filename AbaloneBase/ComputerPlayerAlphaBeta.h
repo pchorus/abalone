@@ -27,21 +27,22 @@ public:
   int GetUsedEvaluation() const;
   void SetUsedEvaluation(int eval);
 
-private:
-  void DeleteBallMoves();
-
+protected:
   double Max(int depth, double alpha, double beta);
   double Min(int depth, double alpha, double beta);
 
   GameManager* mySimGameManager;
 
   ComputerPlayer* myMaxPlayer;
-  ComputerPlayer* myMinPlayer;
   int myTreeDepth;
-  int myUsedEvaluation;
 
   BallMove*** myBallMoves;
   int* myBallMovesSize;
+
+private:
+  void DeleteBallMoves();
+  ComputerPlayer* myMinPlayer;
+  int myUsedEvaluation;
 };
 
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const

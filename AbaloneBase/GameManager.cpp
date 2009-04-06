@@ -1394,12 +1394,19 @@ double GameManager::EvaluateBoard(Player* player, int evaluation) const
 
     // TODO: another evaluation: if you can win the game with your next move,
     // you should take it anyway
+//     double evaluation =
+//       0.3  * lostBallsRating +
+//       0.3  * centerDistanceRating +
+//       0.3  * groupingRating +
+//       0.05 * attackingPowerRating +
+//       0.05 * attackedByOpponentRating;
+
     double evaluation =
-      0.3  * lostBallsRating +
-      0.3  * centerDistanceRating +
-      0.3  * groupingRating +
-      0.05 * attackingPowerRating +
-      0.05 * attackedByOpponentRating;
+      0.5  * lostBallsRating +
+      0.15 * centerDistanceRating +
+      0.15 * groupingRating +
+      0.1  * attackingPowerRating +
+      0.1  * attackedByOpponentRating;
 
     return evaluation;
   }
