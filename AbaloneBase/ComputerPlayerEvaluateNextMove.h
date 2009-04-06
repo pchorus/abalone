@@ -21,7 +21,6 @@ public:
 
 private:
   double SimulateMove(BallMove* ballMove) const;
-  double EvaluateMove() const;
 
   GameManager* mySimGameManager;
 

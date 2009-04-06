@@ -127,68 +127,8 @@ double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
   double ret = 0.;
 
   mySimGameManager->DoMove(ballMove);
-  ret = EvaluateMove();
+  ret = mySimGameManager->EvaluateBoard(myCurrentPlayer, 1);
   mySimGameManager->UndoMove(ballMove);
 
   return ret;
-}
-
-double ComputerPlayerEvaluateNextMove::EvaluateMove() const
-{
-  ComputerPlayer* simGamePlayer = 0;
-
-  if (GetGameManager()->IsFirstPlayersTurn()) {
-    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer1());
-  }
-  else {
-    simGamePlayer = static_cast<ComputerPlayer*>(mySimGameManager->GetPlayer2());
-  }
-
-  double lostBallsRating = mySimGameManager->CalcLostBallsRatio(simGamePlayer);
-  // best ratio:  +6
-  // worst ratio: -6
-  lostBallsRating = (lostBallsRating + 6.) / 12.;
-
-  double centerDistanceRating = mySimGameManager->CalcAvgCenterDistance(simGamePlayer);
-  // 1.3 = 1.0 (1.357 is the best value to achieve with all 14 marbles)
-  // 4.0 =  0.0 (4.0 => every marble is on the game board's border)
-  centerDistanceRating = 1. - ((centerDistanceRating - 1.3) / 2.7);
-
-  double groupingRating = mySimGameManager->CalcAvgGrouping(simGamePlayer);
-  // 4.14 = 1.0 : all marbles are in a huge single group
-  // 0.0  = 0.0 : no marble has any neighboring fellow marbles
-  groupingRating /= 4.1;
-
-  // TODO: attacking powers should be calculated without calling AddPossibleMoves
-//   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(simGamePlayer);
-//   double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(simGamePlayer);
-//   // 0 attacks  = 1.0
-//   // 10 attacks = 0.0
-//   if (attackedByOpponent > 10.)
-//     attackedByOpponent = 10.;
-//   attackedByOpponent = (10. - attackedByOpponent) * 0.1;
-
-  // TODO: another evaluation: if you can win the game with your next move,
-  // you should take it anyway
-  double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
-    + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
-    + GROUPING_EVALUATION_WEIGHT                    * groupingRating;
-//     + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
-//     + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
-
-//   CString out;
-//   CString str;
-//   str.Format("  Lost Balls:             %f\n", lostBallsRating);
-//   out += str;
-//   str.Format("  Center Distance:        %f\n", centerDistanceRating);
-//   out += str;
-//   str.Format("  Grouping:               %f\n", groupingRating);
-//   out += str;
-//   str.Format("  Attacking Power:        %f\n\n", attackingPowerRating);
-//   out += str;
-//   str.Format("  Attacked By Opponent:   %f\n\n", attackingPowerRating);
-//   out += str;
-
-//  Output::Message(out, false, true);
-  return evaluation;
 }

@@ -14,13 +14,6 @@
 class GameManager;
 
 
-static const double LOST_BALLS_EVALUATION_WEIGHT              = 0.3;
-static const double CENTER_DISTANCE_EVALUATION_WEIGHT         = 0.3;
-static const double GROUPING_EVALUATION_WEIGHT                = 0.3;
-static const double ATTACKING_POWER_EVALUATION_WEIGHT         = 0.05;
-static const double ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT    = 0.05;
-
-
 class ABALONE_BASE_DLLINTERFACE ComputerPlayer : public Player {
 
 public:

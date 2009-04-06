@@ -731,36 +731,99 @@ double GameManager::CalcAvgGrouping(const Player* player) const
   return ret;
 }
 
-double GameManager::CalcAttackingPowerOnOpponent(const Player* player)
+int GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
 {
-  double ret = 0.;
+  int count = 0;
 
-  myBallMovesSize = 0;
+  BoardField* left1(0);
+  BoardField* left2(0);
+  BoardField* left3(0);
+  BoardField* right1(0);
+  BoardField* right2(0);
+  BoardField* right3(0);
+  GameBoard* gameBoard = myGameBoard;
+  BoardField::Ball ball = player->GetBall();
 
-  BallMove* currentMove = 0;
-  const ComputerPlayer* computerPlayer = dynamic_cast<const ComputerPlayer*>(player);
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      // check whether two different colored marbles are facing each other
+      left1 = gameBoard->GetBoardField(x, y);
+      if (left1 && left1->GetBall() != BoardField::NO_BALL) {
+        // check balls from left to right
+        right1 = gameBoard->GetBoardField(x+1, y);
+        if (right1 && right1->GetBall() != BoardField::NO_BALL && left1->GetBall() != right1->GetBall()) {
+          // opponent balls are facing each other
+          left2 = gameBoard->GetBoardField(x-1, y);
+          left3 = gameBoard->GetBoardField(x-2, y);
+          right2 = gameBoard->GetBoardField(x+2, y);
+          right3 = gameBoard->GetBoardField(x+3, y);
 
-  AddPossibleMovesTwoBalls(computerPlayer, myBallMoves, myBallMovesSize);
-  AddPossibleMovesThreeBalls(computerPlayer, myBallMoves, myBallMovesSize);
+          if (left1->GetBall() == ball) {
+            // left balls are own balls
+            if (IsAttacking(left1, left2, left3, right2, right3)) {
+              ++count;
+            }
+          }
+          else if (right1->GetBall() == ball) {
+            // right balls are own balls
+            if (IsAttacking(right1, right2, right3, left2, left3)) {
+              ++count;
+            }
+          }
+        }
 
-  for (int i = 0; i < myBallMovesSize; ++i) {
-    currentMove = myBallMoves[i];
+        // check balls from up left to downright
+        right1 = gameBoard->GetBoardField(x, y-1);
+        if (right1 && right1->GetBall() != BoardField::NO_BALL && left1->GetBall() != right1->GetBall()) {
+          // opponent balls are facing each other
+          left2 = gameBoard->GetBoardField(x, y+1);
+          left3 = gameBoard->GetBoardField(x, y+2);
+          right2 = gameBoard->GetBoardField(x, y-2);
+          right3 = gameBoard->GetBoardField(x, y-3);
 
-    if (currentMove->IsAttacking()) {
-      ++ret;
+          if (left1->GetBall() == ball) {
+            // left balls are own balls
+            if (IsAttacking(left1, left2, left3, right2, right3)) {
+              ++count;
+            }
+          }
+          else if (right1->GetBall() == ball) {
+            // right balls are own balls
+            if (IsAttacking(right1, right2, right3, left2, left3)) {
+              ++count;
+            }
+          }
+        }
+        // check balls from downleft to upright
+        right1 = gameBoard->GetBoardField(x+1, y+1);
+        if (right1 && right1->GetBall() != BoardField::NO_BALL && left1->GetBall() != right1->GetBall()) {
+          // opponent balls are facing each other
+          left2 = gameBoard->GetBoardField(x-1, y-1);
+          left3 = gameBoard->GetBoardField(x-2, y-2);
+          right2 = gameBoard->GetBoardField(x+2, y+2);
+          right3 = gameBoard->GetBoardField(x+3, y+3);
+
+          if (left1->GetBall() == ball) {
+            // left balls are own balls
+            if (IsAttacking(left1, left2, left3, right2, right3)) {
+              ++count;
+            }
+          }
+          else if (right1->GetBall() == ball) {
+            // right balls are own balls
+            if (IsAttacking(right1, right2, right3, left2, left3)) {
+              ++count;
+            }
+          }
+        }
+      }
     }
   }
-
-  return ret / (double)myBallMovesSize;
+  return count;
 }
 
-double GameManager::CalcAttackedByOpponent(const Player* player)
+int GameManager::CalcAttackedByOpponent(const Player* player) const
 {
-  double ret = 0.;
-
-  myBallMovesSize = 0;
-
-  BallMove* currentMove = 0;
   const ComputerPlayer* computerPlayer = 0;
 
   // computerPlayer should be the opponent
@@ -770,23 +833,7 @@ double GameManager::CalcAttackedByOpponent(const Player* player)
   else {
     computerPlayer = dynamic_cast<const ComputerPlayer*>(myPlayer1);
   }
-
-  AddPossibleMovesTwoBalls(computerPlayer, myBallMoves, myBallMovesSize);
-  AddPossibleMovesThreeBalls(computerPlayer, myBallMoves, myBallMovesSize);
-
-  for (int i = 0; i < myBallMovesSize; ++i) {
-    currentMove = myBallMoves[i];
-
-    if (currentMove->IsAttacking()) {
-      ++ret;
-    }
-  }
-
-  // TODO: the absolute number of the opponent's attacking moves
-  // is returned
-//  ret = ret / (double)myBallMovesSize;
-
-  return ret;
+  return CalcAttackingPowerOnOpponent(computerPlayer);
 }
 
 int GameManager::CalcCenterDistance(CPoint coord) const
@@ -1335,22 +1382,49 @@ double GameManager::EvaluateBoard(Player* player, int evaluation) const
     // 0.0  = 0.0 : no marble has any neighboring fellow marbles
     groupingRating /= 4.1;
 
-    // TODO: attacking powers should be calculated without calling AddPossibleMoves
-    //   double attackingPowerRating = mySimGameManager->CalcAttackingPowerOnOpponent(myMaxPlayer);
-    //   double attackedByOpponent = mySimGameManager->CalcAttackedByOpponent(myMaxPlayer);
-    //   // 0 attacks  = 1.0
-    //   // 10 attacks = 0.0
-    //   if (attackedByOpponent > 10.)
-    //     attackedByOpponent = 10.;
-    //   attackedByOpponent = (10. - attackedByOpponent) * 0.1;
+    int attackingPower = CalcAttackingPowerOnOpponent(player);
+    if (attackingPower > 10)
+      attackingPower = 10;
+    double attackingPowerRating = attackingPower * 0.1;
+
+    int attackedByOpponent = CalcAttackedByOpponent(player);
+    if (attackedByOpponent > 10)
+      attackedByOpponent = 10;
+    double attackedByOpponentRating = (10 - attackedByOpponent) * 0.1;
 
     // TODO: another evaluation: if you can win the game with your next move,
     // you should take it anyway
-    double evaluation = LOST_BALLS_EVALUATION_WEIGHT  * lostBallsRating
-      + CENTER_DISTANCE_EVALUATION_WEIGHT             * centerDistanceRating
-      + GROUPING_EVALUATION_WEIGHT                    * groupingRating;
-    //     + ATTACKING_POWER_EVALUATION_WEIGHT             * attackingPowerRating
-    //     + ATTACKED_BY_OPPONENT_EVALUATION_WEIGHT        * attackedByOpponent;
+    double evaluation =
+      0.3  * lostBallsRating +
+      0.3  * centerDistanceRating +
+      0.3  * groupingRating +
+      0.05 * attackingPowerRating +
+      0.05 * attackedByOpponentRating;
+
+    return evaluation;
+  }
+  else if (evaluation == 2) {
+    double lostBallsRating = CalcLostBallsRatio(player);
+    // best ratio:  +6
+    // worst ratio: -6
+    lostBallsRating = (lostBallsRating + 6.) / 12.;
+
+    double centerDistanceRating = CalcAvgCenterDistance(player);
+    // 1.3 = 1.0 (1.357 is the best value to achieve with all 14 marbles)
+    // 4.0 =  0.0 (4.0 => every marble is on the game board's border)
+    centerDistanceRating = 1. - ((centerDistanceRating - 1.3) / 2.7);
+
+    double groupingRating = CalcAvgGrouping(player);
+    // 4.14 = 1.0 : all marbles are in a huge single group
+    // 0.0  = 0.0 : no marble has any neighboring fellow marbles
+    groupingRating /= 4.1;
+
+    // TODO: another evaluation: if you can win the game with your next move,
+    // you should take it anyway
+    double evaluation =
+      0.33 * lostBallsRating +
+      0.33 * centerDistanceRating +
+      0.34 * groupingRating;
 
     //   CString out;
     //   CString str;
@@ -1368,7 +1442,7 @@ double GameManager::EvaluateBoard(Player* player, int evaluation) const
     //   Output::Message(out, false, true);
     return evaluation;
   }
-  else if (evaluation == 2) {
+  else if (evaluation == 3) {
     // use only the ratio between the lost balls of both players
     double lostBallsRating = CalcLostBallsRatio(player);
     // best ratio:  +6

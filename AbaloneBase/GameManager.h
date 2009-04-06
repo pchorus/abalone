@@ -84,10 +84,9 @@ public:
   // put them into one to improve performance
   double CalcAvgGrouping(const Player* player) const;
   // calculates the attacking power on the opponent
-  double CalcAttackingPowerOnOpponent(const Player* player);
+  int CalcAttackingPowerOnOpponent(const Player* player) const;
   // calculates how strong the player is attacked by the other player
-  double CalcAttackedByOpponent(const Player* player);
-
+  int CalcAttackedByOpponent(const Player* player) const;
 
   // returns the Manhattan distance of the passed coordinates to the center
   int CalcCenterDistance(CPoint coord) const;
@@ -119,6 +118,8 @@ private:
 
   // returns the next field in the given direction
   BoardField* GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const;
+
+  bool IsAttacking(BoardField* field1, BoardField* field2, BoardField* field3, /*BoardField* opField1, */BoardField* opField2, BoardField* opField3) const;
 
   // members
   GameBoard* myGameBoard;
@@ -221,4 +222,22 @@ inline void GameManager::SetStartPlayer(Player::PlayerNumber startPlayer)
   else {
     myNextTurn = 0;
   }
+}
+
+inline bool GameManager::IsAttacking(BoardField* field1, BoardField* field2, BoardField* field3, /*BoardField* opField1, */BoardField* opField2, BoardField* opField3) const
+{
+  // field3 field2 field1 => opField1 opField2 opField3
+  if (field1 && field2 && field1->GetBall() == field2->GetBall()) {
+    if (!opField2 || opField2->GetBall() == BoardField::NO_BALL) {
+      return true;
+    }
+    else if (opField2 && opField2->GetBall() != field1->GetBall()
+              && field3 && field3->GetBall() == field1->GetBall()
+              && (!opField3 || opField3->GetBall() == BoardField::NO_BALL))
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
