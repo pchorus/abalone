@@ -95,9 +95,9 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 
   myBallMovesSize[myTreeDepth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
   mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
 
   for (int i = 0; i < myBallMovesSize[myTreeDepth-1]; ++i) {
     mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
@@ -121,7 +121,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 //   out += str;
 //   str.Format("  Possible Moves:    %d\n", myBallMovesSize[myTreeDepth-1]);
 //   out += str;
-//  Output::Message(out, false, true);
+//   Output::Message(out, false, true);
 
   // retMove contains the ballfields from the simGameManager,
   // to do the move on the real game board, we have to give it the boardfields from the
@@ -150,9 +150,9 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
 
   myBallMovesSize[depth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
   for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
@@ -180,9 +180,9 @@ double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
 
   myBallMovesSize[depth-1] = 0;
   
-  mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
+  mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
   for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
