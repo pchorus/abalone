@@ -1525,6 +1525,30 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
       ret += opponentLostBalls * 1000;
       ret -= ownLostBalls * 1000;
     }
+    return ret;
+  }
+  else if (evaluation == 4) {
+    // use only the final outcome which is win, draw or defeat
+    int ret = 0;
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
+
+    if (ownLostBalls != 6 && opponentLostBalls == 6) {
+      ret += 10;
+    }
+    else if (ownLostBalls == 6 && opponentLostBalls != 6) {
+      ret -= 10;
+    }
+    return ret;
   }
   return 0;
 }
