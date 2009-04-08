@@ -30,9 +30,9 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
 
   start = GetTickCount();
 
-  double alpha = -10.;
-  double beta = 10.;
-  double value = 0.;
+  int alpha = INT_MIN;
+  int beta = INT_MAX;
+  int value = 0;
 
   myTreeDepth = 2;
 

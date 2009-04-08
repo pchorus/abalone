@@ -60,8 +60,8 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   // these doubles have to be initialized with the smallest
   // number they can take (or even smaller),
   // TODO: define a range of possible ratings
-  double bestRating = -1.;
-  double newRating = -1.;
+  int bestRating = INT_MIN;
+  int newRating = INT_MIN;
 
   // copy current real situation to the gameboard for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -108,15 +108,15 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
 //   out += str;
 //   str.Format("  Simulated Games:   %d\n", GetGamesToSimulate());
 //   out += str;
-//  Output::Message(out, false, true);
+//   Output::Message(out, false, true);
 
   return retMove;
 }
 
-double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
+int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
 {
-  double ret = 0.;
-  double rating = 0.;
+  int ret = 0;
+  int rating = 0;
 
   int gamesToSimulate = myGamesToSimulate;
 
@@ -151,5 +151,5 @@ double ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove) const
     ret += rating;
   }
 
-  return ret;
+  return ret/gamesToSimulate;
 }

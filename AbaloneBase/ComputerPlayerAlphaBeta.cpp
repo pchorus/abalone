@@ -84,9 +84,9 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 
   start = GetTickCount();
 
-  double alpha = -10.;
-  double beta = 10.;
-  double value = 0.;
+  int alpha = INT_MIN;
+  int beta = INT_MAX;
+  int value = 0;
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -140,10 +140,10 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   return retMove;
 }
 
-double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
+int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
 {
-  double ret = alpha;
-  double value = 0.;
+  int ret = alpha;
+  int value = 0;
 
   if (depth == 0)
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -171,10 +171,10 @@ double ComputerPlayerAlphaBeta::Max(int depth, double alpha, double beta)
   return ret;
 }
 
-double ComputerPlayerAlphaBeta::Min(int depth, double alpha, double beta)
+int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
 {
-  double ret = beta;
-  double value = 0.;
+  int ret = beta;
+  int value = 0;
   if (depth == 0)
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
 

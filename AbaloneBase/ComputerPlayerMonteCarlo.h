@@ -31,7 +31,7 @@ private:
   int myGamesToSimulate;
   int myTurnsPerSimGame;
   int myUsedEvaluation;
-  double SimulateGamesWithMove(BallMove* ballMove) const;
+  int SimulateGamesWithMove(BallMove* ballMove) const;
 
   GameManager* mySimGameManager;
 

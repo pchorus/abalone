@@ -20,7 +20,7 @@ public:
   virtual BallMove CalculateNextMove();
 
 private:
-  double SimulateMove(BallMove* ballMove) const;
+  int SimulateMove(BallMove* ballMove) const;
 
   GameManager* mySimGameManager;
 

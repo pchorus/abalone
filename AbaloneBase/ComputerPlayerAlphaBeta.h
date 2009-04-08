@@ -28,8 +28,8 @@ public:
   void SetUsedEvaluation(int eval);
 
 protected:
-  double Max(int depth, double alpha, double beta);
-  double Min(int depth, double alpha, double beta);
+  int Max(int depth, int alpha, int beta);
+  int Min(int depth, int alpha, int beta);
 
   GameManager* mySimGameManager;
 

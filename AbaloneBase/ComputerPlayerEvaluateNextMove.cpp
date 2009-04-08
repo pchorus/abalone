@@ -54,8 +54,8 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   // these doubles have to be initialized with the smallest
   // number they can take (or even smaller),
   // TODO: define a range of possible ratings
-  double bestRating = -1.;
-  double newRating = -1.;
+  int bestRating = INT_MIN;
+  int newRating = INT_MIN;
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -122,9 +122,9 @@ BallMove ComputerPlayerEvaluateNextMove::CalculateNextMove()
   return retMove;
 }
 
-double ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
+int ComputerPlayerEvaluateNextMove::SimulateMove(BallMove* ballMove) const
 {
-  double ret = 0.;
+  int ret = 0;
 
   mySimGameManager->DoMove(ballMove);
   ret = mySimGameManager->EvaluateBoard(myCurrentPlayer, 1);

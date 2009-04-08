@@ -678,9 +678,8 @@ double GameManager::CalcLostBallsRatio(const Player* player) const
   return ret;
 }
 
-double GameManager::CalcAvgCenterDistance(const Player* player) const
+int GameManager::CalcCenterDistance(const Player* player) const
 {
-  double ret = 0.;
   int centerDistance = 0;
   BoardField::Ball playersBall = player->GetBall();
   BoardField* currentField = 0;
@@ -697,20 +696,11 @@ double GameManager::CalcAvgCenterDistance(const Player* player) const
     }
   }
 
-  // we return the average center distance of each ball on the board,
-  // so we have to exclude the balls which are already lost
-  if (player == GetPlayer1()) {
-    ret = centerDistance / double(14 - myLostBallsPlayer1);
-  }
-  else {
-    ret = centerDistance / double(14 - myLostBallsPlayer2);
-  }
-  return ret;
+  return centerDistance;
 }
 
-double GameManager::CalcAvgGrouping(const Player* player) const
+int GameManager::CalcGrouping(const Player* player) const
 {
-  double ret = 0.;
   int grouping = 0;
   BoardField::Ball playersBall = player->GetBall();
   BoardField* currentField = 0;
@@ -727,15 +717,7 @@ double GameManager::CalcAvgGrouping(const Player* player) const
     }
   }
 
-  // we return the average center distance of each ball on the board,
-  // so we have to exclude the balls which are already lost
-  if (player == myPlayer1) {
-    ret = grouping / double(14 - myLostBallsPlayer1);
-  }
-  else {
-    ret = grouping / double(14 - myLostBallsPlayer2);
-  }
-  return ret;
+  return grouping;
 }
 
 int GameManager::CalcAttackingPowerOnOpponent(const Player* player) const
@@ -1371,75 +1353,138 @@ inline BoardField* GameManager::GetNextFieldInDirection(CPoint fieldCoord, Direc
   return 0;
 }
 
-double GameManager::EvaluateBoard(Player* player, int evaluation) const
+int GameManager::EvaluateBoard(Player* player, int evaluation) const
 {
   if (evaluation == 1) {
-    double lostBallsRating = CalcLostBallsRatio(player);
-    // best ratio:  +6
-    // worst ratio: -6
-    lostBallsRating = (lostBallsRating + 6.) / 12.;
+    int ret = 0;
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
 
-    double centerDistanceRating = CalcAvgCenterDistance(player);
-    // 1.3 = 1.0 (1.357 is the best value to achieve with all 14 marbles)
-    // 4.0 =  0.0 (4.0 => every marble is on the game board's border)
-    centerDistanceRating = 1. - ((centerDistanceRating - 1.3) / 2.7);
+    if (opponentLostBalls == 6) {
+      ret += 1000000;
+    }
+    else if (ownLostBalls == 6) {
+      ret -= 1000000;
+    }
+    else {
+      ret += opponentLostBalls * 1000;
+      ret -= ownLostBalls * 1000;
+    }
 
-    double groupingRating = CalcAvgGrouping(player);
-    // 4.14 = 1.0 : all marbles are in a huge single group
-    // 0.0  = 0.0 : no marble has any neighboring fellow marbles
-    groupingRating /= 4.1;
+    // Center Distance ========================================================
+    // 20 is the best value to achieve with all 14 marbles
+    // 56 is the worst value: every marble is on the game board's border
+    int centerDistance = CalcCenterDistance(player);
+    if (centerDistance < 24) {
+      ret += 400;
+    }
+    else if (centerDistance < 30) {
+      ret += 300;
+    }
+    else if (centerDistance < 35) {
+      ret += 200;
+    }
+    else if (centerDistance < 40) {
+      ret += 100;
+    }
 
-    int attackingPower = CalcAttackingPowerOnOpponent(player);
-    if (attackingPower > 10)
-      attackingPower = 10;
-    double attackingPowerRating = attackingPower * 0.1;
+    // Marbles Grouping =======================================================
+    int grouping = CalcGrouping(player);
+    // 58 : all marbles are in a huge single group
+    //  0 : no marble has any neighboring fellow marbles
+    // below 40 is already not very good
+    if (grouping > 55) {
+      ret += 320;
+    }
+    else if (grouping > 50) {
+      ret += 240;
+    }
+    else if (grouping > 45) {
+      ret += 160;
+    }
+    else if (grouping > 40) {
+      ret += 80;
+    }
 
-    int attackedByOpponent = CalcAttackedByOpponent(player);
-    if (attackedByOpponent > 10)
-      attackedByOpponent = 10;
-    double attackedByOpponentRating = (10 - attackedByOpponent) * 0.1;
+    // Attacking Power ========================================================
+    // TODO: Output of power
+    ret += 10 * CalcAttackingPowerOnOpponent(player);
 
-    // TODO: another evaluation: if you can win the game with your next move,
-    // you should take it anyway
-//     double evaluation =
-//       0.3  * lostBallsRating +
-//       0.3  * centerDistanceRating +
-//       0.3  * groupingRating +
-//       0.05 * attackingPowerRating +
-//       0.05 * attackedByOpponentRating;
+    // Defending Power ========================================================
+    ret -= 10 * CalcAttackedByOpponent(player);
 
-    double evaluation =
-      0.5  * lostBallsRating +
-      0.15 * centerDistanceRating +
-      0.15 * groupingRating +
-      0.1  * attackingPowerRating +
-      0.1  * attackedByOpponentRating;
-
-    return evaluation;
+    return ret;
   }
   else if (evaluation == 2) {
-    double lostBallsRating = CalcLostBallsRatio(player);
-    // best ratio:  +6
-    // worst ratio: -6
-    lostBallsRating = (lostBallsRating + 6.) / 12.;
+    int ret = 0;
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
 
-    double centerDistanceRating = CalcAvgCenterDistance(player);
-    // 1.3 = 1.0 (1.357 is the best value to achieve with all 14 marbles)
-    // 4.0 =  0.0 (4.0 => every marble is on the game board's border)
-    centerDistanceRating = 1. - ((centerDistanceRating - 1.3) / 2.7);
+    if (opponentLostBalls == 6) {
+      ret += 1000000;
+    }
+    else if (ownLostBalls == 6) {
+      ret -= 1000000;
+    }
+    else {
+      ret += opponentLostBalls * 1000;
+      ret -= ownLostBalls * 1000;
+    }
 
-    double groupingRating = CalcAvgGrouping(player);
-    // 4.14 = 1.0 : all marbles are in a huge single group
-    // 0.0  = 0.0 : no marble has any neighboring fellow marbles
-    groupingRating /= 4.1;
+    // Center Distance ========================================================
+    // 20 is the best value to achieve with all 14 marbles
+    // 56 is the worst value: every marble is on the game board's border
+    int centerDistance = CalcCenterDistance(player);
+    if (centerDistance < 24) {
+      ret += 400;
+    }
+    else if (centerDistance < 30) {
+      ret += 300;
+    }
+    else if (centerDistance < 35) {
+      ret += 200;
+    }
+    else if (centerDistance < 40) {
+      ret += 100;
+    }
 
-    // TODO: another evaluation: if you can win the game with your next move,
-    // you should take it anyway
-    double evaluation =
-      0.33 * lostBallsRating +
-      0.33 * centerDistanceRating +
-      0.34 * groupingRating;
+    // Marbles Grouping =======================================================
+    int grouping = CalcGrouping(player);
+    // 58 : all marbles are in a huge single group
+    //  0 : no marble has any neighboring fellow marbles
+    // below 40 is already not very good
+    if (grouping > 55) {
+      ret += 320;
+    }
+    else if (grouping > 50) {
+      ret += 240;
+    }
+    else if (grouping > 45) {
+      ret += 160;
+    }
+    else if (grouping > 40) {
+      ret += 80;
+    }
 
+    return ret;
     //   CString out;
     //   CString str;
     //   str.Format("  Lost Balls:             %f\n", lostBallsRating);
@@ -1454,15 +1499,32 @@ double GameManager::EvaluateBoard(Player* player, int evaluation) const
     //   out += str;
     // 
     //   Output::Message(out, false, true);
-    return evaluation;
   }
   else if (evaluation == 3) {
     // use only the ratio between the lost balls of both players
-    double lostBallsRating = CalcLostBallsRatio(player);
-    // best ratio:  +6
-    // worst ratio: -6
-    lostBallsRating = (lostBallsRating + 6.) / 12.;
-    return lostBallsRating;
+    int ret = 0;
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
+
+    if (opponentLostBalls == 6) {
+      ret += 1000000;
+    }
+    else if (ownLostBalls == 6) {
+      ret -= 1000000;
+    }
+    else {
+      ret += opponentLostBalls * 1000;
+      ret -= ownLostBalls * 1000;
+    }
   }
-  return 0.;
+  return 0;
 }

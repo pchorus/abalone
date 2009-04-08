@@ -72,17 +72,17 @@ public:
 
   CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const;
 
-  double EvaluateBoard(Player* player, int evaluation) const;
+  int EvaluateBoard(Player* player, int evaluation) const;
   // methods for evaluation of the current game board situation
   // calculates the ratio of lost balls
   double CalcLostBallsRatio(const Player* player) const;
   // returns the average distance of the player's marbles to the game board's center
   // at the end of a simulated game
-  double CalcAvgCenterDistance(const Player* player) const;
+  int CalcCenterDistance(const Player* player) const;
   // calculates the average grouping of the marbles
   // TODO: this can be calculated in the same loop as in GetAvgCenterDistanceSimGame
   // put them into one to improve performance
-  double CalcAvgGrouping(const Player* player) const;
+  int CalcGrouping(const Player* player) const;
   // calculates the attacking power on the opponent
   int CalcAttackingPowerOnOpponent(const Player* player) const;
   // calculates how strong the player is attacked by the other player
