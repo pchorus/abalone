@@ -58,7 +58,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
 
-    for (int i = 0; i < myBallMovesSize[myTreeDepth-1] && myKeepInvestigating == true; ++i) {
+    for (int i = 0; i < myBallMovesSize[myTreeDepth-1] && myKeepInvestigating; ++i) {
       mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
       value = Min(myTreeDepth-1, alpha, beta);
       mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);

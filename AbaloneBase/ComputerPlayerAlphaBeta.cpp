@@ -146,7 +146,7 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating == true; ++i) {
+  for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Min(depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
@@ -183,7 +183,7 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating == true; ++i) {
+  for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Max(depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
