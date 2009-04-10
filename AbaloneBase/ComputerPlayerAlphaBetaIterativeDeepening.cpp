@@ -3,14 +3,16 @@
 
 #include "GameManager.h"
 #include "GameBoard.h"
-#include "Output.h"
 
 static const int MAX_TREE_DEPTH = 10;
-static const int DEFAULT_MILLISECONDS_PER_MOVE = 20000;
+static const int DEFAULT_MILLISECONDS_PER_MOVE = 12000000;
+static const int AVG_PLIES_PER_GAME = 70;
 
 ComputerPlayerAlphaBetaIterativeDeepening::ComputerPlayerAlphaBetaIterativeDeepening(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayerAlphaBeta(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING)
-, myMilliSecondsPerMove(DEFAULT_MILLISECONDS_PER_MOVE)
+, myMilliSecondsForGame(DEFAULT_MILLISECONDS_PER_MOVE)
+, myLeftMilliSecondsForGame(DEFAULT_MILLISECONDS_PER_MOVE)
+, myStart(0)
 {
   SetTreeDepth(MAX_TREE_DEPTH);
 }
@@ -21,14 +23,15 @@ ComputerPlayerAlphaBetaIterativeDeepening::~ComputerPlayerAlphaBetaIterativeDeep
 
 BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
 {
-  bool stop = false;
-  bool foundMove = false;
+  // TODO: currently we only have an alarm timer, another timer which takes the
+  // ratio between the times for the different tree depth is of interest.
   BallMove retMove;
+  bool foundMove = false;
+  myKeepInvestigating = true;
 
-  DWORD start = 0;
   DWORD end = 0;
 
-  start = GetTickCount();
+  myStart = GetTickCount();
 
   int alpha = INT_MIN;
   int beta = INT_MAX;
@@ -41,7 +44,8 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
 
-  while (!stop && myTreeDepth <= MAX_TREE_DEPTH) {
+  while (myKeepInvestigating && myTreeDepth <= MAX_TREE_DEPTH) {
+    myNodeCounter = 1;
     myBallMovesSize[myTreeDepth-1] = 0;
 
     // best move from previous iteration into the movelist
@@ -54,7 +58,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
 
-    for (int i = 0; i < myBallMovesSize[myTreeDepth-1]; ++i) {
+    for (int i = 0; i < myBallMovesSize[myTreeDepth-1] && myKeepInvestigating == true; ++i) {
       mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
       value = Min(myTreeDepth-1, alpha, beta);
       mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
@@ -66,20 +70,8 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
         alpha = value;
         foundMove = true;
       }
-      end = GetTickCount();
-      if ((end - start) > myMilliSecondsPerMove) {
-        stop = true;
-        break;
-      }
     }
-
-    end = GetTickCount();
-    if ((end - start) < myMilliSecondsPerMove) {
-      ++myTreeDepth;
-    }
-    else {
-      stop = true;
-    }
+    ++myTreeDepth;
   }
 
   // retMove contains the ballfields from the simGameManager,
@@ -96,5 +88,20 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     ball3 = GetGameManager()->GetGameBoard()->GetBoardField(ball3->GetFieldCoordinates());
   retMove.SetBalls(ball1, ball2, ball3);
 
+  end = GetTickCount();
+  if ((end - myStart) < myLeftMilliSecondsForGame) {
+    myLeftMilliSecondsForGame = myLeftMilliSecondsForGame - (GetTickCount() - myStart);
+  }
+  else {
+    myLeftMilliSecondsForGame = 0;
+  }
+  
   return retMove;
+}
+
+void ComputerPlayerAlphaBetaIterativeDeepening::CheckTime()
+{
+  if ((GetTickCount() - myStart) > myLeftMilliSecondsForGame / AVG_PLIES_PER_GAME) {
+    myKeepInvestigating = false;
+  }
 }

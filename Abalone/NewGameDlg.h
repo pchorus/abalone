@@ -36,23 +36,23 @@ private:
   GameManager* myGameManager;
   CStatic myStaticPlayer1MCSimGames;
   CStatic myStaticPlayer1MCTurnsPerSimGame;
-  CStatic myStaticPlayer1ABTimePerMove;
+  CStatic myStaticPlayer1ABTimeForGame;
   CStatic myStaticPlayer1ABTreeDepth;
   CStatic myStaticPlayer1Evaluation;
   CEdit myEditPlayer1MCSimGames;
   CEdit myEditPlayer1MCTurnsPerSimGame;
-  CEdit myEditPlayer1ABTimePerMove;
+  CEdit myEditPlayer1ABTimeForGame;
   CEdit myEditPlayer1ABTreeDepth;
   CEdit myEditPlayer1Evaluation;
 
   CStatic myStaticPlayer2MCSimGames;
   CStatic myStaticPlayer2MCTurnsPerSimGame;
-  CStatic myStaticPlayer2ABTimePerMove;
+  CStatic myStaticPlayer2ABTimeForGame;
   CStatic myStaticPlayer2ABTreeDepth;
   CStatic myStaticPlayer2Evaluation;
   CEdit myEditPlayer2MCSimGames;
   CEdit myEditPlayer2MCTurnsPerSimGame;
-  CEdit myEditPlayer2ABTimePerMove;
+  CEdit myEditPlayer2ABTimeForGame;
   CEdit myEditPlayer2ABTreeDepth;
   CEdit myEditPlayer2Evaluation;
 

@@ -5,9 +5,7 @@
 #include "GameManager.h"
 #include "GameBoard.h"
 
-#include "Output.h"
-
-
+static const unsigned int TIME_CHECK_INTERVAL = 200;
 
 ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball, Player::PlayerType type)
 : ComputerPlayer(gameManager, name, ball, type)
@@ -18,6 +16,8 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myUsedEvaluation(1)
 , myBallMoves(0)
 , myBallMovesSize(0)
+, myNodeCounter(0)
+, myKeepInvestigating(true)
 {
   SetTreeDepth(myTreeDepth);
   mySimGameManager->SetPlayers("SimPlayer1", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, "SimPlayer2", Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES, Player::PLAYER_NONE);
@@ -77,12 +77,9 @@ void ComputerPlayerAlphaBeta::DeleteBallMoves()
 BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 {
   BallMove retMove;
+  myKeepInvestigating = true;
 
-  DWORD time = 0;
-  DWORD start = 0;
-  DWORD end = 0;
-
-  start = GetTickCount();
+  myNodeCounter = 1;
 
   int alpha = INT_MIN;
   int beta = INT_MAX;
@@ -112,17 +109,6 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
     }
   }
 
-//   end = GetTickCount();
-//   time = end - start;
-// 
-//   CString out("AlphaBeta\n");
-//   CString str;
-//   str.Format("  CalculateNextMove: %d\n", time);
-//   out += str;
-//   str.Format("  Possible Moves:    %d\n", myBallMovesSize[myTreeDepth-1]);
-//   out += str;
-//   Output::Message(out, false, true);
-
   // retMove contains the ballfields from the simGameManager,
   // to do the move on the real game board, we have to give it the boardfields from the
   // real game manager
@@ -142,11 +128,17 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 
 int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
 {
-  int ret = alpha;
-  int value = 0;
+  ++myNodeCounter;
 
   if (depth == 0)
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+
+  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+    CheckTime();
+  }
+
+  int ret = alpha;
+  int value = 0;
 
   myBallMovesSize[depth-1] = 0;
 
@@ -154,7 +146,7 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
+  for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating == true; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Min(depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
@@ -173,10 +165,17 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
 
 int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
 {
-  int ret = beta;
-  int value = 0;
+  ++myNodeCounter;
+
   if (depth == 0)
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+
+  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+    CheckTime();
+  }
+
+  int ret = beta;
+  int value = 0;
 
   myBallMovesSize[depth-1] = 0;
   
@@ -184,7 +183,7 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  for (int i = 0; i < myBallMovesSize[depth-1]; ++i) {
+  for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating == true; ++i) {
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Max(depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
@@ -199,4 +198,8 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
   }
 
   return ret;
+}
+
+void ComputerPlayerAlphaBeta::CheckTime()
+{
 }

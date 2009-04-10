@@ -1415,6 +1415,8 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
       ret += 80;
     }
 
+    // TODO: Opponent's Marbles Grouping
+
     // Attacking Power ========================================================
     // TODO: Output of power
     ret += 10 * CalcAttackingPowerOnOpponent(player);

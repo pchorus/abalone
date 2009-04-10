@@ -210,7 +210,7 @@ void CAbaloneApp::PlayBatchGame()
         ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
         hlp = myCmdLineParams["SecPerMove1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
-          abPlayer->SetSecondsPerMove(_ttoi(hlp));
+          abPlayer->SetSecondsForGame(_ttoi(hlp));
         }
         hlp = myCmdLineParams["Evaluation1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
@@ -219,7 +219,7 @@ void CAbaloneApp::PlayBatchGame()
 
         headerPlayer1.Format("%s Seconds per Move: %d, Value Function: %d",
           namePlayer1,
-          abPlayer->GetSecondsPerMove(),
+          abPlayer->GetSecondsForGame(),
           abPlayer->GetUsedEvaluation());
       }
 
@@ -264,7 +264,7 @@ void CAbaloneApp::PlayBatchGame()
         ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
         hlp = myCmdLineParams["SecPerMove2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
-          abPlayer->SetSecondsPerMove(_ttoi(hlp));
+          abPlayer->SetSecondsForGame(_ttoi(hlp));
         }
         hlp = myCmdLineParams["Evaluation2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 1) {
@@ -273,7 +273,7 @@ void CAbaloneApp::PlayBatchGame()
 
         headerPlayer2.Format("%s Seconds per Move: %d, Value Function: %d",
           namePlayer2,
-          abPlayer->GetSecondsPerMove(),
+          abPlayer->GetSecondsForGame(),
           abPlayer->GetUsedEvaluation());
       }
 

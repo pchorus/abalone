@@ -21,6 +21,7 @@ public:
   virtual ~ComputerPlayerAlphaBeta();
 
   virtual BallMove CalculateNextMove();
+  virtual void CheckTime();
 
   int GetTreeDepth() const;
   void SetTreeDepth(int treeDepth);
@@ -38,6 +39,8 @@ protected:
 
   BallMove*** myBallMoves;
   int* myBallMovesSize;
+  unsigned int myNodeCounter;
+  bool myKeepInvestigating;
 
 private:
   void DeleteBallMoves();

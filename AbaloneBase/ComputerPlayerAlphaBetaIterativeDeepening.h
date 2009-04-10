@@ -18,20 +18,30 @@ public:
   virtual ~ComputerPlayerAlphaBetaIterativeDeepening();
 
   virtual BallMove CalculateNextMove();
+  virtual void CheckTime();
 
-  DWORD GetSecondsPerMove() const;
-  void SetSecondsPerMove(DWORD seconds);
+  DWORD GetSecondsForGame() const;
+  DWORD GetLeftSecondsForGame() const;
+  void SetSecondsForGame(DWORD seconds);
 
 private:
-  DWORD myMilliSecondsPerMove;
+  DWORD myMilliSecondsForGame;
+  DWORD myLeftMilliSecondsForGame;
+  DWORD myStart;
 };
 
-inline void ComputerPlayerAlphaBetaIterativeDeepening::SetSecondsPerMove(DWORD seconds)
+inline void ComputerPlayerAlphaBetaIterativeDeepening::SetSecondsForGame(DWORD seconds)
 {
-  myMilliSecondsPerMove = seconds*1000;
+  myMilliSecondsForGame = seconds*1000;
+  myLeftMilliSecondsForGame = seconds*1000;
 }
 
-inline DWORD ComputerPlayerAlphaBetaIterativeDeepening::GetSecondsPerMove() const
+inline DWORD ComputerPlayerAlphaBetaIterativeDeepening::GetSecondsForGame() const
 {
-  return myMilliSecondsPerMove / 1000;
+  return myMilliSecondsForGame / 1000;
+}
+
+inline DWORD ComputerPlayerAlphaBetaIterativeDeepening::GetLeftSecondsForGame() const
+{
+  return myLeftMilliSecondsForGame / 1000;
 }
