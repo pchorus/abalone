@@ -218,7 +218,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HashMapEntry.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HumanPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mtrand.cpp"
 				>
 			</File>
 			<File
@@ -227,6 +235,10 @@
 			</File>
 			<File
 				RelativePath=".\Player.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ZobristHashMap.cpp"
 				>
 			</File>
 		</Filter>
@@ -280,7 +292,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HashMapEntry.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HumanPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mtrand.h"
 				>
 			</File>
 			<File
@@ -289,6 +309,10 @@
 			</File>
 			<File
 				RelativePath=".\Player.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ZobristHashMap.h"
 				>
 			</File>
 		</Filter>

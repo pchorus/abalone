@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "ComputerPlayer.h"
+#include "ZobristHashMap.h"
 
 
 static const int DEFAULT_TREE_DEPTH = 5;
@@ -46,6 +47,7 @@ private:
   void DeleteBallMoves();
   ComputerPlayer* myMinPlayer;
   int myUsedEvaluation;
+  ZobristHashMap myHashMap;
 };
 
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
