@@ -83,6 +83,7 @@ public:
   // TODO: this can be calculated in the same loop as in GetAvgCenterDistanceSimGame
   // put them into one to improve performance
   int CalcGrouping(const Player* player) const;
+  int CalcOpposingGrouping(const Player* player) const;
   // calculates the attacking power on the opponent
   int CalcAttackingPowerOnOpponent(const Player* player) const;
   // calculates how strong the player is attacked by the other player
