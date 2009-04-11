@@ -70,6 +70,8 @@ public:
   // sets the balls in the start formation
   void SetBallFormation(const CString& formation);
 
+  // returns the next field in the given direction
+  BoardField* GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const;
   CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const;
 
   int EvaluateBoard(Player* player, int evaluation) const;
@@ -95,13 +97,14 @@ public:
   // marble at coord
   int CalcGroupingField(const Player* player, CPoint coord) const;
 
+  void GetOpponentFields(Direction direction, const BoardField* selectedField1, const BoardField* selectedField2,
+    const BoardField* selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
+
 private:
   void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
 
   // help methods
   BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2) const;
-  void GetOpponentFields(Direction direction, const BoardField* selectedField1, const BoardField* selectedField2,
-    const BoardField* selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
 
   void AddLostBall(BoardField::Ball ball);
   void RemoveLostBall(BoardField::Ball ball);
@@ -116,9 +119,6 @@ private:
   void SetBallsStandardFormation();
   void SetBallsBelgianDaisyFormation();
   void SetBallsCustomFormation(const CString& formation);
-
-  // returns the next field in the given direction
-  BoardField* GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const;
 
   bool IsAttacking(BoardField* field1, BoardField* field2, BoardField* field3, /*BoardField* opField1, */BoardField* opField2, BoardField* opField3) const;
 

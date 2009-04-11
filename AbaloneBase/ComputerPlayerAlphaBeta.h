@@ -48,6 +48,7 @@ private:
   ComputerPlayer* myMinPlayer;
   int myUsedEvaluation;
   ZobristHashMap myHashMap;
+  ULONG64 myCurrentHashKey;
 };
 
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
