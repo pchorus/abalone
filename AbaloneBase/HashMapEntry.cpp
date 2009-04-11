@@ -2,11 +2,11 @@
 
 #include "HashMapEntry.h"
 
-HashMapEntry::HashMapEntry()
+HashMapEntry::HashMapEntry(ULONG64 lock)
 : myTreeDepth(0)
 , myValue(0)
 , myValueType(UNKOWN)
-, myLock(0)
+, myLock(lock)
 , myMove()
 {
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GameBoard.h"
+#include "HashMapEntry.h"
 
-class HashMapEntry;
 class BallMove;
 class GameManager;
 
@@ -22,6 +22,7 @@ public:
   void RecalcHashKeyUndoMove(ULONG64& currentHash, BallMove* move, GameManager* gameManager);
 
   void Insert(ULONG64 key, HashMapEntry* entry);
+  bool Check(ULONG64 key) const;
 
 private:
   ULONG64 myHashKeys[BOARD_FIELDS_COLUMN][BOARD_FIELDS_ROW][3];
@@ -42,4 +43,16 @@ inline ULONG64 ZobristHashMap::GetHashKey(CPoint point, BoardField::Ball ball) c
 inline void ZobristHashMap::Insert(ULONG64 key, HashMapEntry* entry)
 {
   myHashMap[key % TWO_POW_20] = entry;
+}
+
+inline bool ZobristHashMap::Check(ULONG64 key) const
+{
+  HashMapEntry* entry = myHashMap[key % TWO_POW_20];
+  if (entry) {
+    if (entry->GetLock() == key) {
+      // match
+      return true;
+    }
+  }
+  return false;
 }
