@@ -8,7 +8,7 @@ class GameManager;
 
 static const int TWO_POW_20 = 1048576;
 
-class ZobristHashMap {
+class ABALONE_BASE_DLLINTERFACE ZobristHashMap {
 public:
   ZobristHashMap();
   ~ZobristHashMap();
@@ -21,7 +21,13 @@ public:
   void RecalcHashKey(ULONG64& currentHash, BallMove* move, GameManager* gameManager);
 
   void Insert(ULONG64 key, HashMapEntry* entry);
-  bool Check(ULONG64 key) const;
+  void Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType, BallMove* move);
+  HashMapEntry* Check(ULONG64 key);
+
+  void ClearAndDestroy();
+
+  unsigned int myInserts;
+  unsigned int myReUseEntries;
 
 private:
   ULONG64 myHashKeys[BOARD_FIELDS_COLUMN][BOARD_FIELDS_ROW][3];
@@ -41,17 +47,31 @@ inline ULONG64 ZobristHashMap::GetHashKey(CPoint point, BoardField::Ball ball) c
 
 inline void ZobristHashMap::Insert(ULONG64 key, HashMapEntry* entry)
 {
+  ++myInserts;
   myHashMap[key % TWO_POW_20] = entry;
 }
 
-inline bool ZobristHashMap::Check(ULONG64 key) const
+inline void ZobristHashMap::Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType, BallMove* move)
+{
+  if (myHashMap[key % TWO_POW_20] == 0) {
+    ++myInserts;
+    myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key, move);
+  }
+  else if (myHashMap[key % TWO_POW_20]->GetDepth() > depth) {
+    delete myHashMap[key % TWO_POW_20];
+    myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key, move);
+  }
+}
+
+inline HashMapEntry* ZobristHashMap::Check(ULONG64 key)
 {
   HashMapEntry* entry = myHashMap[key % TWO_POW_20];
   if (entry) {
     if (entry->GetLock() == key) {
       // match
-      return true;
+      ++myReUseEntries;
+      return entry;
     }
   }
-  return false;
+  return 0;
 }

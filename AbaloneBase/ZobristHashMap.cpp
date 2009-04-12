@@ -7,6 +7,8 @@
 #include "GameManager.h"
 
 ZobristHashMap::ZobristHashMap()
+: myInserts(0)
+, myReUseEntries(0)
 {
   unsigned long init[4] = {0x123, 0x234, 0x345, 0x456}, length = 4;
   MTRand_int32 irand(init, length); // 32-bit int generator 
@@ -178,6 +180,16 @@ void ZobristHashMap::RecalcHashKey(ULONG64& currentHash, BallMove* move, GameMan
       currentHash ^= GetHashKey(field->GetFieldCoordinates(), ownBall);
       currentHash ^= GetHashKey(ball3->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(ball3->GetFieldCoordinates(), ownBall);
+    }
+  }
+}
+
+void ZobristHashMap::ClearAndDestroy()
+{
+  for (int i = 0; i < TWO_POW_20; ++i) {
+    if (myHashMap[i]) {
+      delete myHashMap[i];
+      myHashMap[i] = 0;
     }
   }
 }
