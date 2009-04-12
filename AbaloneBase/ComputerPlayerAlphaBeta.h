@@ -30,8 +30,13 @@ public:
   void SetUsedEvaluation(int eval);
 
 protected:
+  // alpha beta search methods
   int Max(int depth, int alpha, int beta);
   int Min(int depth, int alpha, int beta);
+
+  // alpha beta search methods using transposition tables
+  int MaxTT(int depth, int alpha, int beta);
+  int MinTT(int depth, int alpha, int beta);
 
   GameManager* mySimGameManager;
 
