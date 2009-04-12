@@ -105,7 +105,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   for (int i = 0; i < myBallMovesSize[myTreeDepth-1]; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
-    value = Min(myTreeDepth-1, alpha, beta);
+    value = MinTT(myTreeDepth-1, alpha, beta);
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
     if (value >= beta) {
@@ -212,15 +212,36 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
 {
   ++myNodeCounter;
 
-  if (depth == 0)
-    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-
-  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
-    CheckTime();
+  // check if we can use a transposition
+  HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
+  if (entry && entry->GetDepth() >= depth) {
+    if(entry->GetValueType() == HashMapEntry::EXACT)
+      return entry->GetValue();
+    if(entry->GetValueType() == HashMapEntry::LOWER_BOUND && entry->GetValue() > alpha)
+      alpha = entry->GetValue();
+    else if(entry->GetValueType() == HashMapEntry::UPPER_BOUND && entry->GetValue() < beta)
+      beta = entry->GetValue();
+    if(alpha >= beta)
+      return entry->GetValue();
   }
 
   int ret = alpha;
   int value = 0;
+
+  if (depth == 0) {
+    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+    if(value <= alpha) // a lowerbound value
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
+    else if(value >= beta) // an upperbound value
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
+    else // a true minimax value
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
+    return value;
+  }
+
+  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+    CheckTime();
+  }
 
   myBallMovesSize[depth-1] = 0;
 
@@ -228,12 +249,15 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
+  int best = INT_MIN;
   for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
-    value = Min(depth-1, alpha, beta);
+    value = MinTT(depth-1, alpha, beta);
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
+    if (value > best)
+      best = value;
     if (value >= beta) {
       ret = beta;
       break;
@@ -244,6 +268,11 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
     }
   }
 
+  if(best >= beta) // an upperbound value
+    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::UPPER_BOUND);
+  else // a true minimax value
+    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::EXACT);
+
   return ret;
 }
 
@@ -251,15 +280,36 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
 {
   ++myNodeCounter;
 
-  if (depth == 0)
-    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-
-  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
-    CheckTime();
+  // check if we can use a transposition
+  HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
+  if (entry && entry->GetDepth() >= depth) {
+    if(entry->GetValueType() == HashMapEntry::EXACT)
+      return entry->GetValue();
+    if(entry->GetValueType() == HashMapEntry::LOWER_BOUND && entry->GetValue() > alpha)
+      alpha = entry->GetValue();
+    else if(entry->GetValueType() == HashMapEntry::UPPER_BOUND && entry->GetValue() < beta)
+      beta = entry->GetValue();
+    if(alpha >= beta)
+      return entry->GetValue();
   }
 
   int ret = beta;
   int value = 0;
+
+  if (depth == 0) {
+    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+    if(value <= alpha) // a lowerbound value
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
+    else if(value >= beta) // an upperbound value
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
+    else // a true minimax value
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
+    return value;
+  }
+
+  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+    CheckTime();
+  }
 
   myBallMovesSize[depth-1] = 0;
 
@@ -267,12 +317,17 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
+  int best = INT_MAX;
   for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
-    value = Max(depth-1, alpha, beta);
+    value = MaxTT(depth-1, alpha, beta);
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
+
+    if (value < best) {
+      best = value;
+    }
     if (value <= alpha) {
       ret = alpha;
       break;
@@ -283,6 +338,10 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
     }
   }
 
+  if(best <= alpha) // a lowerbound value
+    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::LOWER_BOUND);
+  else // a true minimax value
+    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::EXACT);
   return ret;
 }
 

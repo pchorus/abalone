@@ -11,12 +11,12 @@ HashMapEntry::HashMapEntry(ULONG64 lock)
 {
 }
 
-HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock, BallMove* move)
+HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock/*, BallMove* move*/)
 : myTreeDepth(treeDepth)
 , myValue(value)
 , myValueType(valueType)
 , myLock(lock)
-, myMove(*move)
+, myMove(/**move*/)
 {
 }
 

@@ -21,7 +21,7 @@ public:
   void RecalcHashKey(ULONG64& currentHash, BallMove* move, GameManager* gameManager);
 
   void Insert(ULONG64 key, HashMapEntry* entry);
-  void Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType, BallMove* move);
+  void Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType/*, BallMove* move*/);
   HashMapEntry* Check(ULONG64 key);
 
   void ClearAndDestroy();
@@ -51,16 +51,17 @@ inline void ZobristHashMap::Insert(ULONG64 key, HashMapEntry* entry)
   myHashMap[key % TWO_POW_20] = entry;
 }
 
-inline void ZobristHashMap::Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType, BallMove* move)
+inline void ZobristHashMap::Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType/*, BallMove* move*/)
 {
   if (myHashMap[key % TWO_POW_20] == 0) {
     ++myInserts;
-    myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key, move);
+    myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key/*, move*/);
   }
-  else if (myHashMap[key % TWO_POW_20]->GetDepth() > depth) {
-    delete myHashMap[key % TWO_POW_20];
-    myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key, move);
-  }
+//   else if (myHashMap[key % TWO_POW_20]->GetDepth() < depth) {
+// //  else if (myHashMap[key % TWO_POW_20]->GetDepth() < depth) {
+//     delete myHashMap[key % TWO_POW_20];
+//     myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key/*, move*/);
+//   }
 }
 
 inline HashMapEntry* ZobristHashMap::Check(ULONG64 key)

@@ -7,7 +7,7 @@ public:
   enum ValueType { UNKOWN = 0, EXACT, UPPER_BOUND, LOWER_BOUND };
 
   HashMapEntry(ULONG64 lock);
-  HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock, BallMove* move);
+  HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock/*, BallMove* move*/);
   ~HashMapEntry();
 
   byte GetDepth() const;
