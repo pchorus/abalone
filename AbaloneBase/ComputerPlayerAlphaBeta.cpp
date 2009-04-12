@@ -101,10 +101,10 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
 
   for (int i = 0; i < myBallMovesSize[myTreeDepth-1]; ++i) {
-    myHashMap.RecalcHashKeyDoMove(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
+    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
     value = Min(myTreeDepth-1, alpha, beta);
-    myHashMap.RecalcHashKeyUndoMove(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
+    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
     if (value >= beta) {
       break;
@@ -153,10 +153,10 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
   for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
-    myHashMap.RecalcHashKeyDoMove(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
+    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Min(depth-1, alpha, beta);
-    myHashMap.RecalcHashKeyUndoMove(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
+    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value >= beta) {
       ret = beta;
@@ -192,10 +192,10 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
   for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
-    myHashMap.RecalcHashKeyDoMove(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
+    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = Max(depth-1, alpha, beta);
-    myHashMap.RecalcHashKeyUndoMove(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
+    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value <= alpha) {
       ret = alpha;

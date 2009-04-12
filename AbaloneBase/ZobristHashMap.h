@@ -18,8 +18,7 @@ public:
   HashMapEntry* GetEntry(ULONG64 key) const;
 
   ULONG64 CalcHashKey(const GameBoard* gameBoard) const;
-  void RecalcHashKeyDoMove(ULONG64& currentHash, BallMove* move, GameManager* gameManager);
-  void RecalcHashKeyUndoMove(ULONG64& currentHash, BallMove* move, GameManager* gameManager);
+  void RecalcHashKey(ULONG64& currentHash, BallMove* move, GameManager* gameManager);
 
   void Insert(ULONG64 key, HashMapEntry* entry);
   bool Check(ULONG64 key) const;
