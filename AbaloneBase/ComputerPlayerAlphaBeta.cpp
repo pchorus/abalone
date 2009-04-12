@@ -145,7 +145,6 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
     CheckTime();
   }
 
-  int ret = alpha;
   int value = 0;
 
   myBallMovesSize[depth-1] = 0;
@@ -159,16 +158,13 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
     value = Min(depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value >= beta) {
-      ret = beta;
-      break;
+      return beta;
     }
     if (value > alpha) {
       alpha = value;
-      ret = alpha;
     }
   }
-
-  return ret;
+  return alpha;
 }
 
 int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
@@ -182,7 +178,6 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
     CheckTime();
   }
 
-  int ret = beta;
   int value = 0;
 
   myBallMovesSize[depth-1] = 0;
@@ -196,16 +191,13 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
     value = Max(depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value <= alpha) {
-      ret = alpha;
-      break;
+      return alpha;
     }
     if (value < beta) {
       beta = value;
-      ret = beta;
     }
   }
-
-  return ret;
+  return beta;
 }
 
 int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
@@ -225,7 +217,6 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
       return entry->GetValue();
   }
 
-  int ret = alpha;
   int value = 0;
 
   if (depth == 0) {
@@ -249,31 +240,23 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  int best = INT_MIN;
   for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
     value = MinTT(depth-1, alpha, beta);
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
-    if (value > best)
-      best = value;
     if (value >= beta) {
-      ret = beta;
-      break;
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::UPPER_BOUND);
+      return beta;
     }
     if (value > alpha) {
       alpha = value;
-      ret = alpha;
     }
   }
 
-  if(best >= beta) // an upperbound value
-    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::UPPER_BOUND);
-  else // a true minimax value
-    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::EXACT);
-
-  return ret;
+  myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::EXACT);
+  return alpha;
 }
 
 int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
@@ -293,7 +276,6 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
       return entry->GetValue();
   }
 
-  int ret = beta;
   int value = 0;
 
   if (depth == 0) {
@@ -317,7 +299,6 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
   mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
 
-  int best = INT_MAX;
   for (int i = 0; i < myBallMovesSize[depth-1] && myKeepInvestigating; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[depth-1][i]);
@@ -325,24 +306,17 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
 
-    if (value < best) {
-      best = value;
-    }
     if (value <= alpha) {
-      ret = alpha;
-      break;
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::LOWER_BOUND);
+      return alpha;
     }
     if (value < beta) {
       beta = value;
-      ret = beta;
     }
   }
 
-  if(best <= alpha) // a lowerbound value
-    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::LOWER_BOUND);
-  else // a true minimax value
-    myHashMap.Insert(myCurrentHashKey, (byte)depth, best, HashMapEntry::EXACT);
-  return ret;
+  myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::EXACT);
+  return beta;
 }
 
 void ComputerPlayerAlphaBeta::CheckTime()
