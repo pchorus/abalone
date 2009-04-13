@@ -48,6 +48,9 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     myNodeCounter = 1;
     myBallMovesSize[myTreeDepth-1] = 0;
 
+    myHashMap.UnInit();
+    myCurrentHashKey = myHashMap.CalcHashKey(mySimGameManager->GetGameBoard());
+
     // best move from previous iteration into the movelist
     if (foundMove) {
       *(myBallMoves[myTreeDepth-1][0]) = retMove;
@@ -59,8 +62,16 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
 
     for (int i = 0; i < myBallMovesSize[myTreeDepth-1] && myKeepInvestigating; ++i) {
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
       mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
-      value = Min(myTreeDepth-1, alpha, beta);
+      if (myUseTranspositionTable) {
+        value = MinTT(myTreeDepth-1, alpha, beta);
+      }
+      else {
+        value = Min(myTreeDepth-1, alpha, beta);
+      }
+
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
       mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
       if (value >= beta) {
         break;

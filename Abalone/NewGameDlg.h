@@ -56,6 +56,8 @@ private:
   CEdit myEditPlayer2ABTreeDepth;
   CEdit myEditPlayer2Evaluation;
 
+  CButton myCheckPlayer1TranspositionTable;
+  CButton myCheckPlayer2TranspositionTable;
   CButton myCheckPlayer1IterativeDeepening;
   CButton myCheckPlayer2IterativeDeepening;
 

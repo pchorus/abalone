@@ -28,6 +28,8 @@ public:
   void SetTreeDepth(int treeDepth);
   int GetUsedEvaluation() const;
   void SetUsedEvaluation(int eval);
+  bool GetUseTranspositionTable() const;
+  void SetUseTranspositionTable(bool useTT);
 
 protected:
   // alpha beta search methods
@@ -47,13 +49,14 @@ protected:
   int* myBallMovesSize;
   unsigned int myNodeCounter;
   bool myKeepInvestigating;
+  bool myUseTranspositionTable;
+  ZobristHashMap myHashMap;
+  ULONG64 myCurrentHashKey;
 
 private:
   void DeleteBallMoves();
   ComputerPlayer* myMinPlayer;
   int myUsedEvaluation;
-  ZobristHashMap myHashMap;
-  ULONG64 myCurrentHashKey;
 };
 
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
@@ -69,4 +72,14 @@ inline int ComputerPlayerAlphaBeta::GetUsedEvaluation() const
 inline void ComputerPlayerAlphaBeta::SetUsedEvaluation(int eval)
 {
   myUsedEvaluation = eval;
+}
+
+inline bool ComputerPlayerAlphaBeta::GetUseTranspositionTable() const
+{
+  return myUseTranspositionTable;
+}
+
+inline void ComputerPlayerAlphaBeta::SetUseTranspositionTable(bool useTT)
+{
+  myUseTranspositionTable = useTT;
 }

@@ -192,6 +192,8 @@ void CAbaloneApp::PlayBatchGame()
       }
       else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer1());
+        hlp = myCmdLineParams["TT1"];
+        abPlayer->SetUseTranspositionTable(hlp == "True");
         hlp = myCmdLineParams["TreeDepth1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
           abPlayer->SetTreeDepth(_ttoi(hlp));
@@ -201,13 +203,16 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer1.Format("%s TreeDepth: %d, Value Function: %d",
+        headerPlayer1.Format("%s Transposition Table: %d, TreeDepth: %d, Value Function: %d",
                               namePlayer1,
+                              abPlayer->GetUseTranspositionTable(),
                               abPlayer->GetTreeDepth(),
                               abPlayer->GetUsedEvaluation());
       }
       else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
         ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
+        hlp = myCmdLineParams["TT1"];
+        abPlayer->SetUseTranspositionTable(hlp == "True");
         hlp = myCmdLineParams["SecPerMove1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           abPlayer->SetSecondsForGame(_ttoi(hlp));
@@ -217,8 +222,9 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer1.Format("%s Seconds per Move: %d, Value Function: %d",
+        headerPlayer1.Format("%s Transposition Table: %d, Seconds per Move: %d, Value Function: %d",
           namePlayer1,
+          abPlayer->GetUseTranspositionTable(),
           abPlayer->GetSecondsForGame(),
           abPlayer->GetUsedEvaluation());
       }
@@ -246,6 +252,8 @@ void CAbaloneApp::PlayBatchGame()
       }
       else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer2());
+        hlp = myCmdLineParams["TT2"];
+        abPlayer->SetUseTranspositionTable(hlp == "True");
         hlp = myCmdLineParams["TreeDepth2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0 && _ttoi(hlp) != DEFAULT_TREE_DEPTH) {
           abPlayer->SetTreeDepth(_ttoi(hlp));
@@ -255,13 +263,16 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer2.Format("%s TreeDepth: %d, Value Function: %d",
+        headerPlayer2.Format("%s Transposition Table: %d, TreeDepth: %d, Value Function: %d",
           namePlayer2,
+          abPlayer->GetUseTranspositionTable(),
           abPlayer->GetTreeDepth(),
           abPlayer->GetUsedEvaluation());
       }
       else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
         ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
+        hlp = myCmdLineParams["TT2"];
+        abPlayer->SetUseTranspositionTable(hlp == "True");
         hlp = myCmdLineParams["SecPerMove2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           abPlayer->SetSecondsForGame(_ttoi(hlp));
@@ -271,8 +282,9 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer2.Format("%s Seconds per Move: %d, Value Function: %d",
+        headerPlayer2.Format("%s Transposition Table: %d, Seconds per Move: %d, Value Function: %d",
           namePlayer2,
+          abPlayer->GetUseTranspositionTable(),
           abPlayer->GetSecondsForGame(),
           abPlayer->GetUsedEvaluation());
       }

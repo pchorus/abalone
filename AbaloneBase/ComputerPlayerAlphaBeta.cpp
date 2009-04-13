@@ -19,6 +19,7 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myBallMovesSize(0)
 , myNodeCounter(0)
 , myKeepInvestigating(true)
+, myUseTranspositionTable(false)
 , myHashMap()
 {
   SetTreeDepth(myTreeDepth);
@@ -105,7 +106,13 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   for (int i = 0; i < myBallMovesSize[myTreeDepth-1]; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
     mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
-    value = MinTT(myTreeDepth-1, alpha, beta);
+    if (myUseTranspositionTable) {
+      value = MinTT(myTreeDepth-1, alpha, beta);
+    }
+    else {
+      value = Min(myTreeDepth-1, alpha, beta);
+    }
+
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
     if (value >= beta) {
