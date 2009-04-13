@@ -87,7 +87,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   int beta = INT_MAX;
   int value = 0;
 
-  myHashMap.ClearAndDestroy();
+  myHashMap.UnInit();
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -207,25 +207,26 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
   // check if we can use a transposition
   HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
   if (entry && entry->GetDepth() >= depth) {
-    if(entry->GetValueType() == HashMapEntry::EXACT)
-      return entry->GetValue();
-    if(entry->GetValueType() == HashMapEntry::LOWER_BOUND && entry->GetValue() > alpha)
-      alpha = entry->GetValue();
-    else if(entry->GetValueType() == HashMapEntry::UPPER_BOUND && entry->GetValue() < beta)
-      beta = entry->GetValue();
+    HashMapEntry::ValueType type = entry->GetValueType();
+    int val = entry->GetValue();
+
+    if(type == HashMapEntry::EXACT)
+      return val;
+    if(type == HashMapEntry::LOWER_BOUND && val > alpha)
+      alpha = val;
+    else if(type == HashMapEntry::UPPER_BOUND && val < beta)
+      beta = val;
     if(alpha >= beta)
-      return entry->GetValue();
+      return val;
   }
 
   int value = 0;
 
   if (depth == 0) {
     value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-    if(value <= alpha) // a lowerbound value
+    if(value >= beta)
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
-    else if(value >= beta) // an upperbound value
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
-    else // a true minimax value
+    else
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
     return value;
   }
@@ -247,7 +248,7 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
     if (value >= beta) {
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::UPPER_BOUND);
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
       return beta;
     }
     if (value > alpha) {
@@ -266,25 +267,26 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
   // check if we can use a transposition
   HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
   if (entry && entry->GetDepth() >= depth) {
-    if(entry->GetValueType() == HashMapEntry::EXACT)
-      return entry->GetValue();
-    if(entry->GetValueType() == HashMapEntry::LOWER_BOUND && entry->GetValue() > alpha)
-      alpha = entry->GetValue();
-    else if(entry->GetValueType() == HashMapEntry::UPPER_BOUND && entry->GetValue() < beta)
-      beta = entry->GetValue();
+    HashMapEntry::ValueType type = entry->GetValueType();
+    int val = entry->GetValue();
+
+    if(type == HashMapEntry::EXACT)
+      return val;
+    if(type == HashMapEntry::LOWER_BOUND && val > alpha)
+      alpha = val;
+    else if(type == HashMapEntry::UPPER_BOUND && val < beta)
+      beta = val;
     if(alpha >= beta)
-      return entry->GetValue();
+      return val;
   }
 
   int value = 0;
 
   if (depth == 0) {
     value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-    if(value <= alpha) // a lowerbound value
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
-    else if(value >= beta) // an upperbound value
+    if(value <= alpha)
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
-    else // a true minimax value
+    else
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
     return value;
   }
@@ -307,7 +309,7 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
 
     if (value <= alpha) {
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::LOWER_BOUND);
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
       return alpha;
     }
     if (value < beta) {

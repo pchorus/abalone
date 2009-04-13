@@ -5,6 +5,7 @@
 #include "Output.h"
 #include "HashMapEntry.h"
 #include "GameManager.h"
+#include "BallMove.h"
 
 ZobristHashMap::ZobristHashMap()
 : myInserts(0)
@@ -17,7 +18,7 @@ ZobristHashMap::ZobristHashMap()
   ULONG64 lowerBits = 0;
 
   for (int i = 0; i < TWO_POW_20; ++i) {
-    myHashMap[i] = 0;
+    myHashMap[i] = new HashMapEntry;
   }
 
   // initialization
@@ -184,12 +185,11 @@ void ZobristHashMap::RecalcHashKey(ULONG64& currentHash, BallMove* move, GameMan
   }
 }
 
-void ZobristHashMap::ClearAndDestroy()
+void ZobristHashMap::UnInit()
 {
   for (int i = 0; i < TWO_POW_20; ++i) {
-    if (myHashMap[i]) {
-      delete myHashMap[i];
-      myHashMap[i] = 0;
-    }
+    myHashMap[i]->SetInitialized(false);
   }
+  myInserts = 0;
+  myReUseEntries = 0;
 }

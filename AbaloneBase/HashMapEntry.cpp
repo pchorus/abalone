@@ -2,21 +2,21 @@
 
 #include "HashMapEntry.h"
 
-HashMapEntry::HashMapEntry(ULONG64 lock)
-: myTreeDepth(0)
+HashMapEntry::HashMapEntry()
+: myIsInitialized(false)
+, myTreeDepth(0)
 , myValue(0)
 , myValueType(UNKOWN)
-, myLock(lock)
-, myMove()
+, myLock(0)
 {
 }
 
-HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock/*, BallMove* move*/)
-: myTreeDepth(treeDepth)
+HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock)
+: myIsInitialized(true)
+, myTreeDepth(treeDepth)
 , myValue(value)
 , myValueType(valueType)
 , myLock(lock)
-, myMove(/**move*/)
 {
 }
 
