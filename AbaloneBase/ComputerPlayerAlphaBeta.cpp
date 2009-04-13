@@ -231,8 +231,10 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
 
   if (depth == 0) {
     value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-    if(value >= beta)
+    if(value <= alpha)
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
+    else if(value >= beta)
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
     else
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
     return value;
@@ -292,6 +294,8 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
   if (depth == 0) {
     value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
     if(value <= alpha)
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
+    else if(value >= beta)
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
     else
       myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);

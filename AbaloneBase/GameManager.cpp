@@ -1429,23 +1429,23 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
       ret += 80;
     }
 
-    // Opposing Marbles Grouping ==============================================
-    grouping = CalcOpposingGrouping(player);
-    // 58 : all marbles are in a huge single group
-    //  0 : no marble has any neighboring fellow marbles
-    // below 40 is already not very good
-    if (grouping > 55) {
-      ret -= 40;
-    }
-    else if (grouping > 50) {
-      ret -= 30;
-    }
-    else if (grouping > 45) {
-      ret -= 20;
-    }
-    else if (grouping > 40) {
-      ret -= 10;
-    }
+//     // Opposing Marbles Grouping ==============================================
+//     grouping = CalcOpposingGrouping(player);
+//     // 58 : all marbles are in a huge single group
+//     //  0 : no marble has any neighboring fellow marbles
+//     // below 40 is already not very good
+//     if (grouping > 55) {
+//       ret -= 40;
+//     }
+//     else if (grouping > 50) {
+//       ret -= 30;
+//     }
+//     else if (grouping > 45) {
+//       ret -= 20;
+//     }
+//     else if (grouping > 40) {
+//       ret -= 10;
+//     }
 
     // Attacking Power ========================================================
     // TODO: Output of power

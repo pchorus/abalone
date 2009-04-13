@@ -46,16 +46,16 @@ inline ULONG64 ZobristHashMap::GetHashKey(CPoint point, BoardField::Ball ball) c
 
 inline void ZobristHashMap::Insert(ULONG64 key, byte depth, int value, HashMapEntry::ValueType valueType)
 {
-   if (!myHashMap[key % TWO_POW_20]->IsInitialized()) {
+  if (!myHashMap[key % TWO_POW_20]->IsInitialized()) {
     ++myInserts;
     myHashMap[key % TWO_POW_20]->Init(depth, value, valueType, key);
-   }
-   // TODO: strategy when entries are to substitute
-//   else if (myHashMap[key % TWO_POW_20]->GetDepth() < depth) {
-// //  else if (myHashMap[key % TWO_POW_20]->GetDepth() < depth) {
-//     delete myHashMap[key % TWO_POW_20];
-//     myHashMap[key % TWO_POW_20] = new HashMapEntry(depth, value, valueType, key/*, move*/);
-//   }
+  }
+  // strategy to substitute: if the node in the hashmap is deeper in the tree
+  // than the new one, it is substituted, is it at the same depth it is also
+  // substituted since the most recent node is often the better one
+  else if (myHashMap[key % TWO_POW_20]->GetDepth() <= depth) {
+    myHashMap[key % TWO_POW_20]->Init(depth, value, valueType, key);
+  }
 }
 
 inline HashMapEntry* ZobristHashMap::Check(ULONG64 key)
