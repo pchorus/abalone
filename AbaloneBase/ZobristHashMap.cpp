@@ -34,6 +34,18 @@ ZobristHashMap::ZobristHashMap()
       }
     }
   }
+
+  upperBits = irand();
+  upperBits = upperBits << 32;
+  lowerBits = irand();
+  upperBits += lowerBits;
+  myHashKeyPlayer1IsNext = upperBits;
+
+  upperBits = irand();
+  upperBits = upperBits << 32;
+  lowerBits = irand();
+  upperBits += lowerBits;
+  myHashKeyPlayer2IsNext = upperBits;
 }
 
 ZobristHashMap::~ZobristHashMap()
@@ -54,6 +66,9 @@ ULONG64 ZobristHashMap::CalcHashKey(const GameBoard* gameBoard) const
       }
     }
   }
+
+  // initial next player is player1
+  ret ^= myHashKeyPlayer1IsNext;
 
   return ret;
 }
@@ -176,6 +191,10 @@ void ZobristHashMap::RecalcHashKey(ULONG64& currentHash, BallMove* move, GameMan
       currentHash ^= GetHashKey(ball3->GetFieldCoordinates(), ownBall);
     }
   }
+
+  // the player to move next changes
+  currentHash ^= myHashKeyPlayer1IsNext;
+  currentHash ^= myHashKeyPlayer2IsNext;
 }
 
 void ZobristHashMap::UnInit()

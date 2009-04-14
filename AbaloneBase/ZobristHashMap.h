@@ -30,6 +30,8 @@ public:
 
 private:
   ULONG64 myHashKeys[BOARD_FIELDS_COLUMN][BOARD_FIELDS_ROW][2];
+  ULONG64 myHashKeyPlayer1IsNext;
+  ULONG64 myHashKeyPlayer2IsNext;
   // size: 2^20
   HashMapEntry* myHashMap[TWO_POW_20];
 };

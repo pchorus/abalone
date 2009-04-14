@@ -5,7 +5,7 @@
 #include "GameBoard.h"
 
 static const int MAX_TREE_DEPTH = 10;
-static const int DEFAULT_MILLISECONDS_PER_MOVE = 12000000;
+static const int DEFAULT_MILLISECONDS_PER_MOVE = 1200000;
 static const int AVG_PLIES_PER_GAME = 87;
 
 ComputerPlayerAlphaBetaIterativeDeepening::ComputerPlayerAlphaBetaIterativeDeepening(GameManager* gameManager, const CString& name, BoardField::Ball ball)
