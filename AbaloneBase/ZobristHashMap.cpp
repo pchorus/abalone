@@ -24,7 +24,7 @@ ZobristHashMap::ZobristHashMap()
   // initialization
   for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
-      for (int colour = 0; colour < 3; ++colour) {
+      for (int colour = 0; colour < 2; ++colour) {
         upperBits = irand();
         upperBits = upperBits << 32;
         lowerBits = irand();
@@ -49,7 +49,7 @@ ULONG64 ZobristHashMap::CalcHashKey(const GameBoard* gameBoard) const
     for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
       field = gameBoard->GetBoardField(x, y);
 
-      if (field) {
+      if (field && field->GetBall() != BoardField::NO_BALL) {
         ret ^= myHashKeys[x][y][field->GetBall()];
       }
     }
@@ -115,7 +115,6 @@ void ZobristHashMap::RecalcHashKey(ULONG64& currentHash, BallMove* move, GameMan
 
     field = gameManager->GetNextFieldInDirection(lastOppBall->GetFieldCoordinates(), direction);
     if (field) {
-      currentHash ^= GetHashKey(field->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(field->GetFieldCoordinates(), opponentBall);
     }
   }
@@ -143,18 +142,18 @@ void ZobristHashMap::RecalcHashKey(ULONG64& currentHash, BallMove* move, GameMan
     case LEFT:
     case DOWNLEFT:
       field = gameManager->GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
-      currentHash ^= GetHashKey(field->GetFieldCoordinates(), opponentBall);
+      if (opponentBall != BoardField::NO_BALL)
+        currentHash ^= GetHashKey(field->GetFieldCoordinates(), opponentBall);
       currentHash ^= GetHashKey(field->GetFieldCoordinates(), ownBall);
-      currentHash ^= GetHashKey(lastBall->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(lastBall->GetFieldCoordinates(), ownBall);
       break;
     case UPRIGHT:
     case RIGHT:
     case DOWNRIGHT:
       field = gameManager->GetNextFieldInDirection(lastBall->GetFieldCoordinates(), direction);
-      currentHash ^= GetHashKey(field->GetFieldCoordinates(), opponentBall);
+      if (opponentBall != BoardField::NO_BALL)
+        currentHash ^= GetHashKey(field->GetFieldCoordinates(), opponentBall);
       currentHash ^= GetHashKey(field->GetFieldCoordinates(), ownBall);
-      currentHash ^= GetHashKey(ball1->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(ball1->GetFieldCoordinates(), ownBall);
       break;
     }
@@ -162,24 +161,18 @@ void ZobristHashMap::RecalcHashKey(ULONG64& currentHash, BallMove* move, GameMan
   else {
     // sidemove
     field = gameManager->GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
-    currentHash ^= GetHashKey(field->GetFieldCoordinates(), BoardField::NO_BALL);
     currentHash ^= GetHashKey(field->GetFieldCoordinates(), ownBall);
-    currentHash ^= GetHashKey(ball1->GetFieldCoordinates(), BoardField::NO_BALL);
     currentHash ^= GetHashKey(ball1->GetFieldCoordinates(), ownBall);
 
     if (ball2) {
       field = gameManager->GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction);
-      currentHash ^= GetHashKey(field->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(field->GetFieldCoordinates(), ownBall);
-      currentHash ^= GetHashKey(ball2->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(ball2->GetFieldCoordinates(), ownBall);
     }
 
     if (ball3) {
       field = gameManager->GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction);
-      currentHash ^= GetHashKey(field->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(field->GetFieldCoordinates(), ownBall);
-      currentHash ^= GetHashKey(ball3->GetFieldCoordinates(), BoardField::NO_BALL);
       currentHash ^= GetHashKey(ball3->GetFieldCoordinates(), ownBall);
     }
   }

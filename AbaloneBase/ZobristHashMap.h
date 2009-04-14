@@ -29,7 +29,7 @@ public:
   unsigned int myReUseEntries;
 
 private:
-  ULONG64 myHashKeys[BOARD_FIELDS_COLUMN][BOARD_FIELDS_ROW][3];
+  ULONG64 myHashKeys[BOARD_FIELDS_COLUMN][BOARD_FIELDS_ROW][2];
   // size: 2^20
   HashMapEntry* myHashMap[TWO_POW_20];
 };
@@ -61,12 +61,10 @@ inline void ZobristHashMap::Insert(ULONG64 key, byte depth, int value, HashMapEn
 inline HashMapEntry* ZobristHashMap::Check(ULONG64 key)
 {
   HashMapEntry* entry = myHashMap[key % TWO_POW_20];
-  if (entry->IsInitialized()) {
-    if (entry->GetLock() == key) {
-      // match
-      ++myReUseEntries;
-      return entry;
-    }
+  if (entry->IsInitialized() && entry->GetLock() == key) {
+    // match
+    ++myReUseEntries;
+    return entry;
   }
   return 0;
 }

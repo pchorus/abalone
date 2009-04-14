@@ -10,7 +10,7 @@
 class ABALONE_BASE_DLLINTERFACE BoardField {
 public:
 
-  enum Ball { NO_BALL = 0, WHITE_BALL, BLACK_BALL };
+  enum Ball { WHITE_BALL = 0, BLACK_BALL, NO_BALL };
 
   // constructor / destructor
   BoardField();
