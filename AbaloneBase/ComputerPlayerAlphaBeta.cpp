@@ -227,23 +227,15 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
       return val;
   }
 
-  int value = 0;
-
   if (depth == 0) {
-    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-    if(value <= alpha)
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
-    else if(value >= beta)
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
-    else
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
-    return value;
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
   if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
     CheckTime();
   }
 
+  int value = 0;
   myBallMovesSize[depth-1] = 0;
 
   mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
@@ -289,23 +281,15 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
       return val;
   }
 
-  int value = 0;
-
   if (depth == 0) {
-    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
-    if(value <= alpha)
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
-    else if(value >= beta)
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
-    else
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::EXACT);
-    return value;
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
   if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
     CheckTime();
   }
 
+  int value = 0;
   myBallMovesSize[depth-1] = 0;
 
   mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[depth-1], myBallMovesSize[depth-1]);
