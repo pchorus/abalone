@@ -62,6 +62,7 @@ public:
   void SetLostBallsPlayer1(int lostBalls);
   int GetLostBallsPlayer2() const;
   void SetLostBallsPlayer2(int lostBalls);
+  bool IsTerminalPosition() const;
 
   void ResetLostBalls();
 
@@ -242,4 +243,9 @@ inline bool GameManager::IsAttacking(BoardField* field1, BoardField* field2, Boa
   }
 
   return false;
+}
+
+inline bool GameManager::IsTerminalPosition() const
+{
+  return myLostBallsPlayer1 == 6 || myLostBallsPlayer2 == 6;
 }

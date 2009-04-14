@@ -145,7 +145,7 @@ int ComputerPlayerAlphaBeta::Max(int depth, int alpha, int beta)
 {
   ++myNodeCounter;
 
-  if (depth == 0)
+  if (depth == 0 || mySimGameManager->IsTerminalPosition())
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
 
   if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
@@ -178,7 +178,7 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
 {
   ++myNodeCounter;
 
-  if (depth == 0)
+  if (depth == 0 || mySimGameManager->IsTerminalPosition())
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
 
   if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
@@ -227,7 +227,7 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
       return val;
   }
 
-  if (depth == 0) {
+  if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
@@ -281,7 +281,7 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
       return val;
   }
 
-  if (depth == 0) {
+  if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
