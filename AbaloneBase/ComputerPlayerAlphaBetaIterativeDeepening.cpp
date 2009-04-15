@@ -53,6 +53,9 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     myNodeCounter = 1;
     myBallMovesSize[myTreeDepth-1] = 0;
 
+    alpha = INT_MIN;
+    beta = INT_MAX;
+
     myHashMap.UnInit();
     myCurrentHashKey = myHashMap.CalcHashKey(mySimGameManager->GetGameBoard());
 
