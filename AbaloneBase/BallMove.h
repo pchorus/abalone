@@ -42,6 +42,8 @@ public:
 
   bool HasBalls() const;
 
+  CString ToString() const;
+
 private:
   BoardField* myBall1;
   BoardField* myBall2;

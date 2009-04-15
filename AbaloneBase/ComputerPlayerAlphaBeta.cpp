@@ -5,6 +5,7 @@
 #include "GameManager.h"
 #include "GameBoard.h"
 #include "HashMapEntry.h"
+#include "Output.h"
 
 static const unsigned int TIME_CHECK_INTERVAL = 200;
 
@@ -79,6 +80,7 @@ void ComputerPlayerAlphaBeta::DeleteBallMoves()
 
 BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 {
+  DWORD start = GetTickCount();
   BallMove retMove;
   myKeepInvestigating = true;
 
@@ -137,6 +139,10 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   if (ball3)
     ball3 = GetGameManager()->GetGameBoard()->GetBoardField(ball3->GetFieldCoordinates());
   retMove.SetBalls(ball1, ball2, ball3);
+
+  CString msg;
+  msg.Format("AB\nMove: %s\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), GetTickCount()-start, myNodeCounter, value, myHashMap.myInserts, myHashMap.myReUseEntries);
+  Output::Message(msg, false, true);
 
   return retMove;
 }
@@ -210,25 +216,32 @@ int ComputerPlayerAlphaBeta::Min(int depth, int alpha, int beta)
 int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
 {
   ++myNodeCounter;
-
-  // check if we can use a transposition
-  HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
-  if (entry && entry->GetDepth() >= depth) {
-    HashMapEntry::ValueType type = entry->GetValueType();
-    int val = entry->GetValue();
-
-    if(type == HashMapEntry::EXACT)
-      return val;
-    if(type == HashMapEntry::LOWER_BOUND && val > alpha)
-      alpha = val;
-    else if(type == HashMapEntry::UPPER_BOUND && val < beta)
-      beta = val;
-    if(alpha >= beta)
-      return val;
-  }
+  BallMove* bestMove(0);
 
   if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+  }
+
+  // check if we can use a transposition
+  HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
+  if (entry) {
+    *(myBallMoves[depth-1][0]) = entry->GetMove();
+    myBallMovesSize[depth-1] = 1;
+
+    if (entry->GetDepth() >= depth) {
+      // consider the move in the hash map first
+      HashMapEntry::ValueType type = entry->GetValueType();
+      int val = entry->GetValue();
+
+      if(type == HashMapEntry::EXACT)
+        return val;
+      if(type == HashMapEntry::LOWER_BOUND && val > alpha)
+        alpha = val;
+      else if(type == HashMapEntry::UPPER_BOUND && val < beta)
+        beta = val;
+      if(alpha >= beta)
+        return val;
+    }
   }
 
   if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
@@ -248,41 +261,51 @@ int ComputerPlayerAlphaBeta::MaxTT(int depth, int alpha, int beta)
     value = MinTT(depth-1, alpha, beta);
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[depth-1][i], mySimGameManager);
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
+
     if (value >= beta) {
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND);
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND, myBallMoves[depth-1][i]);
       return beta;
     }
     if (value > alpha) {
+      bestMove = myBallMoves[depth-1][i];
       alpha = value;
     }
   }
 
-  myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::EXACT);
+  myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::EXACT, bestMove);
+
   return alpha;
 }
 
 int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
 {
   ++myNodeCounter;
-
-  // check if we can use a transposition
-  HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
-  if (entry && entry->GetDepth() >= depth) {
-    HashMapEntry::ValueType type = entry->GetValueType();
-    int val = entry->GetValue();
-
-    if(type == HashMapEntry::EXACT)
-      return val;
-    if(type == HashMapEntry::LOWER_BOUND && val > alpha)
-      alpha = val;
-    else if(type == HashMapEntry::UPPER_BOUND && val < beta)
-      beta = val;
-    if(alpha >= beta)
-      return val;
-  }
+  BallMove* bestMove(0);
 
   if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+  }
+
+  // check if we can use a transposition
+  HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
+  if (entry) {
+    // consider the move in the hash map first
+    *(myBallMoves[depth-1][0]) = entry->GetMove();
+    myBallMovesSize[depth-1] = 1;
+
+    if (entry->GetDepth() >= depth) {
+      HashMapEntry::ValueType type = entry->GetValueType();
+      int val = entry->GetValue();
+
+      if(type == HashMapEntry::EXACT)
+        return val;
+      if(type == HashMapEntry::LOWER_BOUND && val > alpha)
+        alpha = val;
+      else if(type == HashMapEntry::UPPER_BOUND && val < beta)
+        beta = val;
+      if(alpha >= beta)
+        return val;
+    }
   }
 
   if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
@@ -304,15 +327,16 @@ int ComputerPlayerAlphaBeta::MinTT(int depth, int alpha, int beta)
     mySimGameManager->UndoMove(myBallMoves[depth-1][i]);
 
     if (value <= alpha) {
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND);
+      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND, myBallMoves[depth-1][i]);
       return alpha;
     }
     if (value < beta) {
+      bestMove = myBallMoves[depth-1][i];
       beta = value;
     }
   }
 
-  myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::EXACT);
+  myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::EXACT, bestMove);
   return beta;
 }
 

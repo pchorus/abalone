@@ -20,6 +20,16 @@ HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG
 {
 }
 
+HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock, BallMove* move)
+: myIsInitialized(true)
+, myTreeDepth(treeDepth)
+, myValue(value)
+, myValueType(valueType)
+, myLock(lock)
+, myMove(*move)
+{
+}
+
 HashMapEntry::~HashMapEntry()
 {
 }

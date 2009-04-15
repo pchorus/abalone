@@ -3,6 +3,7 @@
 
 #include "GameManager.h"
 #include "GameBoard.h"
+#include "Output.h"
 
 static const int MAX_TREE_DEPTH = 10;
 static const int DEFAULT_MILLISECONDS_PER_MOVE = 1200000;
@@ -23,6 +24,7 @@ ComputerPlayerAlphaBetaIterativeDeepening::~ComputerPlayerAlphaBetaIterativeDeep
 
 BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
 {
+  DWORD start = GetTickCount();
   // TODO: currently we only have an alarm timer, another timer which takes the
   // ratio between the times for the different tree depth is of interest.
   BallMove retMove;
@@ -73,6 +75,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
 
       myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
       mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
+
       if (value >= beta) {
         break;
       }
@@ -107,6 +110,10 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     myLeftMilliSecondsForGame = 0;
   }
   
+  CString msg;
+  msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth, GetTickCount()-start, myNodeCounter, value, myHashMap.myInserts, myHashMap.myReUseEntries);
+  Output::Message(msg, false, true);
+
   return retMove;
 }
 

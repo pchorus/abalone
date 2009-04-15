@@ -29,6 +29,9 @@ public:
   bool IsSelected() const;
   void SetIsSelected(bool isSelected);
 
+  CString ToString() const;
+  static CString ToString(CPoint coord);
+
 private:
   // GUICoordinates in the framewindow
   CPoint myGUICoordinates;

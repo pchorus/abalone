@@ -10,6 +10,7 @@
 #include "ComputerPlayerRandomMoves.h"
 #include "ComputerPlayerEvaluateNextMove.h"
 #include "BallMove.h"
+#include "Output.h"
 
 #include <fstream>
 #include <string>
@@ -321,6 +322,9 @@ void GameManager::MoveBallsInDirection(Direction direction)
   BallMove move(direction, false, false, mySelectedBall1, mySelectedBall2, mySelectedBall3, 0);
   DoMove(&move);
 
+  CString msg;
+  msg.Format("Human\nMove: %s\n\n", move.ToString());
+  Output::Message(msg, false, true);
   mySelectedBall1 = 0;
   mySelectedBall2 = 0;
   mySelectedBall3 = 0;
@@ -514,7 +518,7 @@ void GameManager::UndoMove(BallMove* move)
   }
 }
 
-BallAxis GameManager::GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2) const
+BallAxis GameManager::GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2)
 {
   BallAxis ret = NO_VALID_AXIS;
 
@@ -639,7 +643,7 @@ void GameManager::GetOpponentFields(Direction direction, const BoardField* selec
   }
 }
 
-CPoint GameManager::GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const
+CPoint GameManager::GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction)
 {
   CPoint ret(fieldCoord);
 

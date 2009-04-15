@@ -22,3 +22,15 @@ BoardField::BoardField(int fieldX, int fieldY)
 BoardField::~BoardField()
 {
 }
+
+CString BoardField::ToString() const
+{
+  return ToString(myFieldCoordinates);
+}
+
+CString BoardField::ToString(CPoint coord)
+{
+  CString ret;
+  ret.Format("%c%d", char('A'+coord.y), coord.x+1);
+  return ret;
+}

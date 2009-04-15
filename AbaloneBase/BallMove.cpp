@@ -3,6 +3,7 @@
 #include "BallMove.h"
 
 #include "BoardField.h"
+#include "GameManager.h"
 
 BallMove::BallMove()
 : myBall1(0)
@@ -52,4 +53,70 @@ BallMove& BallMove::operator= (const BallMove& other)
   myEjectsBall = other.myEjectsBall;
 
   return *this;
+}
+
+CString BallMove::ToString() const
+{
+  CString ret;
+  BoardField* lastBall(0);
+  BallAxis pushAxis = NO_VALID_AXIS;
+  switch (myDirection) {
+  case UPLEFT:
+  case DOWNRIGHT:
+    pushAxis = UPPERLEFT_TO_DOWNRIGHT;
+    break;
+  case UPRIGHT:
+  case DOWNLEFT:
+    pushAxis = DOWNLEFT_TO_UPPERRIGHT;
+    break;
+  case LEFT:
+  case RIGHT:
+    pushAxis = HORIZONTAL;
+    break;
+  }
+  BallAxis axis = GameManager::GetAxisOfBalls(myBall1, myBall2);
+
+  if (pushAxis == axis || !myBall2) {
+    // Inline Move (or single ball move)
+    switch (myDirection) {
+      case UPLEFT:
+      case LEFT:
+      case DOWNLEFT:
+        if (myBall3) {
+          lastBall = myBall3;
+        }
+        else if (myBall2) {
+          lastBall = myBall2;
+        }
+        else {
+          lastBall = myBall1;
+        }
+        break;
+      case UPRIGHT:
+      case RIGHT:
+      case DOWNRIGHT:
+        lastBall = myBall1;
+        break;
+    }
+    CPoint coord = lastBall->GetFieldCoordinates();
+    CPoint newCoord = GameManager::GetNextFieldCoordinatesInDirection(coord, myDirection);
+    ret.Format("%s%s", BoardField::ToString(coord), BoardField::ToString(newCoord));
+  }
+  else {
+    // side move
+    if (myBall3) {
+      lastBall = myBall3;
+    }
+    else if (myBall2) {
+      lastBall = myBall2;
+    }
+    else {
+      lastBall = myBall1;
+    }
+    CPoint newCoord = GameManager::GetNextFieldCoordinatesInDirection(myBall1->GetFieldCoordinates(), myDirection);
+    ret.Format("%s%s%s", BoardField::ToString(myBall1->GetFieldCoordinates()), BoardField::ToString(lastBall->GetFieldCoordinates()),
+    BoardField::ToString(newCoord));
+  }
+
+  return ret;
 }

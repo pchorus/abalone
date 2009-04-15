@@ -1,14 +1,17 @@
 #pragma once
 
+#include "BallMove.h"
+
 class ABALONE_BASE_DLLINTERFACE HashMapEntry {
 public:
   enum ValueType { UNKOWN = 0, EXACT, UPPER_BOUND, LOWER_BOUND };
 
   HashMapEntry();
   HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock);
+  HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG64 lock, BallMove* move);
   ~HashMapEntry();
 
-  void Init(byte treeDepth, int value, ValueType valueType, ULONG64 lock);
+  void Init(byte treeDepth, int value, ValueType valueType, ULONG64 lock, BallMove* move);
 
   bool IsInitialized() const;
   void SetInitialized(bool initialized);
@@ -16,6 +19,7 @@ public:
   int GetValue() const;
   ValueType GetValueType() const;
   ULONG64 GetLock() const;
+  BallMove GetMove() const;
 
 private:
   bool myIsInitialized;
@@ -23,6 +27,7 @@ private:
   int myValue;
   ValueType myValueType;
   ULONG64 myLock;
+  BallMove myMove;
 };
 
 inline bool HashMapEntry::IsInitialized() const
@@ -55,11 +60,19 @@ inline ULONG64 HashMapEntry::GetLock() const
   return myLock;
 }
 
-inline void HashMapEntry::Init(byte treeDepth, int value, ValueType valueType, ULONG64 lock)
+inline void HashMapEntry::Init(byte treeDepth, int value, ValueType valueType, ULONG64 lock, BallMove* move)
 {
   myIsInitialized = true;
   myTreeDepth = treeDepth;
   myValue = value;
   myValueType = valueType;
   myLock = lock;
+  if (move) {
+    myMove = *move;
+  }
+}
+
+inline BallMove HashMapEntry::GetMove() const
+{
+  return myMove;
 }

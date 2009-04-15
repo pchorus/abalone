@@ -73,7 +73,7 @@ public:
 
   // returns the next field in the given direction
   BoardField* GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const;
-  CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction) const;
+  static CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction);
 
   int EvaluateBoard(Player* player, int evaluation) const;
   // methods for evaluation of the current game board situation
@@ -101,7 +101,7 @@ public:
   void GetOpponentFields(Direction direction, const BoardField* selectedField1, const BoardField* selectedField2,
     const BoardField* selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
 
-  BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2) const;
+  static BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2);
 
 private:
   void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
