@@ -27,6 +27,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   DWORD start = GetTickCount();
   // TODO: currently we only have an alarm timer, another timer which takes the
   // ratio between the times for the different tree depth is of interest.
+  BallMove currentBestMove;
   BallMove retMove;
   bool foundMove = false;
   myKeepInvestigating = true;
@@ -38,6 +39,8 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   int alpha = INT_MIN;
   int beta = INT_MAX;
   int value = 0;
+  int currentBestValue = 0;
+  int retBestValue = 0;
 
   myTreeDepth = 2;
 
@@ -80,12 +83,19 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
         break;
       }
       if (value > alpha) {
-        retMove = *myBallMoves[myTreeDepth-1][i];
+        currentBestMove = *myBallMoves[myTreeDepth-1][i];
+        currentBestValue = value;
         alpha = value;
         foundMove = true;
       }
     }
-    ++myTreeDepth;
+
+    if (myKeepInvestigating) {
+      // search with the current depth is finished, so we have a new best move
+      retMove = currentBestMove;
+      retBestValue = currentBestValue;
+      ++myTreeDepth;
+    }
   }
 
   // retMove contains the ballfields from the simGameManager,
@@ -111,7 +121,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   }
   
   CString msg;
-  msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth, GetTickCount()-start, myNodeCounter, value, myHashMap.myInserts, myHashMap.myReUseEntries);
+  msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth, GetTickCount()-start, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
   Output::Message(msg, false, true);
 
   return retMove;
