@@ -13,10 +13,13 @@
 
 
 static const int DEFAULT_TREE_DEPTH = 5;
+static const int DEFAULT_TREE_DEPTH_QS = 3;
 
 
 class ABALONE_BASE_DLLINTERFACE ComputerPlayerAlphaBeta : public ComputerPlayer {
 public:
+
+  enum NormalOrQuiescence { NORMAL = 0, QS };
   // constructor / destructor
   ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball, Player::PlayerType type = Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA);
   virtual ~ComputerPlayerAlphaBeta();
@@ -30,26 +33,30 @@ public:
   void SetUsedEvaluation(int eval);
   bool GetUseTranspositionTable() const;
   void SetUseTranspositionTable(bool useTT);
+  bool GetUseQuiescenceSearch() const;
+  void SetUseQuiescenceSearch(bool useQS);
 
 protected:
   // alpha beta search methods
-  int Max(int depth, int alpha, int beta);
-  int Min(int depth, int alpha, int beta);
+  int Max(NormalOrQuiescence noq, int depth, int alpha, int beta);
+  int Min(NormalOrQuiescence noq, int depth, int alpha, int beta);
 
   // alpha beta search methods using transposition tables
-  int MaxTT(int depth, int alpha, int beta);
-  int MinTT(int depth, int alpha, int beta);
+  int MaxTT(NormalOrQuiescence noq, int depth, int alpha, int beta);
+  int MinTT(NormalOrQuiescence noq, int depth, int alpha, int beta);
 
   GameManager* mySimGameManager;
 
   ComputerPlayer* myMaxPlayer;
-  int myTreeDepth;
+  int myTreeDepth[2];
 
-  BallMove*** myBallMoves;
-  int* myBallMovesSize;
+  // contains normal ballMoves and ballMoves for Quiescence search
+  BallMove*** myBallMoves[2];
+  int* myBallMovesSize[2];
   unsigned int myNodeCounter;
   bool myKeepInvestigating;
   bool myUseTranspositionTable;
+  bool myUseQuiescenceSearch;
   ZobristHashMap myHashMap;
   ULONG64 myCurrentHashKey;
 
@@ -61,7 +68,7 @@ private:
 
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
 {
-  return myTreeDepth;
+  return myTreeDepth[NORMAL];
 }
 
 inline int ComputerPlayerAlphaBeta::GetUsedEvaluation() const
@@ -82,4 +89,14 @@ inline bool ComputerPlayerAlphaBeta::GetUseTranspositionTable() const
 inline void ComputerPlayerAlphaBeta::SetUseTranspositionTable(bool useTT)
 {
   myUseTranspositionTable = useTT;
+}
+
+inline bool ComputerPlayerAlphaBeta::GetUseQuiescenceSearch() const
+{
+  return myUseQuiescenceSearch;
+}
+
+inline void ComputerPlayerAlphaBeta::SetUseQuiescenceSearch(bool useQS)
+{
+  myUseTranspositionTable = useQS;
 }

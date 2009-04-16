@@ -42,16 +42,16 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   int currentBestValue = 0;
   int retBestValue = 0;
 
-  myTreeDepth = 2;
+  myTreeDepth[NORMAL] = 2;
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
 
-  while (myKeepInvestigating && myTreeDepth <= MAX_TREE_DEPTH) {
+  while (myKeepInvestigating && myTreeDepth[NORMAL] <= MAX_TREE_DEPTH) {
     myNodeCounter = 1;
-    myBallMovesSize[myTreeDepth-1] = 0;
+    myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] = 0;
 
     alpha = INT_MIN;
     beta = INT_MAX;
@@ -61,32 +61,32 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
 
     // best move from previous iteration into the movelist
     if (foundMove) {
-      *(myBallMoves[myTreeDepth-1][0]) = retMove;
-      myBallMovesSize[myTreeDepth-1] = 1;
+      *(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][0]) = retMove;
+      myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] = 1;
     }
 
-    mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
-    mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
-    mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[myTreeDepth-1], myBallMovesSize[myTreeDepth-1]);
+    mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
+    mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
+    mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
 
-    for (int i = 0; i < myBallMovesSize[myTreeDepth-1] && myKeepInvestigating; ++i) {
-      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
-      mySimGameManager->DoMove(myBallMoves[myTreeDepth-1][i]);
+    for (int i = 0; i < myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] && myKeepInvestigating; ++i) {
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
+      mySimGameManager->DoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
       if (myUseTranspositionTable) {
-        value = MinTT(myTreeDepth-1, alpha, beta);
+        value = MinTT(NORMAL, myTreeDepth[NORMAL]-1, alpha, beta);
       }
       else {
-        value = Min(myTreeDepth-1, alpha, beta);
+        value = Min(NORMAL, myTreeDepth[NORMAL]-1, alpha, beta);
       }
 
-      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[myTreeDepth-1][i], mySimGameManager);
-      mySimGameManager->UndoMove(myBallMoves[myTreeDepth-1][i]);
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
+      mySimGameManager->UndoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
 
       if (value >= beta) {
         break;
       }
       if (value > alpha) {
-        currentBestMove = *myBallMoves[myTreeDepth-1][i];
+        currentBestMove = *myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i];
         currentBestValue = value;
         alpha = value;
         foundMove = true;
@@ -97,7 +97,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
       // search with the current depth is finished, so we have a new best move
       retMove = currentBestMove;
       retBestValue = currentBestValue;
-      ++myTreeDepth;
+      ++myTreeDepth[NORMAL];
     }
   }
 
@@ -124,7 +124,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   }
   
   CString msg;
-  msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth, GetTickCount()-start, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
+  msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth[NORMAL], GetTickCount()-start, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
   Output::Message(msg, false, true);
 
   return retMove;

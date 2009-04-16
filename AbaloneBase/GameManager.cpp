@@ -582,7 +582,6 @@ void GameManager::SortBalls(BoardField*& ball1, BoardField*& ball2, BoardField*&
       ball3 = ball2;
       ball2 = hlp;
     }
-
   }
 }
 
@@ -1583,4 +1582,17 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
 //  ret += ((rand() % 60) - 30);
 
   return ret;
+}
+
+void GameManager::OrderMoves(BallMove** ballMoves, int ballMoveSize) const
+{
+
+}
+
+bool GameManager::IsQuiescencePosition() const
+{
+  // the position is only quiescent if no player is currently attacking the other one at
+  // the border of the game board
+
+  return false;
 }

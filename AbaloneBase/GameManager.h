@@ -57,6 +57,7 @@ public:
   void AddPossibleMovesOneBall(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddPossibleMovesTwoBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddPossibleMovesThreeBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
+  void OrderMoves(BallMove** ballMoves, int ballMoveSize) const;
 
   int GetLostBallsPlayer1() const;
   void SetLostBallsPlayer1(int lostBalls);
@@ -102,6 +103,10 @@ public:
     const BoardField* selectedField3, BoardField*& opponentField1, BoardField*& opponentField2, BoardField*& opponentField3) const;
 
   static BallAxis GetAxisOfBalls(const BoardField* ball1, const BoardField* ball2);
+
+  // checks whether a non-quiescent position is reached or a more
+  // intensive search is needed
+  bool IsQuiescencePosition() const;
 
 private:
   void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
