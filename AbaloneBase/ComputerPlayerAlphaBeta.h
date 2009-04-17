@@ -101,5 +101,5 @@ inline bool ComputerPlayerAlphaBeta::GetUseQuiescenceSearch() const
 
 inline void ComputerPlayerAlphaBeta::SetUseQuiescenceSearch(bool useQS)
 {
-  myUseTranspositionTable = useQS;
+  myUseQuiescenceSearch = useQS;
 }

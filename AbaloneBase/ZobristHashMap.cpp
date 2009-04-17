@@ -50,6 +50,9 @@ ZobristHashMap::ZobristHashMap()
 
 ZobristHashMap::~ZobristHashMap()
 {
+  for (int i = 0; i < TWO_POW_20; ++i) {
+    delete myHashMap[i];
+  }
 }
 
 ULONG64 ZobristHashMap::CalcHashKey(const GameBoard* gameBoard) const

@@ -58,6 +58,8 @@ private:
 
   CButton myCheckPlayer1TranspositionTable;
   CButton myCheckPlayer2TranspositionTable;
+  CButton myCheckPlayer1QuiescenceSearch;
+  CButton myCheckPlayer2QuiescenceSearch;
   CButton myCheckPlayer1IterativeDeepening;
   CButton myCheckPlayer2IterativeDeepening;
 
