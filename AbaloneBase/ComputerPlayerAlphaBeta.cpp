@@ -14,15 +14,14 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , mySimGameManager(new GameManager)
 , myMaxPlayer(0)
 , myMinPlayer(0)
-//, myTreeDepth(DEFAULT_TREE_DEPTH)
 , myUsedEvaluation(1)
-// , myBallMoves(0)
-// , myBallMovesSize(0)
 , myNodeCounter(0)
 , myKeepInvestigating(true)
 , myUseTranspositionTable(false)
 , myUseQuiescenceSearch(false)
 , myHashMap()
+, myStartQSCounter(0)
+, myLeafNodesQuiescent(0)
 {
   myBallMovesSize[NORMAL] = 0;
   myBallMovesSize[QS] = 0;
@@ -63,6 +62,7 @@ ComputerPlayerAlphaBeta::~ComputerPlayerAlphaBeta()
   }
 
   DeleteBallMoves();
+  DeleteBallMovesQS();
 }
 
 void ComputerPlayerAlphaBeta::SetTreeDepth(int treeDepth)
@@ -97,6 +97,21 @@ void ComputerPlayerAlphaBeta::DeleteBallMoves()
   }
 }
 
+void ComputerPlayerAlphaBeta::DeleteBallMovesQS()
+{
+  if (myBallMovesSize[QS]) {
+    delete[] myBallMovesSize[QS];
+
+    for (int i = 0; i < myTreeDepth[QS]; ++i) {
+      for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
+        delete myBallMoves[QS][i][j];
+      }
+      delete[] myBallMoves[QS][i];
+    }
+    delete[] myBallMoves[QS];
+  }
+}
+
 BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
 {
   DWORD start = GetTickCount();
@@ -104,6 +119,9 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   myKeepInvestigating = true;
 
   myNodeCounter = 1;
+
+  myStartQSCounter = 0;
+  myLeafNodesQuiescent = 0;
 
   int alpha = INT_MIN;
   int beta = INT_MAX;
@@ -160,7 +178,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   retMove.SetBalls(ball1, ball2, ball3);
 
   CString msg;
-  msg.Format("AB\nMove: %s\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), GetTickCount()-start, myNodeCounter, value, myHashMap.myInserts, myHashMap.myReUseEntries);
+  msg.Format("AB\nMove: %s\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\nQS starts: %d\nQuiescent Leaves: %d\n\n", retMove.ToString(), GetTickCount()-start, myNodeCounter, value, myHashMap.myInserts, myHashMap.myReUseEntries, myStartQSCounter, myLeafNodesQuiescent);
   Output::Message(msg, false, true);
 
   return retMove;
@@ -170,10 +188,16 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
 {
   ++myNodeCounter;
 
-  if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
-    if (myUseQuiescenceSearch && !mySimGameManager->IsQuiescencePosition()) {
+  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+  }
+  else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+      ++myStartQSCounter;
       return Max(QS, myTreeDepth[QS]-1, alpha, beta);
     }
+    if (noq == NORMAL)
+      ++myLeafNodesQuiescent;
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
@@ -207,10 +231,16 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
 {
   ++myNodeCounter;
 
-  if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
-    if (myUseQuiescenceSearch && !mySimGameManager->IsQuiescencePosition()) {
+  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+  }
+  else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+      ++myStartQSCounter;
       return Min(QS, myTreeDepth[QS]-1, alpha, beta);
     }
+    if (noq == NORMAL)
+      ++myLeafNodesQuiescent;
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
@@ -245,10 +275,16 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   ++myNodeCounter;
   BallMove* bestMove(0);
 
-  if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
-    if (myUseQuiescenceSearch && !mySimGameManager->IsQuiescencePosition()) {
+  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+  }
+  else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+      ++myStartQSCounter;
       return MaxTT(QS, myTreeDepth[QS]-1, alpha, beta);
     }
+    if (noq == NORMAL)
+      ++myLeafNodesQuiescent;
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
@@ -312,10 +348,16 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   ++myNodeCounter;
   BallMove* bestMove(0);
 
-  if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
-    if (myUseQuiescenceSearch && !mySimGameManager->IsQuiescencePosition()) {
+  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+    return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+  }
+  else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+      ++myStartQSCounter;
       return MinTT(QS, myTreeDepth[QS]-1, alpha, beta);
     }
+    if (noq == NORMAL)
+      ++myLeafNodesQuiescent;
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 

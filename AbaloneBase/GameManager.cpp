@@ -29,6 +29,7 @@ GameManager::GameManager()
 , mySelectedBall3(0)
 , myMaxNumberOfTurns(INT_MAX)
 , myBallMovesSize(0)
+, myCheckAttackingOnlyAtBorder(false)
 {
   for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     myBallMoves[i] = new BallMove;
@@ -1589,10 +1590,13 @@ void GameManager::OrderMoves(BallMove** ballMoves, int ballMoveSize) const
 
 }
 
-bool GameManager::IsQuiescencePosition() const
+bool GameManager::IsQuiescencePosition(Player* player)
 {
   // the position is only quiescent if no player is currently attacking the other one at
   // the border of the game board
+  myCheckAttackingOnlyAtBorder = true;
+  int ret = CalcAttackingPowerOnOpponent(player) + CalcAttackedByOpponent(player);
+  myCheckAttackingOnlyAtBorder = false;
 
-  return false;
+  return ret == 0;
 }

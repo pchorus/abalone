@@ -106,7 +106,7 @@ public:
 
   // checks whether a non-quiescent position is reached or a more
   // intensive search is needed
-  bool IsQuiescencePosition() const;
+  bool IsQuiescencePosition(Player* player);
 
 private:
   void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
@@ -128,6 +128,7 @@ private:
   void SetBallsCustomFormation(const CString& formation);
 
   bool IsAttacking(BoardField* field1, BoardField* field2, BoardField* field3, /*BoardField* opField1, */BoardField* opField2, BoardField* opField3) const;
+  bool myCheckAttackingOnlyAtBorder;
 
   // members
   GameBoard* myGameBoard;
@@ -236,17 +237,23 @@ inline bool GameManager::IsAttacking(BoardField* field1, BoardField* field2, Boa
 {
   // field3 field2 field1 => opField1 opField2 opField3
   if (field1 && field2 && field1->GetBall() == field2->GetBall()) {
-    if (!opField2 || opField2->GetBall() == BoardField::NO_BALL) {
+    if (!opField2) {
       return true;
+    }
+    else if (opField2->GetBall() == BoardField::NO_BALL) {
+      return !myCheckAttackingOnlyAtBorder;
     }
     else if (opField2 && opField2->GetBall() != field1->GetBall()
-              && field3 && field3->GetBall() == field1->GetBall()
-              && (!opField3 || opField3->GetBall() == BoardField::NO_BALL))
+              && field3 && field3->GetBall() == field1->GetBall())
     {
-      return true;
+      if (!opField3) {
+        return true;
+      }
+      else if (opField3->GetBall() == BoardField::NO_BALL) {
+        return !myCheckAttackingOnlyAtBorder;
+      }
     }
   }
-
   return false;
 }
 

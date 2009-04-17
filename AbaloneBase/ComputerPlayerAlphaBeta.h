@@ -59,9 +59,12 @@ protected:
   bool myUseQuiescenceSearch;
   ZobristHashMap myHashMap;
   ULONG64 myCurrentHashKey;
+  int myStartQSCounter;
+  int myLeafNodesQuiescent;
 
 private:
   void DeleteBallMoves();
+  void DeleteBallMovesQS();
   ComputerPlayer* myMinPlayer;
   int myUsedEvaluation;
 };
