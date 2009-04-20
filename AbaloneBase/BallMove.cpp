@@ -120,3 +120,11 @@ CString BallMove::ToString() const
 
   return ret;
 }
+
+bool BallMove::operator== (const BallMove& other)
+{
+  return myBall1 == other.myBall1
+    && myBall2 == other.myBall2
+    && myBall3 == other.myBall3
+    && myDirection == other.myDirection;
+}

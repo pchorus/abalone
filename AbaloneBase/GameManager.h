@@ -37,6 +37,7 @@ public:
   void SetGameStarted(bool started);
   int GetMaxNumberOfTurns() const;
   void SetMaxNumberOfTurns(int maxTurns);
+  int GetPlyCount() const;
 
   void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
   BOOL IsPossibleDirection(Direction direction) const;
@@ -142,6 +143,7 @@ private:
   BoardField* mySelectedBall2;
   BoardField* mySelectedBall3;
   int myMaxNumberOfTurns;
+  int myPlyCount;
 
   // this collection is used for evaluating the game situation
   // so we avoid too many constructor calls
@@ -218,6 +220,11 @@ inline int GameManager::GetMaxNumberOfTurns() const
 inline void GameManager::SetMaxNumberOfTurns(int maxTurns)
 {
   myMaxNumberOfTurns = maxTurns;
+}
+
+inline int GameManager::GetPlyCount() const
+{
+  return myPlyCount;
 }
 
 inline void GameManager::SetStartPlayer(Player::PlayerNumber startPlayer)

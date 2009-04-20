@@ -6,8 +6,8 @@
 #include "Output.h"
 
 static const int MAX_TREE_DEPTH = 10;
-static const int DEFAULT_MILLISECONDS_PER_MOVE = 1200000;
-static const int AVG_PLIES_PER_GAME = 87;
+static const int DEFAULT_MILLISECONDS_PER_MOVE = 600000;
+static const int AVG_PLY_PER_GAME_PER_PLAYER = 44;
 
 ComputerPlayerAlphaBetaIterativeDeepening::ComputerPlayerAlphaBetaIterativeDeepening(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayerAlphaBeta(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING)
@@ -42,7 +42,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   int currentBestValue = 0;
   int retBestValue = 0;
 
-  myTreeDepth[NORMAL] = 2;
+  myTreeDepth[NORMAL] = 1;
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -103,6 +103,10 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     }
   }
 
+  // TODO: it happened that no move was found. In that case we should at least choose a
+  // move randomly or one with 3 balls in direction to the center
+  // save the move chosen on the simboard to prevent loops in the game
+
   // retMove contains the ballfields from the simGameManager,
   // to do the move on the real game board, we have to give it the boardfields from the
   // real game manager
@@ -127,14 +131,14 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   
   CString msg;
   msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth[NORMAL], GetTickCount()-start, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
-  Output::Message(msg, false, true);
+//  Output::Message(msg, false, true);
 
   return retMove;
 }
 
 void ComputerPlayerAlphaBetaIterativeDeepening::CheckTime()
 {
-  if ((GetTickCount() - myStart) > myLeftMilliSecondsForGame / AVG_PLIES_PER_GAME) {
+  if ((GetTickCount() - myStart) > myLeftMilliSecondsForGame / AVG_PLY_PER_GAME_PER_PLAYER) {
     myKeepInvestigating = false;
   }
 }

@@ -52,6 +52,8 @@ inline void ZobristHashMap::Insert(ULONG64 key, byte depth, int value, HashMapEn
     ++myInserts;
     myHashMap[key % TWO_POW_20]->Init(depth, value, valueType, key, move);
   }
+  // TODO: check >= <= for insert and reuse, they should not overlap
+
   // strategy to substitute: if the node in the hashmap is deeper in the tree
   // than the new one, it is substituted, is it at the same depth it is also
   // substituted since the most recent node is often the better one

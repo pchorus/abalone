@@ -28,6 +28,7 @@ GameManager::GameManager()
 , mySelectedBall2(0)
 , mySelectedBall3(0)
 , myMaxNumberOfTurns(INT_MAX)
+, myPlyCount(0)
 , myBallMovesSize(0)
 , myCheckAttackingOnlyAtBorder(false)
 {
@@ -935,9 +936,9 @@ void GameManager::TurnIsOver(LPVOID pParam)
   mySelectedBall1 = 0;
   mySelectedBall2 = 0;
   mySelectedBall3 = 0;
-  int turnCount = 0;
+  myPlyCount = 0;
 
-  while (turnCount < myMaxNumberOfTurns
+  while (myPlyCount < myMaxNumberOfTurns
     && myLostBallsPlayer1 < 6 && myLostBallsPlayer2 < 6 && myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN)
   {
     computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
@@ -953,7 +954,7 @@ void GameManager::TurnIsOver(LPVOID pParam)
     mySelectedBall2 = 0;
     mySelectedBall3 = 0;
 
-    ++turnCount;
+    ++myPlyCount;
 
     if (pParam) {
       ::PostMessage((HWND)pParam, WM_COMPUTER_CALC_FINISHED, 0, 0);
@@ -1395,7 +1396,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
     else {
       ret += opponentLostBalls * 1000;
-      ret -= ownLostBalls * 1500;
+      ret -= ownLostBalls * 1000;
     }
 
     // Center Distance ========================================================
@@ -1580,7 +1581,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
   }
 
   // random factor
-//  ret += ((rand() % 60) - 30);
+  ret += ((rand() % 10) - 5);
 
   return ret;
 }

@@ -218,7 +218,7 @@ void CAbaloneApp::PlayBatchGame()
         abPlayer->SetUseTranspositionTable(hlp == "True");
         hlp = myCmdLineParams["QS1"];
         abPlayer->SetUseQuiescenceSearch(hlp == "True");
-        hlp = myCmdLineParams["SecPerMove1"];
+        hlp = myCmdLineParams["SecondsForGame1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           abPlayer->SetSecondsForGame(_ttoi(hlp));
         }
@@ -227,7 +227,7 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer1.Format("%s Transposition Table: %d, QuiescenceSearch: %d, Seconds per Move: %d, Value Function: %d",
+        headerPlayer1.Format("%s Transposition Table: %d, QuiescenceSearch: %d, Seconds for Game: %d, Value Function: %d",
           namePlayer1,
           abPlayer->GetUseTranspositionTable(),
           abPlayer->GetUseQuiescenceSearch(),
@@ -284,7 +284,7 @@ void CAbaloneApp::PlayBatchGame()
         abPlayer->SetUseTranspositionTable(hlp == "True");
         hlp = myCmdLineParams["QS2"];
         abPlayer->SetUseQuiescenceSearch(hlp == "True");
-        hlp = myCmdLineParams["SecPerMove2"];
+        hlp = myCmdLineParams["SecondsForGame2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
           abPlayer->SetSecondsForGame(_ttoi(hlp));
         }
@@ -293,7 +293,7 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer2.Format("%s Transposition Table: %d, QuiescenceSearch: %d, Seconds per Move: %d, Value Function: %d",
+        headerPlayer2.Format("%s Transposition Table: %d, QuiescenceSearch: %d, Seconds for Game: %d, Value Function: %d",
           namePlayer2,
           abPlayer->GetUseTranspositionTable(),
           abPlayer->GetUseQuiescenceSearch(),
@@ -312,12 +312,13 @@ void CAbaloneApp::PlayBatchGame()
       header.Format("=========================\n"
                     "===== Game is over!\n"
                     "=========================\n"
-                    "===== MaxTurns: %d\n"
+                    "===== MaxTurns: %d, Number of played ply: %d\n"
                     "===== Formation: %s\n"
                     "===== %s\n"
                     "===== %s\n"
                     "=========================\n"
                     , gameManager.GetMaxNumberOfTurns()
+                    , gameManager.GetPlyCount()
                     , myCmdLineParams["Formation"]
                     , headerPlayer1
                     , headerPlayer2);
