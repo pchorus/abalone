@@ -1698,7 +1698,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
   }
 
   // random factor
-  ret += ((rand() % 4) - 2);
+  ret += ((rand() % 5) - 2);
 
   return ret;
 }
