@@ -58,6 +58,7 @@ public:
   void AddPossibleMovesOneBall(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddPossibleMovesTwoBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddPossibleMovesThreeBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
+  void AddCapturingMoves(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize);
   void OrderMoves(BallMove** ballMoves, int ballMoveSize) const;
 
   int GetLostBallsPlayer1() const;

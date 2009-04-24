@@ -1078,6 +1078,182 @@ void GameManager::AddPossibleMovesThreeBalls(const ComputerPlayer* player, BallM
   }
 }
 
+void GameManager::AddCapturingMoves(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize)
+{
+  myCheckAttackingOnlyAtBorder = true;
+  int opponentBalls = 0;
+
+  BoardField* left1(0);
+  BoardField* left2(0);
+  BoardField* left3(0);
+  BoardField* right1(0);
+  BoardField* right2(0);
+  BoardField* right3(0);
+  GameBoard* gameBoard = myGameBoard;
+  BoardField::Ball ball = player->GetBall();
+
+  for (int x = 0; x < BOARD_FIELDS_COLUMN; ++x) {
+    for (int y = 0; y < BOARD_FIELDS_ROW; ++y) {
+      // check whether two different colored marbles are facing each other
+      left1 = gameBoard->GetBoardField(x, y);
+      if (left1 && left1->GetBall() != BoardField::NO_BALL) {
+        // check balls from left to right
+        right1 = gameBoard->GetBoardField(x+1, y);
+        if (right1 && right1->GetBall() != BoardField::NO_BALL && left1->GetBall() != right1->GetBall()) {
+          // opponent balls are facing each other
+          left2 = gameBoard->GetBoardField(x-1, y);
+          left3 = gameBoard->GetBoardField(x-2, y);
+          right2 = gameBoard->GetBoardField(x+2, y);
+          right3 = gameBoard->GetBoardField(x+3, y);
+
+          if (left1->GetBall() == ball) {
+            // left balls are own balls
+            if (IsAttacking(left1, left2, left3, right2, right3)) {
+              opponentBalls = 1;
+              if (right2 && right2->GetBall() != BoardField::NO_BALL)
+                opponentBalls = 2;
+
+              if (opponentBalls == 2) {
+                ballMoves[ballMovesSize]->Init(RIGHT, true, true, left3, left2, left1, opponentBalls);
+              }
+              else {
+                if (left3 && left3->GetBall() == ball) {
+                  ballMoves[ballMovesSize]->Init(RIGHT, true, true, left3, left2, left1, opponentBalls);
+                  ++ballMovesSize;
+                }
+                ballMoves[ballMovesSize]->Init(RIGHT, true, true, left2, left1, 0, opponentBalls);
+              }
+              ++ballMovesSize;
+            }
+          }
+          else if (right1->GetBall() == ball) {
+            // right balls are own balls
+            if (IsAttacking(right1, right2, right3, left2, left3)) {
+              opponentBalls = 1;
+              if (left2 && left2->GetBall() != BoardField::NO_BALL)
+                opponentBalls = 2;
+
+              if (opponentBalls == 2) {
+                ballMoves[ballMovesSize]->Init(LEFT, true, true, right1, right2, right3, opponentBalls);
+              }
+              else {
+                if (right3 && right3->GetBall() == ball) {
+                  ballMoves[ballMovesSize]->Init(LEFT, true, true, right1, right2, right3, opponentBalls);
+                  ++ballMovesSize;
+                }
+                ballMoves[ballMovesSize]->Init(LEFT, true, true, right1, right2, 0, opponentBalls);
+              }
+              ++ballMovesSize;
+            }
+          }
+        }
+
+        // check balls from up left to downright
+        right1 = gameBoard->GetBoardField(x, y-1);
+        if (right1 && right1->GetBall() != BoardField::NO_BALL && left1->GetBall() != right1->GetBall()) {
+          // opponent balls are facing each other
+          left2 = gameBoard->GetBoardField(x, y+1);
+          left3 = gameBoard->GetBoardField(x, y+2);
+          right2 = gameBoard->GetBoardField(x, y-2);
+          right3 = gameBoard->GetBoardField(x, y-3);
+
+          if (left1->GetBall() == ball) {
+            // left balls are own balls
+            if (IsAttacking(left1, left2, left3, right2, right3)) {
+              opponentBalls = 1;
+              if (right2 && right2->GetBall() != BoardField::NO_BALL)
+                opponentBalls = 2;
+
+              if (opponentBalls == 2) {
+                ballMoves[ballMovesSize]->Init(DOWNRIGHT, true, true, left3, left2, left1, opponentBalls);
+              }
+              else {
+                if (left3 && left3->GetBall() == ball) {
+                  ballMoves[ballMovesSize]->Init(DOWNRIGHT, true, true, left3, left2, left1, opponentBalls);
+                  ++ballMovesSize;
+                }
+                ballMoves[ballMovesSize]->Init(DOWNRIGHT, true, true, left2, left1, 0, opponentBalls);
+              }
+              ++ballMovesSize;
+            }
+          }
+          else if (right1->GetBall() == ball) {
+            // right balls are own balls
+            if (IsAttacking(right1, right2, right3, left2, left3)) {
+              opponentBalls = 1;
+              if (left2 && left2->GetBall() != BoardField::NO_BALL)
+                opponentBalls = 2;
+
+              if (opponentBalls == 2) {
+                ballMoves[ballMovesSize]->Init(UPLEFT, true, true, right1, right2, right3, opponentBalls);
+              }
+              else {
+                if (right3 && right3->GetBall() == ball) {
+                  ballMoves[ballMovesSize]->Init(UPLEFT, true, true, right1, right2, right3, opponentBalls);
+                  ++ballMovesSize;
+                }
+                ballMoves[ballMovesSize]->Init(UPLEFT, true, true, right1, right2, 0, opponentBalls);
+              }
+              ++ballMovesSize;
+            }
+          }
+        }
+        // check balls from downleft to upright
+        right1 = gameBoard->GetBoardField(x+1, y+1);
+        if (right1 && right1->GetBall() != BoardField::NO_BALL && left1->GetBall() != right1->GetBall()) {
+          // opponent balls are facing each other
+          left2 = gameBoard->GetBoardField(x-1, y-1);
+          left3 = gameBoard->GetBoardField(x-2, y-2);
+          right2 = gameBoard->GetBoardField(x+2, y+2);
+          right3 = gameBoard->GetBoardField(x+3, y+3);
+
+          if (left1->GetBall() == ball) {
+            // left balls are own balls
+            if (IsAttacking(left1, left2, left3, right2, right3)) {
+              opponentBalls = 1;
+              if (right2 && right2->GetBall() != BoardField::NO_BALL)
+                opponentBalls = 2;
+
+              if (opponentBalls == 2) {
+                ballMoves[ballMovesSize]->Init(UPRIGHT, true, true, left3, left2, left1, opponentBalls);
+              }
+              else {
+                if (left3 && left3->GetBall() == ball) {
+                  ballMoves[ballMovesSize]->Init(UPRIGHT, true, true, left3, left2, left1, opponentBalls);
+                  ++ballMovesSize;
+                }
+                ballMoves[ballMovesSize]->Init(UPRIGHT, true, true, left2, left1, 0, opponentBalls);
+              }
+              ++ballMovesSize;
+            }
+          }
+          else if (right1->GetBall() == ball) {
+            // right balls are own balls
+            if (IsAttacking(right1, right2, right3, left2, left3)) {
+              opponentBalls = 1;
+              if (left2 && left2->GetBall() != BoardField::NO_BALL)
+                opponentBalls = 2;
+
+              if (opponentBalls == 2) {
+                ballMoves[ballMovesSize]->Init(DOWNLEFT, true, true, right1, right2, right3, opponentBalls);
+              }
+              else {
+                if (right3 && right3->GetBall() == ball) {
+                  ballMoves[ballMovesSize]->Init(DOWNLEFT, true, true, right1, right2, right3, opponentBalls);
+                  ++ballMovesSize;
+                }
+                ballMoves[ballMovesSize]->Init(DOWNLEFT, true, true, right1, right2, 0, opponentBalls);
+              }
+              ++ballMovesSize;
+            }
+          }
+        }
+      }
+    }
+  }
+  myCheckAttackingOnlyAtBorder = false;
+}
+
 void GameManager::SetBallFormation(const CString& formation)
 {
   if (formation == START_FORMATION_STR_STANDARD) {
@@ -1651,6 +1827,72 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     ret -= 40 * CalcAttackedByOpponent(player);
   }
   else if (evaluation == 5) {
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
+
+    if (opponentLostBalls == 6) {
+      ret += 1000000;
+    }
+    else if (ownLostBalls == 6) {
+      ret -= 1000000;
+    }
+    else {
+      ret += opponentLostBalls * 700;
+      ret -= ownLostBalls * 1000;
+    }
+
+    // Center Distance ========================================================
+    // 20 is the best value to achieve with all 14 marbles
+    // 56 is the worst value: every marble is on the game board's border
+    int centerDistance = CalcCenterDistance(player);
+    if (centerDistance < 24) {
+      ret += 400;
+    }
+    else if (centerDistance < 30) {
+      ret += 300;
+    }
+    else if (centerDistance < 35) {
+      ret += 200;
+    }
+    else if (centerDistance < 40) {
+      ret += 100;
+    }
+
+    // Marbles Grouping =======================================================
+    int grouping = CalcGrouping(player);
+    // 58 : all marbles are in a huge single group
+    //  0 : no marble has any neighboring fellow marbles
+    // below 40 is already not very good
+    if (grouping > 55) {
+      ret += 320;
+    }
+    else if (grouping > 50) {
+      ret += 240;
+    }
+    else if (grouping > 45) {
+      ret += 160;
+    }
+    else if (grouping > 40) {
+      ret += 80;
+    }
+
+    // Attacking Power ========================================================
+    // TODO: Output of power
+    ret += 10 * CalcAttackingPowerOnOpponent(player);
+
+    // Defending Power ========================================================
+    ret -= 10 * CalcAttackedByOpponent(player);
+  }
+  else if (evaluation == 6) {
     // use only the ratio between the lost balls of both players
     // Lost Marbles ===========================================================
     int ownLostBalls = 0;
@@ -1675,7 +1917,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
       ret -= ownLostBalls * 1000;
     }
   }
-  else if (evaluation == 6) {
+  else if (evaluation == 7) {
     // use only the final outcome which is win, draw or defeat
     // Lost Marbles ===========================================================
     int ownLostBalls = 0;
@@ -1713,7 +1955,7 @@ bool GameManager::IsQuiescencePosition(Player* player)
   // the position is only quiescent if no player is currently attacking the other one at
   // the border of the game board
   myCheckAttackingOnlyAtBorder = true;
-  int ret = CalcAttackingPowerOnOpponent(player) + CalcAttackedByOpponent(player);
+  int ret = CalcAttackingPowerOnOpponent(player);/* + CalcAttackedByOpponent(player);*/
   myCheckAttackingOnlyAtBorder = false;
 
   return ret == 0;

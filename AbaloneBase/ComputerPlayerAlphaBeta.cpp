@@ -37,8 +37,8 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
   myBallMoves[QS] = new BallMove**[myTreeDepth[QS]];
 
   for (int i = 0; i < myTreeDepth[QS]; ++i) {
-    myBallMoves[QS][i] = new BallMove* [BALL_MOVES_ARRAY_SIZE];
-    for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
+    myBallMoves[QS][i] = new BallMove* [BALL_MOVES_ARRAY_SIZE_QS];
+    for (int j = 0; j < BALL_MOVES_ARRAY_SIZE_QS; ++j) {
       myBallMoves[QS][i][j] = new BallMove;
     }
     myBallMovesSize[QS][i] = 0;
@@ -103,7 +103,7 @@ void ComputerPlayerAlphaBeta::DeleteBallMovesQS()
     delete[] myBallMovesSize[QS];
 
     for (int i = 0; i < myTreeDepth[QS]; ++i) {
-      for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
+      for (int j = 0; j < BALL_MOVES_ARRAY_SIZE_QS; ++j) {
         delete myBallMoves[QS][i][j];
       }
       delete[] myBallMoves[QS][i];
@@ -188,13 +188,29 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
 {
   ++myNodeCounter;
 
+  int value = 0;
+
   if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
     if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
       ++myStartQSCounter;
-      return Max(QS, myTreeDepth[QS]-1, alpha, beta);
+      value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+
+      if (value >= beta) {
+        return beta;
+      }
+
+      int qsValue = Max(QS, myTreeDepth[QS]-1, alpha, beta);
+
+      if (value > qsValue) {
+        return value;
+      }
+      else if (qsValue >= beta) {
+        return beta;
+      }
+      return qsValue;
     }
     if (noq == NORMAL)
       ++myLeafNodesQuiescent;
@@ -205,13 +221,16 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
     CheckTime();
   }
 
-  int value = 0;
-
   myBallMovesSize[noq][depth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  if (noq == NORMAL) {
+    mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
+  else {
+    mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
     mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
@@ -231,13 +250,28 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
 {
   ++myNodeCounter;
 
-  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+  int value = 0;
+
+  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
-    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
       ++myStartQSCounter;
-      return Min(QS, myTreeDepth[QS]-1, alpha, beta);
+      value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+
+      if (value <= alpha) {
+        return alpha;
+      }
+
+      int qsValue = Min(QS, myTreeDepth[QS]-1, alpha, beta);
+      if (value < qsValue) {
+        return value;
+      }
+      else if (qsValue <= alpha) {
+        return alpha;
+      }
+      return qsValue;
     }
     if (noq == NORMAL)
       ++myLeafNodesQuiescent;
@@ -248,13 +282,16 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
     CheckTime();
   }
 
-  int value = 0;
-
   myBallMovesSize[noq][depth-1] = 0;
-  
-  mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+
+  if (noq == NORMAL) {
+    mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
+  else {
+    mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
     mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
@@ -274,6 +311,7 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
 {
   ++myNodeCounter;
   BallMove* bestMove(0);
+  int value = 0;
 
   if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -281,7 +319,21 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
     if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
       ++myStartQSCounter;
-      return MaxTT(QS, myTreeDepth[QS]-1, alpha, beta);
+      value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+
+      if (value >= beta) {
+        return beta;
+      }
+
+      int qsValue = MaxTT(QS, myTreeDepth[QS]-1, alpha, beta);
+
+      if (value > qsValue) {
+        return value;
+      }
+      else if (qsValue >= beta) {
+        return beta;
+      }
+      return qsValue;
     }
     if (noq == NORMAL)
       ++myLeafNodesQuiescent;
@@ -314,12 +366,16 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     CheckTime();
   }
 
-  int value = 0;
   myBallMovesSize[noq][depth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  if (noq == NORMAL) {
+    mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
+  else {
+    mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
@@ -338,7 +394,8 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     }
   }
 
-  myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::EXACT, bestMove);
+  if (noq == NORMAL)
+    myHashMap.Insert(myCurrentHashKey, (byte)depth, alpha, HashMapEntry::EXACT, bestMove);
 
   return alpha;
 }
@@ -347,14 +404,28 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
 {
   ++myNodeCounter;
   BallMove* bestMove(0);
+  int value = 0;
 
-  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+  if (noq == QS && mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
-    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
+    if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
       ++myStartQSCounter;
-      return MinTT(QS, myTreeDepth[QS]-1, alpha, beta);
+      value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+
+      if (value <= alpha) {
+        return alpha;
+      }
+
+      int qsValue = MinTT(QS, myTreeDepth[QS]-1, alpha, beta);
+      if (value < qsValue) {
+        return value;
+      }
+      else if (qsValue <= alpha) {
+        return alpha;
+      }
+      return qsValue;
     }
     if (noq == NORMAL)
       ++myLeafNodesQuiescent;
@@ -387,12 +458,16 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     CheckTime();
   }
 
-  int value = 0;
   myBallMovesSize[noq][depth-1] = 0;
 
-  mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-  mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  if (noq == NORMAL) {
+    mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
+  else {
+    mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
@@ -411,7 +486,9 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     }
   }
 
-  myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::EXACT, bestMove);
+  if (noq == NORMAL)
+    myHashMap.Insert(myCurrentHashKey, (byte)depth, beta, HashMapEntry::EXACT, bestMove);
+
   return beta;
 }
 

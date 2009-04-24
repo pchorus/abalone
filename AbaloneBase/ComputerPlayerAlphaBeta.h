@@ -13,7 +13,7 @@
 
 
 static const int DEFAULT_TREE_DEPTH = 5;
-static const int DEFAULT_TREE_DEPTH_QS = 3;
+static const int DEFAULT_TREE_DEPTH_QS = 30;
 
 
 class ABALONE_BASE_DLLINTERFACE ComputerPlayerAlphaBeta : public ComputerPlayer {
