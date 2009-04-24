@@ -19,19 +19,20 @@ public:
   virtual ~ComputerPlayerMonteCarlo();
 
   virtual BallMove CalculateNextMove();
+  virtual void CheckTime();
 
-  int GetGamesToSimulate() const;
-  void SetGamesToSimulate(int gamesToSimulate);
+  DWORD GetSecondsForGame() const;
+  DWORD GetLeftSecondsForGame() const;
+  void SetSecondsForGame(DWORD seconds);
   int GetTurnsPerSimGame() const;
   void SetTurnsPerSimGame(int turnsPerSimGame);
   int GetUsedEvaluation() const;
   void SetUsedEvaluation(int eval);
 
 private:
-  int myGamesToSimulate;
   int myTurnsPerSimGame;
   int myUsedEvaluation;
-  int SimulateGamesWithMove(BallMove* ballMove) const;
+  int SimulateGamesWithMove(BallMove* ballMove);
 
   GameManager* mySimGameManager;
 
@@ -39,16 +40,27 @@ private:
   int myBallMovesSize;
   // current player on the sim game board
   ComputerPlayer* myCurrentPlayer;
+
+  DWORD myMilliSecondsForGame;
+  DWORD myLeftMilliSecondsForGame;
+  DWORD myStart;
+  bool myKeepSimulating;
 };
 
-inline int ComputerPlayerMonteCarlo::GetGamesToSimulate() const
+inline DWORD ComputerPlayerMonteCarlo::GetSecondsForGame() const
 {
-  return myGamesToSimulate;
+  return myMilliSecondsForGame / 1000;
 }
 
-inline void ComputerPlayerMonteCarlo::SetGamesToSimulate(int gamesToSimulate)
+inline DWORD ComputerPlayerMonteCarlo::GetLeftSecondsForGame() const
 {
-  myGamesToSimulate = gamesToSimulate;
+  return myLeftMilliSecondsForGame / 1000;
+}
+
+inline void ComputerPlayerMonteCarlo::SetSecondsForGame(DWORD seconds)
+{
+  myMilliSecondsForGame = seconds*1000;
+  myLeftMilliSecondsForGame = seconds*1000;
 }
 
 inline int ComputerPlayerMonteCarlo::GetTurnsPerSimGame() const

@@ -7,7 +7,7 @@
 #include "HashMapEntry.h"
 #include "Output.h"
 
-static const unsigned int TIME_CHECK_INTERVAL = 200;
+static const unsigned int AB_TIME_CHECK_INTERVAL_NODES = 200;
 
 ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const CString& name, BoardField::Ball ball, Player::PlayerType type)
 : ComputerPlayer(gameManager, name, ball, type)
@@ -217,7 +217,7 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
-  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+  if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
 
@@ -278,7 +278,7 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
-  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+  if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
 
@@ -362,7 +362,7 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     }
   }
 
-  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+  if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
 
@@ -454,7 +454,7 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     }
   }
 
-  if (myNodeCounter % TIME_CHECK_INTERVAL == 0) {
+  if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
 

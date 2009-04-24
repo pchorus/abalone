@@ -234,7 +234,7 @@ void NewGameDlg::OnOK()
     CString str;
     myEditPlayer1MCSimGames.GetWindowText(str);
     if (!str.IsEmpty() && _ttoi(str) != 0) {
-      mcPlayer->SetGamesToSimulate(_ttoi(str));
+      mcPlayer->SetSecondsForGame(_ttoi(str));
     }
     else {
       ok = false;
@@ -310,7 +310,7 @@ void NewGameDlg::OnOK()
     CString str;
     myEditPlayer2MCSimGames.GetWindowText(str);
     if (!str.IsEmpty() && _ttoi(str) != 0) {
-      mcPlayer->SetGamesToSimulate(_ttoi(str));
+      mcPlayer->SetSecondsForGame(_ttoi(str));
     }
     else {
       ok = false;

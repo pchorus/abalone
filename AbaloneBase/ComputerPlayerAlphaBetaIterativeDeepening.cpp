@@ -7,7 +7,6 @@
 
 static const int MAX_TREE_DEPTH = 10;
 static const int DEFAULT_MILLISECONDS_PER_MOVE = 600000;
-static const int AVG_PLY_PER_GAME_PER_PLAYER = 44;
 
 ComputerPlayerAlphaBetaIterativeDeepening::ComputerPlayerAlphaBetaIterativeDeepening(GameManager* gameManager, const CString& name, BoardField::Ball ball)
 : ComputerPlayerAlphaBeta(gameManager, name, ball, Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING)

@@ -171,9 +171,9 @@ void CAbaloneApp::PlayBatchGame()
       // set the players' configuration
       if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
         ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer1());
-        hlp = myCmdLineParams["SimGames1"];
+        hlp = myCmdLineParams["SecondsForGame1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
-          mcPlayer->SetGamesToSimulate(_ttoi(hlp));
+          mcPlayer->SetSecondsForGame(_ttoi(hlp));
         }
         hlp = myCmdLineParams["TurnsPerSim1"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
@@ -184,9 +184,9 @@ void CAbaloneApp::PlayBatchGame()
           mcPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer1.Format("%s SimGames: %d, TurnsPerSim: %d, Value Function: %d",
+        headerPlayer1.Format("%s SecondsForGame: %d, TurnsPerSim: %d, Value Function: %d",
                               namePlayer1,
-                              mcPlayer->GetGamesToSimulate(),
+                              mcPlayer->GetSecondsForGame(),
                               mcPlayer->GetTurnsPerSimGame(),
                               mcPlayer->GetUsedEvaluation());
       }
@@ -237,9 +237,9 @@ void CAbaloneApp::PlayBatchGame()
 
       if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_MONTE_CARLO) {
         ComputerPlayerMonteCarlo* mcPlayer = static_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer2());
-        hlp = myCmdLineParams["SimGames2"];
+        hlp = myCmdLineParams["SecondsForGame2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
-          mcPlayer->SetGamesToSimulate(_ttoi(hlp));
+          mcPlayer->SetSecondsForGame(_ttoi(hlp));
         }
         hlp = myCmdLineParams["TurnsPerSim2"];
         if (!hlp.IsEmpty() && _ttoi(hlp) != 0) {
@@ -250,9 +250,9 @@ void CAbaloneApp::PlayBatchGame()
           mcPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer2.Format("%s SimGames: %d, TurnsPerSim: %d, Value Function: %d",
+        headerPlayer2.Format("%s SecondsForGame: %d, TurnsPerSim: %d, Value Function: %d",
           namePlayer2,
-          mcPlayer->GetGamesToSimulate(),
+          mcPlayer->GetSecondsForGame(),
           mcPlayer->GetTurnsPerSimGame(),
           mcPlayer->GetUsedEvaluation());
       }
