@@ -40,6 +40,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   int value = 0;
   int currentBestValue = 0;
   int retBestValue = 0;
+  int startOrderAtIdx = 0;
 
   myTreeDepth[NORMAL] = 1;
 
@@ -56,6 +57,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     beta = INT_MAX;
     myStartQSCounter = 0;
     myLeafNodesQuiescent = 0;
+    startOrderAtIdx = 0;
 
     myHashMap.UnInit();
     myCurrentHashKey = myHashMap.CalcHashKey(mySimGameManager->GetGameBoard());
@@ -64,11 +66,13 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     if (foundMove) {
       *(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][0]) = retMove;
       myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] = 1;
+      startOrderAtIdx = 1;
     }
 
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
+    mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
 
     for (int i = 0; i < myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] && myKeepInvestigating; ++i) {
       myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);

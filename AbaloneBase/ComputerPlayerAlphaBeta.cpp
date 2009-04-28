@@ -141,6 +141,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
   mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
   mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
+  mySimGameManager->OrderMoves(0, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
 
   for (int i = 0; i < myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]; ++i) {
     myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
@@ -227,6 +228,7 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->OrderMoves(0, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
   }
   else {
     mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -288,6 +290,7 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
     mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->OrderMoves(0, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
   }
   else {
     mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -312,6 +315,7 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   ++myNodeCounter;
   BallMove* bestMove(0);
   int value = 0;
+  int startOrderAtIdx = 0;
 
   if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -345,6 +349,7 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   if (entry) {
     *(myBallMoves[noq][depth-1][0]) = entry->GetMove();
     myBallMovesSize[noq][depth-1] = 1;
+    startOrderAtIdx = 1;
 
     if (entry->GetDepth() >= depth) {
       // consider the move in the hash map first
@@ -372,6 +377,7 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
   }
   else {
     mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -405,6 +411,7 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   ++myNodeCounter;
   BallMove* bestMove(0);
   int value = 0;
+  int startOrderAtIdx = 0;
 
   if (noq == QS && mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -438,6 +445,7 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     // consider the move in the hash map first
     *(myBallMoves[noq][depth-1][0]) = entry->GetMove();
     myBallMovesSize[noq][depth-1] = 1;
+    startOrderAtIdx = 1;
 
     if (entry->GetDepth() >= depth) {
       HashMapEntry::ValueType type = entry->GetValueType();
@@ -464,6 +472,7 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
   }
   else {
     mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);

@@ -59,7 +59,7 @@ public:
   void AddPossibleMovesTwoBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddPossibleMovesThreeBalls(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize) const;
   void AddCapturingMoves(const ComputerPlayer* player, BallMove** ballMoves, int& ballMovesSize);
-  void OrderMoves(BallMove** ballMoves, int ballMoveSize) const;
+  void OrderMoves(int startOrderAtIdx, BallMove** ballMoves, int ballMoveSize) const;
 
   int GetLostBallsPlayer1() const;
   void SetLostBallsPlayer1(int lostBalls);
@@ -114,6 +114,8 @@ private:
   void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
 
   // help methods
+  // sorting the array of BallMoves
+  void qsort(BallMove** arr, int l, int r) const;
 
   void AddLostBall(BoardField::Ball ball);
   void RemoveLostBall(BoardField::Ball ball);

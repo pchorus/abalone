@@ -1940,14 +1940,27 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
   }
 
   // random factor
-  ret += ((rand() % 5) - 2);
+//  ret += ((rand() % 5) - 2);
 
   return ret;
 }
 
-void GameManager::OrderMoves(BallMove** ballMoves, int ballMoveSize) const
+void GameManager::OrderMoves(int startOrderAtIdx, BallMove** ballMoves, int ballMoveSize) const
 {
+  qsort(ballMoves, startOrderAtIdx, ballMoveSize-1);
 
+  // only for debug
+//   if (false) {
+//     BallMove* current = 0;
+//     CString msg;
+// 
+//     Output::Message(myGameBoard->ToString(), false, true);
+//     for (int i = 0; i < ballMoveSize; ++i) {
+//       current = ballMoves[i];
+//       msg.Format("%s\n", current->ToStringDebug());
+//       Output::Message(msg, false, true);
+//     }
+//   }
 }
 
 bool GameManager::IsQuiescencePosition(Player* player)
@@ -1959,4 +1972,38 @@ bool GameManager::IsQuiescencePosition(Player* player)
   myCheckAttackingOnlyAtBorder = false;
 
   return ret == 0;
+}
+
+void GameManager::qsort(BallMove** arr, int l, int r) const
+{
+  int i, j;
+  BallMove* tmp;
+  // Quicksort für Teilfelder größer als 8
+  if (r-l > 8) {
+    i = l - 1;
+    j = r;
+    for (;;) {
+      while(arr[++i]->Compare(arr[r]) < 0);
+      while(arr[--j]->Compare(arr[r]) > 0 && j > i);
+      if( i >= j) break;
+      tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    tmp = arr[i];
+    arr[i] = arr[r];
+    arr[r] = tmp;
+
+    qsort(arr, l, i-1);
+    qsort(arr, i+1, r);
+  }
+  // für Teilfelder kleiner als 9 Insertion Sort
+  else {
+    for (i = l+1; i <= r; ++i) {
+      tmp = arr[i];
+      for(j = i-1; j >= l && tmp->Compare(arr[j]) < 0; --j)
+        arr[j+1] = arr[j];
+      arr[j+1] = tmp;
+    }
+  }
 }

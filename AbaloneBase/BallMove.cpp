@@ -121,6 +121,13 @@ CString BallMove::ToString() const
   return ret;
 }
 
+CString BallMove::ToStringDebug() const
+{
+  CString ret;
+  ret.Format("%s Eject: %d Attack: %d Inline: %d Balls: %d", ToString(), myEjectsBall, myIsAttacking, IsInline(), GetNoOfBalls());
+  return ret;
+}
+
 bool BallMove::operator== (const BallMove& other)
 {
   return myBall1 == other.myBall1
@@ -128,3 +135,92 @@ bool BallMove::operator== (const BallMove& other)
     && myBall3 == other.myBall3
     && myDirection == other.myDirection;
 }
+
+// ordering 2
+int BallMove::Compare(const BallMove* other) const
+{
+  // first compare if move ejects opponent marbles or not
+  if (GetEjectsBall() && !other->GetEjectsBall()) {
+    return -1;
+  }
+  else if (!GetEjectsBall() && other->GetEjectsBall()) {
+    return 1;
+  }
+  else {
+    // compare inline and sideway moves
+    if (IsAttacking() && !other->IsAttacking()) {
+      return -1;
+    }
+    else if (!IsAttacking() && other->IsAttacking()) {
+      return 1;
+    }
+    else {
+      // compare inline vs not inline
+      if (IsInline() && !other->IsInline()) {
+        return -1;
+      }
+      else if (!IsInline() && other->IsInline()) {
+        return 1;
+      }
+      else {
+        // compare no of balls
+        if (GetNoOfBalls() > other->GetNoOfBalls()) {
+          return -1;
+        }
+        else if (GetNoOfBalls() < other->GetNoOfBalls()) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      }
+    }
+  }
+}
+
+// ordering 3
+// int BallMove::Compare(const BallMove* other) const
+// {
+//   // first compare if move ejects opponent marbles or not
+//   // compare no of balls
+//   if (GetNoOfBalls() > other->GetNoOfBalls()) {
+//     return -1;
+//   }
+//   else if (GetNoOfBalls() < other->GetNoOfBalls()) {
+//     return 1;
+//   }
+//   else {
+//     if (GetNoOfBalls() != 1 && other->GetNoOfBalls() != 1) {
+//       if (GetEjectsBall() && !other->GetEjectsBall()) {
+//         return -1;
+//       }
+//       else if (!GetEjectsBall() && other->GetEjectsBall()) {
+//         return 1;
+//       }
+//       else {
+//       // compare inline and sideway moves
+//         if (IsAttacking() && !other->IsAttacking()) {
+//           return -1;
+//         }
+//         else if (!IsAttacking() && other->IsAttacking()) {
+//           return 1;
+//         }
+//         else {
+//           // compare inline vs not inline
+//           if (IsInline() && !other->IsInline()) {
+//             return -1;
+//           }
+//           else if (!IsInline() && other->IsInline()) {
+//             return 1;
+//           }
+//           else {
+//             return 0;
+//           }
+//         }
+//       }
+//     }
+//     else {
+//       return 0;
+//     }
+//   }
+// }

@@ -11,7 +11,10 @@
 
 #include "AbaloneBase.h"
 
+#include "GameManager.h"
+
 class BoardField;
+
 
 class ABALONE_BASE_DLLINTERFACE BallMove {
 public:
@@ -32,11 +35,14 @@ public:
   Direction GetDirection() const;
   void SetDirection(Direction direction);
 
+  bool IsInline() const;
   bool IsAttacking() const;
   void SetIsAttacking(bool isAttacking);
 
   bool GetEjectsBall() const;
   void SetEjectsBall(bool ejectsBall);
+
+  int GetNoOfBalls() const;
 
   BallMove& operator= (const BallMove& other);
   bool operator== (const BallMove& other);
@@ -44,6 +50,9 @@ public:
   bool HasBalls() const;
 
   CString ToString() const;
+  CString ToStringDebug() const;
+
+  int Compare(const BallMove* other) const;
 
 private:
   BoardField* myBall1;
@@ -142,4 +151,34 @@ inline void BallMove::Init(Direction direction, bool isAttacking, bool ejectsBal
   myDirection = direction;
   myIsAttacking = isAttacking;
   myEjectsBall = ejectsBall;
+}
+
+inline bool BallMove::IsInline() const
+{
+  GameManager::GetAxisOfBalls(myBall1, myBall2);
+
+  switch (myDirection) {
+  case UPLEFT:
+  case DOWNRIGHT:
+    return GameManager::GetAxisOfBalls(myBall1, myBall2) == UPPERLEFT_TO_DOWNRIGHT;
+    break;
+  case UPRIGHT:
+  case DOWNLEFT:
+    return GameManager::GetAxisOfBalls(myBall1, myBall2) == DOWNLEFT_TO_UPPERRIGHT;
+    break;
+  case LEFT:
+  case RIGHT:
+    return GameManager::GetAxisOfBalls(myBall1, myBall2) == HORIZONTAL;
+    break;
+  }
+  return false;
+}
+
+inline int BallMove::GetNoOfBalls() const
+{
+  if (myBall3)
+    return 3;
+  if (myBall2)
+    return 2;
+  return 1;
 }
