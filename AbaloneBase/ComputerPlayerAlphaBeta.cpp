@@ -232,6 +232,13 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
   }
   else {
     mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+    if (value >= beta) {
+      return beta;
+    }
+    else if (value > alpha) {
+      alpha = value;
+    }
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
@@ -294,6 +301,13 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
   }
   else {
     mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+    if (value <= alpha) {
+      return alpha;
+    }
+    else if (value < beta) {
+      beta = value;
+    }
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
@@ -381,6 +395,13 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   }
   else {
     mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+    if (value >= beta) {
+      return beta;
+    }
+    else if (value > alpha) {
+      alpha = value;
+    }
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
@@ -476,6 +497,13 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   }
   else {
     mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
+    if (value <= alpha) {
+      return alpha;
+    }
+    else if (value < beta) {
+      beta = value;
+    }
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
