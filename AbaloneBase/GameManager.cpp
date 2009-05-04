@@ -1565,10 +1565,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
 
     if (opponentLostBalls == 6) {
-      ret += 1000000;
+      return 1000000;
     }
     else if (ownLostBalls == 6) {
-      ret -= 1000000;
+      return -1000000;
     }
     else {
       ret += opponentLostBalls * 1000;
@@ -1631,10 +1631,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
 
     if (opponentLostBalls == 6) {
-      ret += 1000000;
+      return 1000000;
     }
     else if (ownLostBalls == 6) {
-      ret -= 1000000;
+      return -1000000;
     }
     else {
       ret += opponentLostBalls * 1000;
@@ -1715,10 +1715,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
 
     if (opponentLostBalls == 6) {
-      ret += 1000000;
+      return 1000000;
     }
     else if (ownLostBalls == 6) {
-      ret -= 1000000;
+      return -1000000;
     }
     else {
       ret += opponentLostBalls * 1000;
@@ -1774,10 +1774,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
 
     if (opponentLostBalls == 6) {
-      ret += 1000000;
+      return 1000000;
     }
     else if (ownLostBalls == 6) {
-      ret -= 1000000;
+      return -1000000;
     }
     else {
       ret += opponentLostBalls * 1000;
@@ -1840,10 +1840,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
 
     if (opponentLostBalls == 6) {
-      ret += 1000000;
+      return 1000000;
     }
     else if (ownLostBalls == 6) {
-      ret -= 1000000;
+      return -1000000;
     }
     else {
       ret += opponentLostBalls * 700;
@@ -1907,10 +1907,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
     }
 
     if (opponentLostBalls == 6) {
-      ret += 1000000;
+      return 1000000;
     }
     else if (ownLostBalls == 6) {
-      ret -= 1000000;
+      return -1000000;
     }
     else {
       ret += opponentLostBalls * 1000;

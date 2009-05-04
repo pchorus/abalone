@@ -136,6 +136,11 @@ bool BallMove::operator== (const BallMove& other)
     && myDirection == other.myDirection;
 }
 
+bool BallMove::operator!= (const BallMove& other)
+{
+  return !operator==(other);
+}
+
 // ordering 2
 int BallMove::Compare(const BallMove* other) const
 {

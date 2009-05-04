@@ -46,6 +46,7 @@ public:
 
   BallMove& operator= (const BallMove& other);
   bool operator== (const BallMove& other);
+  bool operator!= (const BallMove& other);
 
   bool HasBalls() const;
 

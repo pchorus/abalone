@@ -75,26 +75,28 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
 
     for (int i = 0; i < myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] && myKeepInvestigating; ++i) {
-      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
-      mySimGameManager->DoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
-      if (myUseTranspositionTable) {
-        value = MinTT(NORMAL, myTreeDepth[NORMAL]-1, alpha, beta);
-      }
-      else {
-        value = Min(NORMAL, myTreeDepth[NORMAL]-1, alpha, beta);
-      }
+      if (*(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]) != *(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][0]) || i == 0) {
+        myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
+        mySimGameManager->DoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
+        if (myUseTranspositionTable) {
+          value = MinTT(NORMAL, myTreeDepth[NORMAL]-1, alpha, beta);
+        }
+        else {
+          value = Min(NORMAL, myTreeDepth[NORMAL]-1, alpha, beta);
+        }
 
-      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
-      mySimGameManager->UndoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
+        myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
+        mySimGameManager->UndoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
 
-      if (value >= beta) {
-        break;
-      }
-      if (value > alpha) {
-        currentBestMove = *myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i];
-        currentBestValue = value;
-        alpha = value;
-        foundMove = true;
+        if (value >= beta) {
+          break;
+        }
+        if (value > alpha) {
+          currentBestMove = *myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i];
+          currentBestValue = value;
+          alpha = value;
+          foundMove = true;
+        }
       }
     }
 
@@ -105,10 +107,6 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
       ++myTreeDepth[NORMAL];
     }
   }
-
-  // TODO: it happened that no move was found. In that case we should at least choose a
-  // move randomly or one with 3 balls in direction to the center
-  // save the move chosen on the simboard to prevent loops in the game
 
   // retMove contains the ballfields from the simGameManager,
   // to do the move on the real game board, we have to give it the boardfields from the
