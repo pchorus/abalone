@@ -323,10 +323,23 @@ void CAbaloneApp::PlayBatchGame()
                     , headerPlayer1
                     , headerPlayer2);
 
-      msg.Format("%s  Lost Balls %s:\t%d\n  Lost Balls %s:\t%d\n",
-        header,
-        namePlayer1, gameManager.GetLostBallsPlayer1(),
-        namePlayer2, gameManager.GetLostBallsPlayer2());
+      ComputerPlayerAlphaBetaIterativeDeepening* abPlayer1 = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
+      ComputerPlayerAlphaBetaIterativeDeepening* abPlayer2 = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
+
+      if (abPlayer1 && abPlayer2) {
+        msg.Format("%s  Lost Balls %s:\t%d\tRemaining Time:\t%d\n  Lost Balls %s:\t%d\tRemaining Time:\t%d\n",
+          header,
+          namePlayer1, gameManager.GetLostBallsPlayer1(), abPlayer1->GetLeftSecondsForGame(),
+          namePlayer2, gameManager.GetLostBallsPlayer2(), abPlayer2->GetLeftSecondsForGame());
+
+      }
+      else {
+        msg.Format("%s  Lost Balls %s:\t%d\n  Lost Balls %s:\t%d\n",
+          header,
+          namePlayer1, gameManager.GetLostBallsPlayer1(),
+          namePlayer2, gameManager.GetLostBallsPlayer2());
+
+      }
       Output::Message(msg, false, true);
       Output::Message(gameManager.GetGameBoard()->ToString(), false, true);
     }
