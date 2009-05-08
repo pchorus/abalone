@@ -1846,7 +1846,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
       return -1000000;
     }
     else {
-      ret += opponentLostBalls * 700;
+      ret += opponentLostBalls * 1000;
       ret -= ownLostBalls * 1000;
     }
 
@@ -1887,10 +1887,10 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
 
     // Attacking Power ========================================================
     // TODO: Output of power
-    ret += 10 * CalcAttackingPowerOnOpponent(player);
+    ret += 80 * CalcAttackingPowerOnOpponent(player);
 
     // Defending Power ========================================================
-    ret -= 10 * CalcAttackedByOpponent(player);
+    ret -= 80 * CalcAttackedByOpponent(player);
   }
   else if (evaluation == 6) {
     // use only the ratio between the lost balls of both players
@@ -1940,7 +1940,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
   }
 
   // random factor
-//  ret += ((rand() % 5) - 2);
+  ret += ((rand() % 5) - 2);
 
   return ret;
 }
