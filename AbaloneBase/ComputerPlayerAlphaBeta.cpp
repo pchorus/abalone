@@ -278,17 +278,19 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
-    mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
-    value = Min(noq, depth-1, alpha, beta);
-    mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
-    if (value >= beta) {
-      if (myUseKillerMoves && noq == NORMAL) {
-        InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+    if (myBallMoves[noq][depth-1][i]->HasBalls()) {
+      mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
+      value = Min(noq, depth-1, alpha, beta);
+      mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
+      if (value >= beta) {
+        if (myUseKillerMoves && noq == NORMAL) {
+          InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+        }
+        return beta;
       }
-      return beta;
-    }
-    if (value > alpha) {
-      alpha = value;
+      if (value > alpha) {
+        alpha = value;
+      }
     }
   }
   return alpha;
@@ -358,17 +360,19 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
-    mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
-    value = Max(noq, depth-1, alpha, beta);
-    mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
-    if (value <= alpha) {
-      if (myUseKillerMoves && noq == NORMAL) {
-        InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+    if (myBallMoves[noq][depth-1][i]->HasBalls()) {
+      mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
+      value = Max(noq, depth-1, alpha, beta);
+      mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
+      if (value <= alpha) {
+        if (myUseKillerMoves && noq == NORMAL) {
+          InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+        }
+        return alpha;
       }
-      return alpha;
-    }
-    if (value < beta) {
-      beta = value;
+      if (value < beta) {
+        beta = value;
+      }
     }
   }
   return beta;
@@ -464,24 +468,26 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
-    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
-    mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
-    value = MinTT(noq, depth-1, alpha, beta);
-    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
-    mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
+    if (myBallMoves[noq][depth-1][i]->HasBalls()) {
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
+      mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
+      value = MinTT(noq, depth-1, alpha, beta);
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
+      mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
 
-    if (value >= beta) {
-      if (noq == NORMAL) {
-        myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND, myBallMoves[noq][depth-1][i]);
-        if (myUseKillerMoves) {
-          InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+      if (value >= beta) {
+        if (noq == NORMAL) {
+          myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND, myBallMoves[noq][depth-1][i]);
+          if (myUseKillerMoves) {
+            InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+          }
         }
+        return beta;
       }
-      return beta;
-    }
-    if (value > alpha) {
-      bestMove = myBallMoves[noq][depth-1][i];
-      alpha = value;
+      if (value > alpha) {
+        bestMove = myBallMoves[noq][depth-1][i];
+        alpha = value;
+      }
     }
   }
 
@@ -579,24 +585,26 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   }
 
   for (int i = 0; i < myBallMovesSize[noq][depth-1] && myKeepInvestigating; ++i) {
-    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
-    mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
-    value = MaxTT(noq, depth-1, alpha, beta);
-    myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
-    mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
+    if (myBallMoves[noq][depth-1][i]->HasBalls()) {
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
+      mySimGameManager->DoMove(myBallMoves[noq][depth-1][i]);
+      value = MaxTT(noq, depth-1, alpha, beta);
+      myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[noq][depth-1][i], mySimGameManager);
+      mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
 
-    if (value <= alpha) {
-      if (noq == NORMAL) {
-        myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND, myBallMoves[noq][depth-1][i]);
-        if (myUseKillerMoves) {
-          InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+      if (value <= alpha) {
+        if (noq == NORMAL) {
+          myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND, myBallMoves[noq][depth-1][i]);
+          if (myUseKillerMoves) {
+            InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+          }
         }
+        return alpha;
       }
-      return alpha;
-    }
-    if (value < beta) {
-      bestMove = myBallMoves[noq][depth-1][i];
-      beta = value;
+      if (value < beta) {
+        bestMove = myBallMoves[noq][depth-1][i];
+        beta = value;
+      }
     }
   }
 

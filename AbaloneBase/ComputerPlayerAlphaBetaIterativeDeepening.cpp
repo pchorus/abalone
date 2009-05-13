@@ -79,7 +79,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);
 
     for (int i = 0; i < myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] && myKeepInvestigating; ++i) {
-      if (*(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]) != *(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][0]) || i == 0) {
+      if (myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]->HasBalls()) {
         myHashMap.RecalcHashKey(myCurrentHashKey, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i], mySimGameManager);
         mySimGameManager->DoMove(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i]);
         if (myUseTranspositionTable) {

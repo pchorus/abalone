@@ -2047,6 +2047,19 @@ void GameManager::OrderMoves(int startOrderAtIdx, BallMove** ballMoves, int ball
 {
   qsort(ballMoves, startOrderAtIdx, ballMoveSize-1);
 
+  // eliminate duplicates in the array
+  // the only duplicates that appear are those moves which are
+  // killer moves or best-first search moves or taken from the transposition table
+  if (startOrderAtIdx != 0) {
+    for (int i = 0; i < startOrderAtIdx; ++i) {
+      for (int j = startOrderAtIdx; j < ballMoveSize; ++j) {
+        if (*(ballMoves[i]) == *(ballMoves[j])) {
+          ballMoves[j]->ClearBalls();
+        }
+      }
+    }
+  }
+
   // only for debug
 //   if (false) {
 //     BallMove* current = 0;
