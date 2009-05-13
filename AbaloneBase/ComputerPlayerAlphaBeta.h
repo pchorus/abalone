@@ -33,6 +33,8 @@ public:
   void SetUsedEvaluation(int eval);
   bool GetUseTranspositionTable() const;
   void SetUseTranspositionTable(bool useTT);
+  bool GetUseKillerMoves() const;
+  void SetUseKillerMoves(bool useKM);
   bool GetUseQuiescenceSearch() const;
   void SetUseQuiescenceSearch(bool useQS);
 
@@ -45,6 +47,8 @@ protected:
   int MaxTT(NormalOrQuiescence noq, int depth, int alpha, int beta);
   int MinTT(NormalOrQuiescence noq, int depth, int alpha, int beta);
 
+  void InsertKillerMove(int depth, const BallMove* move);
+  void UnInitKillerMoves();
   GameManager* mySimGameManager;
 
   ComputerPlayer* myMaxPlayer;
@@ -57,6 +61,7 @@ protected:
   bool myKeepInvestigating;
   bool myUseTranspositionTable;
   bool myUseQuiescenceSearch;
+  bool myUseKillerMoves;
   ZobristHashMap myHashMap;
   ULONG64 myCurrentHashKey;
   int myStartQSCounter;
@@ -67,6 +72,10 @@ private:
   void DeleteBallMovesQS();
   ComputerPlayer* myMinPlayer;
   int myUsedEvaluation;
+
+  BallMove*** myKillerMoves;
+  int* myKillerMovesSize;
+  int* myKillerMovesNextInsertIdx;
 };
 
 inline int ComputerPlayerAlphaBeta::GetTreeDepth() const
@@ -94,6 +103,16 @@ inline void ComputerPlayerAlphaBeta::SetUseTranspositionTable(bool useTT)
   myUseTranspositionTable = useTT;
 }
 
+inline bool ComputerPlayerAlphaBeta::GetUseKillerMoves() const
+{
+  return myUseKillerMoves;
+}
+
+inline void ComputerPlayerAlphaBeta::SetUseKillerMoves(bool useKM)
+{
+  myUseKillerMoves = useKM;
+}
+
 inline bool ComputerPlayerAlphaBeta::GetUseQuiescenceSearch() const
 {
   return myUseQuiescenceSearch;
@@ -102,4 +121,17 @@ inline bool ComputerPlayerAlphaBeta::GetUseQuiescenceSearch() const
 inline void ComputerPlayerAlphaBeta::SetUseQuiescenceSearch(bool useQS)
 {
   myUseQuiescenceSearch = useQS;
+}
+
+inline void ComputerPlayerAlphaBeta::InsertKillerMove(int depth, const BallMove* move)
+{
+  for (int i = 0; i < myKillerMovesSize[depth-1]; ++i) {
+    if (*myKillerMoves[depth-1][i] == *move)
+      return;
+  }
+
+  *myKillerMoves[depth-1][myKillerMovesNextInsertIdx[depth-1]] = *move;
+  myKillerMovesNextInsertIdx[depth-1] = ++myKillerMovesNextInsertIdx[depth-1] % KILLER_MOVES_ARRAY_SIZE;
+  if (myKillerMovesSize[depth-1] < KILLER_MOVES_ARRAY_SIZE)
+    ++myKillerMovesSize[depth-1];
 }

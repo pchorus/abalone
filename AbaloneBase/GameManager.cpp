@@ -318,6 +318,104 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
   }
 }
 
+void GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, BallMove** ballMoves, int& ballMovesSize) const
+{
+  Direction direction = move->GetDirection();
+
+  BallAxis pushAxis = NO_VALID_AXIS;
+  switch (direction) {
+  case UPLEFT:
+  case DOWNRIGHT:
+    pushAxis = UPPERLEFT_TO_DOWNRIGHT;
+    break;
+  case UPRIGHT:
+  case DOWNLEFT:
+    pushAxis = DOWNLEFT_TO_UPPERRIGHT;
+    break;
+  case LEFT:
+  case RIGHT:
+    pushAxis = HORIZONTAL;
+    break;
+  }
+
+  BoardField* ball1 = 0;
+  BoardField* ball2 = 0;
+  BoardField* ball3 = 0;
+
+  move->GetBalls(ball1, ball2, ball3);
+
+  BoardField* opponentField1 = 0;
+  BoardField* opponentField2 = 0;
+  BoardField* opponentField3 = 0;
+
+  BoardField::Ball ownBall = player->GetBall();
+
+  // check whether the fields for the own marbles are occupied by own marbles
+  if (ball1 && ball1->GetBall() == ownBall && (!ball2 || ball2->GetBall() == ownBall) && (!ball3 || ball3->GetBall() == ownBall)) {
+    GetOpponentFields(direction, ball1, ball2, ball3, opponentField1, opponentField2, opponentField3);
+    BoardField::Ball opponentBall = BoardField::BLACK_BALL;
+    if (ball1->GetBall() == BoardField::BLACK_BALL) {
+      opponentBall = BoardField::WHITE_BALL;
+    }
+
+    if (GetAxisOfBalls(ball1, ball2) == pushAxis) {
+      // -> O|X or -> OO|X or -> OOO|X
+      if (opponentField1) {
+        if (opponentField1->GetBall() == BoardField::NO_BALL) {
+          ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
+          ++ballMovesSize;
+        }
+        else if (opponentField1->GetBall() == opponentBall) {
+          if (ball2 && (!opponentField2 || opponentField2->GetBall() == BoardField::NO_BALL))
+            // -> OO|0 or -> OO|0X or -> OOO|0 or -> OOO|0X
+          {
+            ballMoves[ballMovesSize]->Init(direction, true, !opponentField2, ball1, ball2, ball3, 1);
+            ++ballMovesSize;
+          }
+
+          else if (ball3 && opponentField2 && opponentField2->GetBall() == opponentBall
+            && (!opponentField3 || (opponentField3 && opponentField3->GetBall() == BoardField::NO_BALL)))
+            // -> OOO|00 or -> OOO|00X
+          {
+            ballMoves[ballMovesSize]->Init(direction, true, !opponentField3, ball1, ball2, ball3, 2);
+            ++ballMovesSize;
+          }
+        }
+      }
+    }
+    // sidesteps
+    else {
+      // since we use the opponentField1 as help variable since it is not used otherwise in this else block
+      opponentField1 = GetNextFieldInDirection(ball1->GetFieldCoordinates(), direction);
+      if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL)
+      {
+        if (ball2) {
+          opponentField1 = GetNextFieldInDirection(ball2->GetFieldCoordinates(), direction);
+          if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL)
+          {
+            if (ball3) {
+              opponentField1 = GetNextFieldInDirection(ball3->GetFieldCoordinates(), direction);
+              if (opponentField1 && opponentField1->GetBall() == BoardField::NO_BALL)
+              {
+                ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
+                ++ballMovesSize;
+              }
+            }
+            else {
+              ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
+              ++ballMovesSize;
+            }
+          }
+        }
+        else {
+          ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
+          ++ballMovesSize;
+        }
+      }
+    }
+  }
+}
+
 void GameManager::MoveBallsInDirection(Direction direction)
 {
   // we are allowed to pass 0 as opponentBalls, because it is only used in UndoMove
@@ -1940,7 +2038,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
   }
 
   // random factor
-  ret += ((rand() % 5) - 2);
+//  ret += ((rand() % 5) - 2);
 
   return ret;
 }

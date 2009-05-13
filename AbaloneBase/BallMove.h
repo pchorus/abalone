@@ -181,5 +181,7 @@ inline int BallMove::GetNoOfBalls() const
     return 3;
   if (myBall2)
     return 2;
-  return 1;
+  if (myBall1)
+    return 1;
+  return 0;
 }

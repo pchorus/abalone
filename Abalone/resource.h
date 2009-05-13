@@ -74,6 +74,8 @@
 #define IDC_CHECK_TRANSPOSITION_TABLE2  1057
 #define IDC_CHECK_QUIESCENCE_SEARCH1    1058
 #define IDC_CHECK_QUIESCENCE_SEARCH2    1059
+#define IDC_CHECK_KILLER_MOVES1         1060
+#define IDC_CHECK_KILLER_MOVES2         1061
 #define ID_NEU_NEWGAME                  32771
 #define ID_NEWGAME                      32772
 #define ID_NEW_CLOSE                    32773

@@ -19,6 +19,8 @@ ComputerPlayerAlphaBetaIterativeDeepening::ComputerPlayerAlphaBetaIterativeDeepe
 
 ComputerPlayerAlphaBetaIterativeDeepening::~ComputerPlayerAlphaBetaIterativeDeepening()
 {
+  // to ensure that everything is deleted, we have to set myTreeDepth back to the maximum
+  myTreeDepth[NORMAL] = MAX_TREE_DEPTH;
 }
 
 BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
@@ -60,6 +62,8 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     startOrderAtIdx = 0;
 
     myHashMap.UnInit();
+    UnInitKillerMoves();
+
     myCurrentHashKey = myHashMap.CalcHashKey(mySimGameManager->GetGameBoard());
 
     // best move from previous iteration into the movelist

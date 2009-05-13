@@ -20,6 +20,7 @@ public:
   ValueType GetValueType() const;
   ULONG64 GetLock() const;
   BallMove GetMove() const;
+  bool HasMove() const;
 
 private:
   bool myIsInitialized;
@@ -28,6 +29,7 @@ private:
   ValueType myValueType;
   ULONG64 myLock;
   BallMove myMove;
+  bool myHasMove;
 };
 
 inline bool HashMapEntry::IsInitialized() const
@@ -69,10 +71,19 @@ inline void HashMapEntry::Init(byte treeDepth, int value, ValueType valueType, U
   myLock = lock;
   if (move) {
     myMove = *move;
+    myHasMove = true;
+  }
+  else {
+    myHasMove = false;
   }
 }
 
 inline BallMove HashMapEntry::GetMove() const
 {
   return myMove;
+}
+
+inline bool HashMapEntry::HasMove() const
+{
+  return myHasMove;
 }

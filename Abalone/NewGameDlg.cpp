@@ -55,6 +55,8 @@ void NewGameDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Control(pDX, IDC_CHECK_ITERATIVE_DEEPENING2, myCheckPlayer2IterativeDeepening);
   DDX_Control(pDX, IDC_CHECK_TRANSPOSITION_TABLE1, myCheckPlayer1TranspositionTable);
   DDX_Control(pDX, IDC_CHECK_TRANSPOSITION_TABLE2, myCheckPlayer2TranspositionTable);
+  DDX_Control(pDX, IDC_CHECK_KILLER_MOVES1, myCheckPlayer1KillerMoves);
+  DDX_Control(pDX, IDC_CHECK_KILLER_MOVES2, myCheckPlayer2KillerMoves);
   DDX_Control(pDX, IDC_CHECK_QUIESCENCE_SEARCH1, myCheckPlayer1QuiescenceSearch);
   DDX_Control(pDX, IDC_CHECK_QUIESCENCE_SEARCH2, myCheckPlayer2QuiescenceSearch);
 }
@@ -150,6 +152,11 @@ BOOL NewGameDlg::OnInitDialog()
   myCheckPlayer2TranspositionTable.SetCheck(BST_CHECKED);
   myCheckPlayer1TranspositionTable.EnableWindow(FALSE);
   myCheckPlayer2TranspositionTable.EnableWindow(FALSE);
+
+  myCheckPlayer1KillerMoves.SetCheck(BST_CHECKED);
+  myCheckPlayer2KillerMoves.SetCheck(BST_CHECKED);
+  myCheckPlayer1KillerMoves.EnableWindow(FALSE);
+  myCheckPlayer2KillerMoves.EnableWindow(FALSE);
 
   myEditMaxNoOfMoves.SetWindowText("300");
 
@@ -260,6 +267,7 @@ void NewGameDlg::OnOK()
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(myGameManager->GetPlayer1());
     abPlayer->SetUseTranspositionTable(myCheckPlayer1TranspositionTable.GetCheck() == BST_CHECKED);
+    abPlayer->SetUseKillerMoves(myCheckPlayer1KillerMoves.GetCheck() == BST_CHECKED);
     abPlayer->SetUseQuiescenceSearch(myCheckPlayer1QuiescenceSearch.GetCheck() == BST_CHECKED);
     CString str;
     myEditPlayer1ABTreeDepth.GetWindowText(str);
@@ -285,6 +293,7 @@ void NewGameDlg::OnOK()
   else if (typePlayer1 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
     ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(myGameManager->GetPlayer1());
     abPlayer->SetUseTranspositionTable(myCheckPlayer1TranspositionTable.GetCheck() == BST_CHECKED);
+    abPlayer->SetUseKillerMoves(myCheckPlayer1KillerMoves.GetCheck() == BST_CHECKED);
     abPlayer->SetUseQuiescenceSearch(myCheckPlayer1QuiescenceSearch.GetCheck() == BST_CHECKED);
     CString str;
     myEditPlayer1ABTimeForGame.GetWindowText(str);
@@ -337,6 +346,7 @@ void NewGameDlg::OnOK()
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA) {
     ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(myGameManager->GetPlayer2());
     abPlayer->SetUseTranspositionTable(myCheckPlayer2TranspositionTable.GetCheck() == BST_CHECKED);
+    abPlayer->SetUseKillerMoves(myCheckPlayer2KillerMoves.GetCheck() == BST_CHECKED);
     abPlayer->SetUseQuiescenceSearch(myCheckPlayer2QuiescenceSearch.GetCheck() == BST_CHECKED);
     CString str;
     myEditPlayer2ABTreeDepth.GetWindowText(str);
@@ -361,6 +371,7 @@ void NewGameDlg::OnOK()
   else if (typePlayer2 == Player::PLAYER_TYPE_COMPUTER_ALPHA_BETA_ITERATIVE_DEEPENING) {
     ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(myGameManager->GetPlayer2());
     abPlayer->SetUseTranspositionTable(myCheckPlayer2TranspositionTable.GetCheck() == BST_CHECKED);
+    abPlayer->SetUseKillerMoves(myCheckPlayer2KillerMoves.GetCheck() == BST_CHECKED);
     abPlayer->SetUseQuiescenceSearch(myCheckPlayer2QuiescenceSearch.GetCheck() == BST_CHECKED);
     CString str;
     myEditPlayer2ABTimeForGame.GetWindowText(str);
@@ -424,12 +435,14 @@ void NewGameDlg::OnRadioPlayer1Changed()
 
   if (radioTypePlayer1 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER1) {
     myCheckPlayer1TranspositionTable.EnableWindow(TRUE);
+    myCheckPlayer1KillerMoves.EnableWindow(TRUE);
     myCheckPlayer1QuiescenceSearch.EnableWindow(TRUE);
     myCheckPlayer1IterativeDeepening.EnableWindow(TRUE);
     OnCheckIterativeDeepeningPlayer1Changed();
   }
   else {
     myCheckPlayer1TranspositionTable.EnableWindow(FALSE);
+    myCheckPlayer1KillerMoves.EnableWindow(FALSE);
     myCheckPlayer1QuiescenceSearch.EnableWindow(FALSE);
     myCheckPlayer1IterativeDeepening.EnableWindow(FALSE);
     myStaticPlayer1ABTimeForGame.EnableWindow(FALSE);
@@ -467,12 +480,14 @@ void NewGameDlg::OnRadioPlayer2Changed()
 
   if (radioTypePlayer2 == IDC_RADIO_COMPUTER_ALPHA_BETA_PLAYER2) {
     myCheckPlayer2TranspositionTable.EnableWindow(TRUE);
+    myCheckPlayer2KillerMoves.EnableWindow(TRUE);
     myCheckPlayer2QuiescenceSearch.EnableWindow(TRUE);
     myCheckPlayer2IterativeDeepening.EnableWindow(TRUE);
     OnCheckIterativeDeepeningPlayer2Changed();
   }
   else {
     myCheckPlayer2TranspositionTable.EnableWindow(FALSE);
+    myCheckPlayer2KillerMoves.EnableWindow(FALSE);
     myCheckPlayer2QuiescenceSearch.EnableWindow(FALSE);
     myCheckPlayer2IterativeDeepening.EnableWindow(FALSE);
     myStaticPlayer2ABTimeForGame.EnableWindow(FALSE);

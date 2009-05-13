@@ -19,12 +19,15 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myKeepInvestigating(true)
 , myUseTranspositionTable(false)
 , myUseQuiescenceSearch(false)
+, myUseKillerMoves(false)
 , myHashMap()
 , myStartQSCounter(0)
 , myLeafNodesQuiescent(0)
 {
   myBallMovesSize[NORMAL] = 0;
   myBallMovesSize[QS] = 0;
+  myKillerMovesSize = 0;
+  myKillerMovesNextInsertIdx = 0;
 
   myTreeDepth[NORMAL] = DEFAULT_TREE_DEPTH;
   myTreeDepth[QS] = DEFAULT_TREE_DEPTH_QS;
@@ -73,12 +76,23 @@ void ComputerPlayerAlphaBeta::SetTreeDepth(int treeDepth)
   myBallMovesSize[NORMAL] = new int[myTreeDepth[NORMAL]];
   myBallMoves[NORMAL] = new BallMove**[myTreeDepth[NORMAL]];
 
+  myKillerMovesSize = new int[myTreeDepth[NORMAL]];
+  myKillerMovesNextInsertIdx = new int[myTreeDepth[NORMAL]];
+  myKillerMoves = new BallMove**[myTreeDepth[NORMAL]];
+
   for (int i = 0; i < myTreeDepth[NORMAL]; ++i) {
     myBallMoves[NORMAL][i] = new BallMove* [BALL_MOVES_ARRAY_SIZE];
     for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
       myBallMoves[NORMAL][i][j] = new BallMove;
     }
     myBallMovesSize[NORMAL][i] = 0;
+
+    myKillerMoves[i] = new BallMove* [KILLER_MOVES_ARRAY_SIZE];
+    for (int j = 0; j < KILLER_MOVES_ARRAY_SIZE; ++j) {
+      myKillerMoves[i][j] = new BallMove;
+    }
+    myKillerMovesSize[i] = 0;
+    myKillerMovesNextInsertIdx[i] = 0;
   }
 }
 
@@ -94,6 +108,19 @@ void ComputerPlayerAlphaBeta::DeleteBallMoves()
       delete[] myBallMoves[NORMAL][i];
     }
     delete[] myBallMoves[NORMAL];
+  }
+
+  if (myKillerMovesSize) {
+    delete[] myKillerMovesSize;
+    delete[] myKillerMovesNextInsertIdx;
+
+    for (int i = 0; i < myTreeDepth[NORMAL]; ++i) {
+      for (int j = 0; j < KILLER_MOVES_ARRAY_SIZE; ++j) {
+        delete myKillerMoves[i][j];
+      }
+      delete[] myKillerMoves[i];
+    }
+    delete[] myKillerMoves;
   }
 }
 
@@ -128,6 +155,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   int value = 0;
 
   myHashMap.UnInit();
+  UnInitKillerMoves();
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -224,11 +252,19 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
 
   myBallMovesSize[noq][depth-1] = 0;
 
+  // check if we can use a killer move
+  if (myUseKillerMoves && noq == NORMAL) {
+    for (int i = 0; i < myKillerMovesSize[depth-1]; ++i) {
+      mySimGameManager->AddMoveIfLegal(myMaxPlayer, myKillerMoves[depth-1][i], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    }
+  }
+  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
+
   if (noq == NORMAL) {
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-    mySimGameManager->OrderMoves(0, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
   }
   else {
     mySimGameManager->AddCapturingMoves(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -246,6 +282,9 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
     value = Min(noq, depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
     if (value >= beta) {
+      if (myUseKillerMoves && noq == NORMAL) {
+        InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+      }
       return beta;
     }
     if (value > alpha) {
@@ -293,11 +332,19 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
 
   myBallMovesSize[noq][depth-1] = 0;
 
+  // check if we can use a killer move
+  if (myUseKillerMoves && noq == NORMAL) {
+    for (int i = 0; i < myKillerMovesSize[depth-1]; ++i) {
+      mySimGameManager->AddMoveIfLegal(myMinPlayer, myKillerMoves[depth-1][i], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    }
+ }
+  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
+
   if (noq == NORMAL) {
     mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesTwoBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     mySimGameManager->AddPossibleMovesOneBall(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
-    mySimGameManager->OrderMoves(0, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    mySimGameManager->OrderMoves(startOrderAtIdx, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
   }
   else {
     mySimGameManager->AddCapturingMoves(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -315,6 +362,9 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
     value = Max(noq, depth-1, alpha, beta);
     mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
     if (value <= alpha) {
+      if (myUseKillerMoves && noq == NORMAL) {
+        InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+      }
       return alpha;
     }
     if (value < beta) {
@@ -329,7 +379,6 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   ++myNodeCounter;
   BallMove* bestMove(0);
   int value = 0;
-  int startOrderAtIdx = 0;
 
   if (noq == QS && mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -358,12 +407,24 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
+  myBallMovesSize[noq][depth-1] = 0;
+
+  // check if we can use a killer move
+  if (myUseKillerMoves && noq == NORMAL) {
+    for (int i = 0; i < myKillerMovesSize[depth-1]; ++i) {
+      mySimGameManager->AddMoveIfLegal(myMaxPlayer, myKillerMoves[depth-1][i], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    }
+  }
+  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
+
   // check if we can use a transposition
   HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
   if (entry) {
-    *(myBallMoves[noq][depth-1][0]) = entry->GetMove();
-    myBallMovesSize[noq][depth-1] = 1;
-    startOrderAtIdx = 1;
+    if (entry->HasMove()) {
+      *(myBallMoves[noq][depth-1][startOrderAtIdx]) = entry->GetMove();
+      ++myBallMovesSize[noq][depth-1];
+      ++startOrderAtIdx;
+    }
 
     if (entry->GetDepth() >= depth) {
       // consider the move in the hash map first
@@ -384,8 +445,6 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
-
-  myBallMovesSize[noq][depth-1] = 0;
 
   if (noq == NORMAL) {
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -412,7 +471,12 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
 
     if (value >= beta) {
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND, myBallMoves[noq][depth-1][i]);
+      if (noq == NORMAL) {
+        myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::LOWER_BOUND, myBallMoves[noq][depth-1][i]);
+        if (myUseKillerMoves) {
+          InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+        }
+      }
       return beta;
     }
     if (value > alpha) {
@@ -432,7 +496,6 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   ++myNodeCounter;
   BallMove* bestMove(0);
   int value = 0;
-  int startOrderAtIdx = 0;
 
   if (noq == QS && mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -460,13 +523,24 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
 
+  myBallMovesSize[noq][depth-1] = 0;
+
+  // check if we can use a killer move
+  if (myUseKillerMoves && noq == NORMAL) {
+    for (int i = 0; i < myKillerMovesSize[depth-1]; ++i) {
+      mySimGameManager->AddMoveIfLegal(myMinPlayer, myKillerMoves[depth-1][i], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+    }
+  }
+  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
+
   // check if we can use a transposition
   HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
   if (entry) {
-    // consider the move in the hash map first
-    *(myBallMoves[noq][depth-1][0]) = entry->GetMove();
-    myBallMovesSize[noq][depth-1] = 1;
-    startOrderAtIdx = 1;
+    if (entry->HasMove()) {
+      *(myBallMoves[noq][depth-1][startOrderAtIdx]) = entry->GetMove();
+      ++myBallMovesSize[noq][depth-1];
+      ++startOrderAtIdx;
+    }
 
     if (entry->GetDepth() >= depth) {
       HashMapEntry::ValueType type = entry->GetValueType();
@@ -486,8 +560,6 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
-
-  myBallMovesSize[noq][depth-1] = 0;
 
   if (noq == NORMAL) {
     mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -514,7 +586,12 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     mySimGameManager->UndoMove(myBallMoves[noq][depth-1][i]);
 
     if (value <= alpha) {
-      myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND, myBallMoves[noq][depth-1][i]);
+      if (noq == NORMAL) {
+        myHashMap.Insert(myCurrentHashKey, (byte)depth, value, HashMapEntry::UPPER_BOUND, myBallMoves[noq][depth-1][i]);
+        if (myUseKillerMoves) {
+          InsertKillerMove(depth, myBallMoves[noq][depth-1][i]);
+        }
+      }
       return alpha;
     }
     if (value < beta) {
@@ -531,4 +608,12 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
 
 void ComputerPlayerAlphaBeta::CheckTime()
 {
+}
+
+void ComputerPlayerAlphaBeta::UnInitKillerMoves()
+{
+  for (int i = 0; i < myTreeDepth[NORMAL]; ++i) {
+    myKillerMovesSize[i] = 0;
+    myKillerMovesNextInsertIdx[i] = 0;
+  }
 }

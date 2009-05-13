@@ -194,6 +194,8 @@ void CAbaloneApp::PlayBatchGame()
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer1());
         hlp = myCmdLineParams["TT1"];
         abPlayer->SetUseTranspositionTable(hlp == "True");
+        hlp = myCmdLineParams["KM1"];
+        abPlayer->SetUseKillerMoves(hlp == "True");
         hlp = myCmdLineParams["QS1"];
         abPlayer->SetUseQuiescenceSearch(hlp == "True");
         hlp = myCmdLineParams["TreeDepth1"];
@@ -205,9 +207,10 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer1.Format("%s Transposition Table: %d, QuiescenceSearch: %d, TreeDepth: %d, Value Function: %d",
+        headerPlayer1.Format("%s Transposition Table: %d, Killer Moves: %d, QuiescenceSearch: %d, TreeDepth: %d, Value Function: %d",
                               namePlayer1,
                               abPlayer->GetUseTranspositionTable(),
+                              abPlayer->GetUseKillerMoves(),
                               abPlayer->GetUseQuiescenceSearch(),
                               abPlayer->GetTreeDepth(),
                               abPlayer->GetUsedEvaluation());
@@ -216,6 +219,8 @@ void CAbaloneApp::PlayBatchGame()
         ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
         hlp = myCmdLineParams["TT1"];
         abPlayer->SetUseTranspositionTable(hlp == "True");
+        hlp = myCmdLineParams["KM1"];
+        abPlayer->SetUseKillerMoves(hlp == "True");
         hlp = myCmdLineParams["QS1"];
         abPlayer->SetUseQuiescenceSearch(hlp == "True");
         hlp = myCmdLineParams["SecondsForGame1"];
@@ -227,9 +232,10 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer1.Format("%s Transposition Table: %d, QuiescenceSearch: %d, Seconds for Game: %d, Value Function: %d",
+        headerPlayer1.Format("%s Transposition Table: %d, Killer Moves: %d, QuiescenceSearch: %d, Seconds for Game: %d, Value Function: %d",
           namePlayer1,
           abPlayer->GetUseTranspositionTable(),
+          abPlayer->GetUseKillerMoves(),
           abPlayer->GetUseQuiescenceSearch(),
           abPlayer->GetSecondsForGame(),
           abPlayer->GetUsedEvaluation());
@@ -260,6 +266,8 @@ void CAbaloneApp::PlayBatchGame()
         ComputerPlayerAlphaBeta* abPlayer = static_cast<ComputerPlayerAlphaBeta*>(gameManager.GetPlayer2());
         hlp = myCmdLineParams["TT2"];
         abPlayer->SetUseTranspositionTable(hlp == "True");
+        hlp = myCmdLineParams["KM2"];
+        abPlayer->SetUseKillerMoves(hlp == "True");
         hlp = myCmdLineParams["QS2"];
         abPlayer->SetUseQuiescenceSearch(hlp == "True");
         hlp = myCmdLineParams["TreeDepth2"];
@@ -271,9 +279,10 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer2.Format("%s Transposition Table: %d, QuiescenceSearch: %d, TreeDepth: %d, Value Function: %d",
+        headerPlayer2.Format("%s Transposition Table: %d, Killer Moves: %d, QuiescenceSearch: %d, TreeDepth: %d, Value Function: %d",
           namePlayer2,
           abPlayer->GetUseTranspositionTable(),
+          abPlayer->GetUseKillerMoves(),
           abPlayer->GetUseQuiescenceSearch(),
           abPlayer->GetTreeDepth(),
           abPlayer->GetUsedEvaluation());
@@ -282,6 +291,8 @@ void CAbaloneApp::PlayBatchGame()
         ComputerPlayerAlphaBetaIterativeDeepening* abPlayer = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
         hlp = myCmdLineParams["TT2"];
         abPlayer->SetUseTranspositionTable(hlp == "True");
+        hlp = myCmdLineParams["KM2"];
+        abPlayer->SetUseKillerMoves(hlp == "True");
         hlp = myCmdLineParams["QS2"];
         abPlayer->SetUseQuiescenceSearch(hlp == "True");
         hlp = myCmdLineParams["SecondsForGame2"];
@@ -293,9 +304,10 @@ void CAbaloneApp::PlayBatchGame()
           abPlayer->SetUsedEvaluation(_ttoi(hlp));
         }
 
-        headerPlayer2.Format("%s Transposition Table: %d, QuiescenceSearch: %d, Seconds for Game: %d, Value Function: %d",
+        headerPlayer2.Format("%s Transposition Table: %d, Killer Moves: %d, QuiescenceSearch: %d, Seconds for Game: %d, Value Function: %d",
           namePlayer2,
           abPlayer->GetUseTranspositionTable(),
+          abPlayer->GetUseKillerMoves(),
           abPlayer->GetUseQuiescenceSearch(),
           abPlayer->GetSecondsForGame(),
           abPlayer->GetUsedEvaluation());

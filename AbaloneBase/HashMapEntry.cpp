@@ -8,6 +8,7 @@ HashMapEntry::HashMapEntry()
 , myValue(0)
 , myValueType(UNKOWN)
 , myLock(0)
+, myHasMove(false)
 {
 }
 
@@ -17,6 +18,7 @@ HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG
 , myValue(value)
 , myValueType(valueType)
 , myLock(lock)
+, myHasMove(false)
 {
 }
 
@@ -26,8 +28,14 @@ HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG
 , myValue(value)
 , myValueType(valueType)
 , myLock(lock)
-, myMove(*move)
 {
+  if (move) {
+    myMove = *move;
+    myHasMove = true;
+  }
+  else {
+    myHasMove = false;
+  }
 }
 
 HashMapEntry::~HashMapEntry()

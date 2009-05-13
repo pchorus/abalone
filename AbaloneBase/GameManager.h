@@ -41,6 +41,8 @@ public:
 
   void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
   BOOL IsPossibleDirection(Direction direction) const;
+  void AddMoveIfLegal(const Player* player, const BallMove* move, BallMove** ballMoves, int& ballMovesSize) const;
+
   void MoveBallsInDirection(Direction direction);
   void DoMove(BallMove* move);
   void UndoMove(BallMove* move);
