@@ -319,24 +319,32 @@ void CAbaloneApp::PlayBatchGame()
         maxNoOfTurns = _ttoi(myCmdLineParams["NoOfTurns"]);
       }
       gameManager.SetMaxNumberOfTurns(maxNoOfTurns);
+
+      DWORD start = GetTickCount();
       gameManager.TurnIsOver();
+      DWORD end = GetTickCount();
 
       header.Format("=========================\n"
                     "===== Game is over!\n"
                     "=========================\n"
                     "===== MaxTurns: %d, Number of played ply: %d\n"
                     "===== Formation: %s\n"
+                    "===== Seconds: %d\n"
                     "===== %s\n"
                     "===== %s\n"
                     "=========================\n"
                     , gameManager.GetMaxNumberOfTurns()
                     , gameManager.GetPlyCount()
                     , myCmdLineParams["Formation"]
+                    , (end-start)/1000
                     , headerPlayer1
                     , headerPlayer2);
 
-      ComputerPlayerAlphaBetaIterativeDeepening* abPlayer1 = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
-      ComputerPlayerAlphaBetaIterativeDeepening* abPlayer2 = static_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
+      ComputerPlayerAlphaBetaIterativeDeepening* abPlayer1 = dynamic_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer1());
+      ComputerPlayerAlphaBetaIterativeDeepening* abPlayer2 = dynamic_cast<ComputerPlayerAlphaBetaIterativeDeepening*>(gameManager.GetPlayer2());
+
+      ComputerPlayerMonteCarlo* mcPlayer1 = dynamic_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer1());
+      ComputerPlayerMonteCarlo* mcPlayer2 = dynamic_cast<ComputerPlayerMonteCarlo*>(gameManager.GetPlayer2());
 
       if (abPlayer1 && abPlayer2) {
         msg.Format("%s  Lost Balls %s:\t%d\tRemaining Time:\t%d\n  Lost Balls %s:\t%d\tRemaining Time:\t%d\n",
@@ -344,6 +352,12 @@ void CAbaloneApp::PlayBatchGame()
           namePlayer1, gameManager.GetLostBallsPlayer1(), abPlayer1->GetLeftSecondsForGame(),
           namePlayer2, gameManager.GetLostBallsPlayer2(), abPlayer2->GetLeftSecondsForGame());
 
+      }
+      else if (mcPlayer1 && mcPlayer2) {
+        msg.Format("%s  Lost Balls %s:\t%d\tRemaining Time:\t%d\n  Lost Balls %s:\t%d\tRemaining Time:\t%d\n",
+          header,
+          namePlayer1, gameManager.GetLostBallsPlayer1(), mcPlayer1->GetLeftSecondsForGame(),
+          namePlayer2, gameManager.GetLostBallsPlayer2(), mcPlayer2->GetLeftSecondsForGame());
       }
       else {
         msg.Format("%s  Lost Balls %s:\t%d\n  Lost Balls %s:\t%d\n",

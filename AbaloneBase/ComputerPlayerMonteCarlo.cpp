@@ -59,6 +59,7 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   DWORD end = 0;
 
   start = GetTickCount();
+  myStart = GetTickCount();
 
   myKeepSimulating = true;
 
@@ -105,9 +106,16 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   end = GetTickCount();
   time = end - start;
 
+  if ((end - myStart) < myLeftMilliSecondsForGame) {
+    myLeftMilliSecondsForGame = myLeftMilliSecondsForGame - (GetTickCount() - myStart);
+  }
+  else {
+    myLeftMilliSecondsForGame = 0;
+  }
+
   CString msg;
   msg.Format("MC\nMove: %s\nTime: %d\nRatingBestMove: %d\n\n", retMove.ToString(), GetTickCount()-start, bestRating);
-  Output::Message(msg, false, true);
+  //Output::Message(msg, false, true);
 
   return retMove;
 }
