@@ -318,7 +318,7 @@ void GameManager::IsPossibleDirection(Direction direction, BoardField* ball1, Bo
   }
 }
 
-void GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, BallMove** ballMoves, int& ballMovesSize) const
+bool GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, BallMove** ballMoves, int& ballMovesSize) const
 {
   Direction direction = move->GetDirection();
 
@@ -364,6 +364,7 @@ void GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, Bal
         if (opponentField1->GetBall() == BoardField::NO_BALL) {
           ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
           ++ballMovesSize;
+          return true;
         }
         else if (opponentField1->GetBall() == opponentBall) {
           if (ball2 && (!opponentField2 || opponentField2->GetBall() == BoardField::NO_BALL))
@@ -371,6 +372,7 @@ void GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, Bal
           {
             ballMoves[ballMovesSize]->Init(direction, true, !opponentField2, ball1, ball2, ball3, 1);
             ++ballMovesSize;
+            return true;
           }
 
           else if (ball3 && opponentField2 && opponentField2->GetBall() == opponentBall
@@ -379,6 +381,7 @@ void GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, Bal
           {
             ballMoves[ballMovesSize]->Init(direction, true, !opponentField3, ball1, ball2, ball3, 2);
             ++ballMovesSize;
+            return true;
           }
         }
       }
@@ -399,21 +402,25 @@ void GameManager::AddMoveIfLegal(const Player* player, const BallMove* move, Bal
               {
                 ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
                 ++ballMovesSize;
+                return true;
               }
             }
             else {
               ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
               ++ballMovesSize;
+              return true;
             }
           }
         }
         else {
           ballMoves[ballMovesSize]->Init(direction, false, false, ball1, ball2, ball3, 0);
           ++ballMovesSize;
+          return true;
         }
       }
     }
   }
+  return false;
 }
 
 void GameManager::MoveBallsInDirection(Direction direction)

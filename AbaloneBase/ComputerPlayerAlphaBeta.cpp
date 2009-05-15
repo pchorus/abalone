@@ -419,18 +419,16 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
       mySimGameManager->AddMoveIfLegal(myMaxPlayer, myKillerMoves[depth-1][i], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     }
   }
-  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
 
   // check if we can use a transposition
   HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
   if (entry) {
+    bool useEntry = true;
     if (entry->HasMove()) {
-      *(myBallMoves[noq][depth-1][startOrderAtIdx]) = entry->GetMove();
-      ++myBallMovesSize[noq][depth-1];
-      ++startOrderAtIdx;
+      useEntry = mySimGameManager->AddMoveIfLegal(myMaxPlayer, entry->GetMove(), myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     }
 
-    if (entry->GetDepth() >= depth) {
+    if (entry->GetDepth() >= depth && useEntry) {
       // consider the move in the hash map first
       HashMapEntry::ValueType type = entry->GetValueType();
       int val = entry->GetValue();
@@ -449,6 +447,8 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
+
+  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
 
   if (noq == NORMAL) {
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
@@ -537,18 +537,16 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
       mySimGameManager->AddMoveIfLegal(myMinPlayer, myKillerMoves[depth-1][i], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     }
   }
-  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
 
   // check if we can use a transposition
   HashMapEntry* entry = myHashMap.Check(myCurrentHashKey);
   if (entry) {
+    bool useEntry = true;
     if (entry->HasMove()) {
-      *(myBallMoves[noq][depth-1][startOrderAtIdx]) = entry->GetMove();
-      ++myBallMovesSize[noq][depth-1];
-      ++startOrderAtIdx;
+      useEntry = mySimGameManager->AddMoveIfLegal(myMinPlayer, entry->GetMove(), myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
     }
 
-    if (entry->GetDepth() >= depth) {
+    if (entry->GetDepth() >= depth && useEntry) {
       HashMapEntry::ValueType type = entry->GetValueType();
       int val = entry->GetValue();
 
@@ -566,6 +564,8 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   if (myNodeCounter % AB_TIME_CHECK_INTERVAL_NODES == 0) {
     CheckTime();
   }
+
+  int startOrderAtIdx = myBallMovesSize[noq][depth-1];
 
   if (noq == NORMAL) {
     mySimGameManager->AddPossibleMovesThreeBalls(myMinPlayer, myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);

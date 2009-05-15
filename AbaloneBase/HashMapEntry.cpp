@@ -8,6 +8,7 @@ HashMapEntry::HashMapEntry()
 , myValue(0)
 , myValueType(UNKOWN)
 , myLock(0)
+, myMove(new BallMove)
 , myHasMove(false)
 {
 }
@@ -18,6 +19,7 @@ HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG
 , myValue(value)
 , myValueType(valueType)
 , myLock(lock)
+, myMove(new BallMove)
 , myHasMove(false)
 {
 }
@@ -27,10 +29,11 @@ HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG
 , myTreeDepth(treeDepth)
 , myValue(value)
 , myValueType(valueType)
+, myMove(new BallMove)
 , myLock(lock)
 {
   if (move) {
-    myMove = *move;
+    *myMove = *move;
     myHasMove = true;
   }
   else {
@@ -40,4 +43,5 @@ HashMapEntry::HashMapEntry(byte treeDepth, int value, ValueType valueType, ULONG
 
 HashMapEntry::~HashMapEntry()
 {
+  delete myMove;
 }
