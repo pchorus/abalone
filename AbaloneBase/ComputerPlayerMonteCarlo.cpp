@@ -159,9 +159,11 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove)
     ret += rating;
 
     ++simGames;
-    if (simGames % MC_TIME_CHECK_INTERVAL_SIM_GAMES == 0) {
-      CheckTime();
-    }
+    CheckTime();
+
+//    if (simGames % MC_TIME_CHECK_INTERVAL_SIM_GAMES == 0) {
+//      CheckTime();
+//    }
   }
 
   return ret/simGames;
