@@ -23,6 +23,8 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myHashMap()
 , myStartQSCounter(0)
 , myLeafNodesQuiescent(0)
+, myPVMoves(0)
+, myKillerMoves(0)
 {
   myBallMovesSize[NORMAL] = 0;
   myBallMovesSize[QS] = 0;
@@ -80,6 +82,8 @@ void ComputerPlayerAlphaBeta::SetTreeDepth(int treeDepth)
   myKillerMovesNextInsertIdx = new int[myTreeDepth[NORMAL]];
   myKillerMoves = new BallMove**[myTreeDepth[NORMAL]];
 
+  myPVMoves = new BallMove**[myTreeDepth[NORMAL]];
+
   for (int i = 0; i < myTreeDepth[NORMAL]; ++i) {
     myBallMoves[NORMAL][i] = new BallMove* [BALL_MOVES_ARRAY_SIZE];
     for (int j = 0; j < BALL_MOVES_ARRAY_SIZE; ++j) {
@@ -93,6 +97,11 @@ void ComputerPlayerAlphaBeta::SetTreeDepth(int treeDepth)
     }
     myKillerMovesSize[i] = 0;
     myKillerMovesNextInsertIdx[i] = 0;
+
+    myPVMoves[i] = new BallMove* [i+1];
+    for (int j = 0; j <= i; ++j) {
+      myPVMoves[i][j] = new BallMove;
+    }
   }
 }
 
@@ -121,6 +130,16 @@ void ComputerPlayerAlphaBeta::DeleteBallMoves()
       delete[] myKillerMoves[i];
     }
     delete[] myKillerMoves;
+  }
+
+  if (myPVMoves) {
+    for (int i = 0; i < myTreeDepth[NORMAL]; ++i) {
+      for (int j = 0; j <= i; ++j) {
+        delete myPVMoves[i][j];
+      }
+      delete[] myPVMoves[i];
+    }
+    delete[] myPVMoves;
   }
 }
 
@@ -189,6 +208,9 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
     if (value > alpha) {
       retMove = *myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][i];
       alpha = value;
+      // save current part of principal variation
+      CopyCurrentPV(myTreeDepth[NORMAL]);
+      *(myPVMoves[myTreeDepth[NORMAL]-1][myTreeDepth[NORMAL]-1]) = retMove;
     }
   }
 
@@ -209,6 +231,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   CString msg;
   msg.Format("AB\nMove: %s\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\nQS starts: %d\nQuiescent Leaves: %d\n\n", retMove.ToString(), GetTickCount()-start, myNodeCounter, value, myHashMap.myInserts, myHashMap.myReUseEntries, myStartQSCounter, myLeafNodesQuiescent);
   Output::Message(msg, false, true);
+  Output::Message(GetPrincipalVariation(), false, true);
 
   return retMove;
 }
@@ -290,6 +313,9 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
       }
       if (value > alpha) {
         alpha = value;
+        // save current part of principal variation
+        CopyCurrentPV(depth);
+        *(myPVMoves[depth-1][depth-1]) = *(myBallMoves[noq][depth-1][i]);
       }
     }
   }
@@ -372,6 +398,9 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
       }
       if (value < beta) {
         beta = value;
+        // save current part of principal variation
+        CopyCurrentPV(depth);
+        *(myPVMoves[depth-1][depth-1]) = *(myBallMoves[noq][depth-1][i]);
       }
     }
   }
@@ -429,7 +458,6 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     }
 
     if (entry->GetDepth() >= depth && useEntry) {
-      // consider the move in the hash map first
       HashMapEntry::ValueType type = entry->GetValueType();
       int val = entry->GetValue();
 
@@ -487,6 +515,9 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
       if (value > alpha) {
         bestMove = myBallMoves[noq][depth-1][i];
         alpha = value;
+        // save current part of principal variation
+        CopyCurrentPV(depth);
+        *(myPVMoves[depth-1][depth-1]) = *bestMove;
       }
     }
   }
@@ -604,6 +635,9 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
       if (value < beta) {
         bestMove = myBallMoves[noq][depth-1][i];
         beta = value;
+        // save current part of principal variation
+        CopyCurrentPV(depth);
+        *(myPVMoves[depth-1][depth-1]) = *bestMove;
       }
     }
   }
@@ -624,4 +658,16 @@ void ComputerPlayerAlphaBeta::UnInitKillerMoves()
     myKillerMovesSize[i] = 0;
     myKillerMovesNextInsertIdx[i] = 0;
   }
+}
+
+CString ComputerPlayerAlphaBeta::GetPrincipalVariation() const
+{
+  CString msg;
+  CString str;
+  for (int i = myTreeDepth[NORMAL]-1; i >= 0; --i) {
+    str += myPVMoves[myTreeDepth[NORMAL]-1][i]->ToString();
+    str += "\n";
+  }
+  msg.Format("PV:\n%s\n", str);
+  return msg;
 }

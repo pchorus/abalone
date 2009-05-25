@@ -98,6 +98,9 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
           currentBestValue = value;
           alpha = value;
           foundMove = true;
+          // save current part of principal variation
+          CopyCurrentPV(myTreeDepth[NORMAL]);
+          *(myPVMoves[myTreeDepth[NORMAL]-1][myTreeDepth[NORMAL]-1]) = currentBestMove;
         }
       }
     }

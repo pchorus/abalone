@@ -49,6 +49,9 @@ protected:
 
   void InsertKillerMove(int depth, const BallMove* move);
   void UnInitKillerMoves();
+
+  void CopyCurrentPV(int depth);
+  CString GetPrincipalVariation() const;
   GameManager* mySimGameManager;
 
   ComputerPlayer* myMaxPlayer;
@@ -57,6 +60,7 @@ protected:
   // contains normal ballMoves and ballMoves for Quiescence search
   BallMove*** myBallMoves[2];
   int* myBallMovesSize[2];
+  BallMove*** myPVMoves;
   unsigned int myNodeCounter;
   bool myKeepInvestigating;
   bool myUseTranspositionTable;
@@ -70,9 +74,9 @@ protected:
 private:
   void DeleteBallMoves();
   void DeleteBallMovesQS();
+
   ComputerPlayer* myMinPlayer;
   int myUsedEvaluation;
-
   BallMove*** myKillerMoves;
   int* myKillerMovesSize;
   int* myKillerMovesNextInsertIdx;
@@ -134,4 +138,14 @@ inline void ComputerPlayerAlphaBeta::InsertKillerMove(int depth, const BallMove*
   myKillerMovesNextInsertIdx[depth-1] = ++myKillerMovesNextInsertIdx[depth-1] % KILLER_MOVES_ARRAY_SIZE;
   if (myKillerMovesSize[depth-1] < KILLER_MOVES_ARRAY_SIZE)
     ++myKillerMovesSize[depth-1];
+}
+
+inline void ComputerPlayerAlphaBeta::CopyCurrentPV(int depth)
+{
+  if (depth > 1) {
+    // copy principal variation of the subtree to the current tree
+    for (int i = 0; i <= depth-2; ++i) {
+      *(myPVMoves[depth-1][i]) = *(myPVMoves[depth-2][i]);
+    }
+  }
 }
