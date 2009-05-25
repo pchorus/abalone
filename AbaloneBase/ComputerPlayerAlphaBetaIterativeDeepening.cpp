@@ -25,7 +25,6 @@ ComputerPlayerAlphaBetaIterativeDeepening::~ComputerPlayerAlphaBetaIterativeDeep
 
 BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
 {
-  DWORD start = GetTickCount();
   // TODO: currently we only have an alarm timer, another timer which takes the
   // ratio between the times for the different tree depth is of interest.
   BallMove currentBestMove;
@@ -43,8 +42,13 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   int currentBestValue = 0;
   int retBestValue = 0;
   int startOrderAtIdx = 0;
+  myNodeCounter = 1;
+  myStartQSCounter = 0;
+  myLeafNodesQuiescent = 0;
 
   myTreeDepth[NORMAL] = 1;
+  myHashMap.UnInit();
+  UnInitKillerMoves();
 
   // copy current real situation to the game board for simulation
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
@@ -52,17 +56,11 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
 
   while (myKeepInvestigating && myTreeDepth[NORMAL] <= MAX_TREE_DEPTH) {
-    myNodeCounter = 1;
     myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] = 0;
 
     alpha = INT_MIN;
     beta = INT_MAX;
-    myStartQSCounter = 0;
-    myLeafNodesQuiescent = 0;
     startOrderAtIdx = 0;
-
-    myHashMap.UnInit();
-    UnInitKillerMoves();
 
     myCurrentHashKey = myHashMap.CalcHashKey(mySimGameManager->GetGameBoard());
 
@@ -134,8 +132,8 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     myLeftMilliSecondsForGame = 0;
   }
   
-  CString msg;
-  msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), --myTreeDepth[NORMAL], GetTickCount()-start, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
+//   CString msg;
+//   msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), myTreeDepth[NORMAL]-1, GetTickCount()-myStart, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
 //  Output::Message(msg, false, true);
 
   return retMove;
