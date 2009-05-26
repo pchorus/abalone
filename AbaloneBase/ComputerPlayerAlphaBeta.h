@@ -66,6 +66,7 @@ protected:
   bool myUseTranspositionTable;
   bool myUseQuiescenceSearch;
   bool myUseKillerMoves;
+  bool myUsePrincipalVariation;
   ZobristHashMap myHashMap;
   ULONG64 myCurrentHashKey;
   int myStartQSCounter;

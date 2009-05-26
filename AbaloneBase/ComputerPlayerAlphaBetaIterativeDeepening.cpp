@@ -69,6 +69,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
       *(myBallMoves[NORMAL][myTreeDepth[NORMAL]-1][0]) = retMove;
       myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1] = 1;
       startOrderAtIdx = 1;
+      myUsePrincipalVariation = true;
     }
 
     mySimGameManager->AddPossibleMovesThreeBalls(myMaxPlayer, myBallMoves[NORMAL][myTreeDepth[NORMAL]-1], myBallMovesSize[NORMAL][myTreeDepth[NORMAL]-1]);

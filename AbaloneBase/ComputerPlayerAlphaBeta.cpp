@@ -20,6 +20,7 @@ ComputerPlayerAlphaBeta::ComputerPlayerAlphaBeta(GameManager* gameManager, const
 , myUseTranspositionTable(false)
 , myUseQuiescenceSearch(false)
 , myUseKillerMoves(false)
+, myUsePrincipalVariation(false)
 , myHashMap()
 , myStartQSCounter(0)
 , myLeafNodesQuiescent(0)
@@ -246,6 +247,7 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    myUsePrincipalVariation = false;
     if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
       ++myStartQSCounter;
       value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -274,6 +276,11 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
   }
 
   myBallMovesSize[noq][depth-1] = 0;
+
+  // check if we can use the principal variation
+  if (myUsePrincipalVariation && noq == NORMAL && depth > 1) {
+    mySimGameManager->AddMoveIfLegal(myMaxPlayer, myPVMoves[myTreeDepth[NORMAL]-2][depth-2], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   // check if we can use a killer move
   if (myUseKillerMoves && noq == NORMAL) {
@@ -332,6 +339,7 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    myUsePrincipalVariation = false;
     if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
       ++myStartQSCounter;
       value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -359,6 +367,11 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
   }
 
   myBallMovesSize[noq][depth-1] = 0;
+
+  // check if we can use the principal variation
+  if (myUsePrincipalVariation && noq == NORMAL && depth > 1) {
+    mySimGameManager->AddMoveIfLegal(myMinPlayer, myPVMoves[myTreeDepth[NORMAL]-2][depth-2], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   // check if we can use a killer move
   if (myUseKillerMoves && noq == NORMAL) {
@@ -417,6 +430,7 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    myUsePrincipalVariation = false;
     if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMaxPlayer)) {
       ++myStartQSCounter;
       value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -441,6 +455,11 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
   }
 
   myBallMovesSize[noq][depth-1] = 0;
+
+  // check if we can use the principal variation
+  if (myUsePrincipalVariation && noq == NORMAL  && depth > 1) {
+    mySimGameManager->AddMoveIfLegal(myMaxPlayer, myPVMoves[myTreeDepth[NORMAL]-2][depth-2], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   // check if we can use a killer move
   if (myUseKillerMoves && noq == NORMAL) {
@@ -538,6 +557,7 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
     return mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
   }
   else if (depth == 0 || mySimGameManager->IsTerminalPosition()) {
+    myUsePrincipalVariation = false;
     if (myUseQuiescenceSearch && noq == NORMAL && !mySimGameManager->IsQuiescencePosition(myMinPlayer)) {
       ++myStartQSCounter;
       value = mySimGameManager->EvaluateBoard(myMaxPlayer, myUsedEvaluation);
@@ -561,6 +581,11 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
   }
 
   myBallMovesSize[noq][depth-1] = 0;
+
+  // check if we can use the principal variation
+  if (myUsePrincipalVariation && noq == NORMAL && depth > 1) {
+    mySimGameManager->AddMoveIfLegal(myMinPlayer, myPVMoves[myTreeDepth[NORMAL]-2][depth-2], myBallMoves[noq][depth-1], myBallMovesSize[noq][depth-1]);
+  }
 
   // check if we can use a killer move
   if (myUseKillerMoves && noq == NORMAL) {
