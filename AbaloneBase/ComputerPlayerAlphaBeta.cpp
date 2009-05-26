@@ -321,8 +321,10 @@ int ComputerPlayerAlphaBeta::Max(NormalOrQuiescence noq, int depth, int alpha, i
       if (value > alpha) {
         alpha = value;
         // save current part of principal variation
-        CopyCurrentPV(depth);
-        *(myPVMoves[depth-1][depth-1]) = *(myBallMoves[noq][depth-1][i]);
+        if (noq == NORMAL) {
+          CopyCurrentPV(depth);
+          *(myPVMoves[depth-1][depth-1]) = *(myBallMoves[noq][depth-1][i]);
+        }
       }
     }
   }
@@ -412,8 +414,10 @@ int ComputerPlayerAlphaBeta::Min(NormalOrQuiescence noq, int depth, int alpha, i
       if (value < beta) {
         beta = value;
         // save current part of principal variation
-        CopyCurrentPV(depth);
-        *(myPVMoves[depth-1][depth-1]) = *(myBallMoves[noq][depth-1][i]);
+        if (noq == NORMAL) {
+          CopyCurrentPV(depth);
+          *(myPVMoves[depth-1][depth-1]) = *(myBallMoves[noq][depth-1][i]);
+        }
       }
     }
   }
@@ -535,8 +539,10 @@ int ComputerPlayerAlphaBeta::MaxTT(NormalOrQuiescence noq, int depth, int alpha,
         bestMove = myBallMoves[noq][depth-1][i];
         alpha = value;
         // save current part of principal variation
-        CopyCurrentPV(depth);
-        *(myPVMoves[depth-1][depth-1]) = *bestMove;
+        if (noq == NORMAL) {
+          CopyCurrentPV(depth);
+          *(myPVMoves[depth-1][depth-1]) = *bestMove;
+        }
       }
     }
   }
@@ -661,8 +667,10 @@ int ComputerPlayerAlphaBeta::MinTT(NormalOrQuiescence noq, int depth, int alpha,
         bestMove = myBallMoves[noq][depth-1][i];
         beta = value;
         // save current part of principal variation
-        CopyCurrentPV(depth);
-        *(myPVMoves[depth-1][depth-1]) = *bestMove;
+        if (noq == NORMAL) {
+          CopyCurrentPV(depth);
+          *(myPVMoves[depth-1][depth-1]) = *bestMove;
+        }
       }
     }
   }
