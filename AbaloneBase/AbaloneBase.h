@@ -64,6 +64,6 @@ static const CString START_FORMATION_STR_BELGIAN_DAISY = "Belgian Daisy";
 
 static const int BALL_MOVES_ARRAY_SIZE = 160;
 static const int BALL_MOVES_ARRAY_SIZE_QS = 20;
-static const int KILLER_MOVES_ARRAY_SIZE = 1;
+static const int KILLER_MOVES_ARRAY_SIZE = 2;
 
 static const int AVG_PLY_PER_GAME_PER_PLAYER = 44;
