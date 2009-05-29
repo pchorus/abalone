@@ -31,6 +31,8 @@ GameManager::GameManager()
 , myPlyCount(0)
 , myBallMovesSize(0)
 , myCheckAttackingOnlyAtBorder(false)
+, myRandomNoGenerator(GetTickCount())
+
 {
   for (int i = 0; i < BALL_MOVES_ARRAY_SIZE; ++i) {
     myBallMoves[i] = new BallMove;
@@ -1653,7 +1655,7 @@ inline BoardField* GameManager::GetNextFieldInDirection(CPoint fieldCoord, Direc
   return 0;
 }
 
-int GameManager::EvaluateBoard(Player* player, int evaluation) const
+int GameManager::EvaluateBoard(Player* player, int evaluation)
 {
   int ret = 0;
   if (evaluation == 1) {
@@ -2111,7 +2113,7 @@ int GameManager::EvaluateBoard(Player* player, int evaluation) const
   }
 
   // random factor
-//  ret += ((rand() % 5) - 2);
+//  ret += ((GetNextRandomNo() % 5) - 2);
 
   return ret;
 }

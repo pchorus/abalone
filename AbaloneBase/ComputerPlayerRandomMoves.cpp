@@ -31,7 +31,6 @@ BallMove ComputerPlayerRandomMoves::CalculateNextMove()
 
   time_t sec;
   time(&sec);
-  srand( (unsigned) sec);
-  int idx = (rand() % myBallMovesSize);
+  int idx = (GetGameManager()->GetNextRandomNo() % myBallMovesSize);
   return *myBallMoves[idx];
 }

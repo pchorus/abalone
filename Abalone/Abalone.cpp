@@ -69,9 +69,6 @@ BOOL CAbaloneApp::InitInstance()
 	// z.B. zum Namen Ihrer Firma oder Organisation.
 	SetRegistryKey(_T("Vom lokalen Anwendungs-Assistenten generierte Anwendungen"));
 
-  time_t sec;
-  time(&sec);
-  srand( (unsigned) sec);
   CHAR* buffer = new CHAR[256];
   GetCurrentDirectory((DWORD)256, buffer);
   Output::Init(buffer);

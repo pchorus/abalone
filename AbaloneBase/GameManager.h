@@ -9,6 +9,7 @@
 
 #include "Player.h"
 #include "BoardField.h"
+#include "mtrand.h"
 
 #define WM_COMPUTER_CALC_FINISHED     WM_USER + 23
 
@@ -80,7 +81,7 @@ public:
   BoardField* GetNextFieldInDirection(CPoint fieldCoord, Direction direction) const;
   static CPoint GetNextFieldCoordinatesInDirection(const CPoint& fieldCoord, Direction direction);
 
-  int EvaluateBoard(Player* player, int evaluation) const;
+  int EvaluateBoard(Player* player, int evaluation);
   // methods for evaluation of the current game board situation
   // calculates the ratio of lost balls
   double CalcLostBallsRatio(const Player* player) const;
@@ -111,6 +112,8 @@ public:
   // checks whether a non-quiescent position is reached or a more
   // intensive search is needed
   bool IsQuiescencePosition(Player* player);
+
+  unsigned long GetNextRandomNo();
 
 private:
   void CheckDirections(BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
@@ -154,6 +157,8 @@ private:
   // so we avoid too many constructor calls
   BallMove* myBallMoves[BALL_MOVES_ARRAY_SIZE];
   int myBallMovesSize;
+
+  MTRand_int32 myRandomNoGenerator;
 };
 
 inline GameBoard* GameManager::GetGameBoard() const
@@ -272,4 +277,9 @@ inline bool GameManager::IsAttacking(BoardField* field1, BoardField* field2, Boa
 inline bool GameManager::IsTerminalPosition() const
 {
   return myLostBallsPlayer1 == 6 || myLostBallsPlayer2 == 6;
+}
+
+inline unsigned long GameManager::GetNextRandomNo()
+{
+  return myRandomNoGenerator();
 }
