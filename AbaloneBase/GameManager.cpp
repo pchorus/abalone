@@ -2065,6 +2065,138 @@ int GameManager::EvaluateBoard(Player* player, int evaluation)
     // Defending Power ========================================================
     ret -= 40 * CalcAttackedByOpponent(player);
   }
+  else if (evaluation == 7) {
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
+
+    if (opponentLostBalls == 6) {
+      return 1000000;
+    }
+    else if (ownLostBalls == 6) {
+      return -1000000;
+    }
+    else {
+      ret += opponentLostBalls * 1000;
+      ret -= ownLostBalls * 3000;
+    }
+
+    // Center Distance ========================================================
+    // 20 is the best value to achieve with all 14 marbles
+    // 56 is the worst value: every marble is on the game board's border
+    int centerDistance = CalcCenterDistance(player);
+    if (centerDistance < 24) {
+      ret += 400;
+    }
+    else if (centerDistance < 30) {
+      ret += 300;
+    }
+    else if (centerDistance < 35) {
+      ret += 200;
+    }
+    else if (centerDistance < 40) {
+      ret += 100;
+    }
+
+    // Marbles Grouping =======================================================
+    int grouping = CalcGrouping(player);
+    // 58 : all marbles are in a huge single group
+    //  0 : no marble has any neighboring fellow marbles
+    // below 40 is already not very good
+    if (grouping > 55) {
+      ret += 320;
+    }
+    else if (grouping > 50) {
+      ret += 240;
+    }
+    else if (grouping > 45) {
+      ret += 160;
+    }
+    else if (grouping > 40) {
+      ret += 80;
+    }
+
+    // Attacking Power ========================================================
+    // TODO: Output of power
+    ret += 40 * CalcAttackingPowerOnOpponent(player);
+
+    // Defending Power ========================================================
+    ret -= 40 * CalcAttackedByOpponent(player);
+  }
+  else if (evaluation == 8) {
+    // Lost Marbles ===========================================================
+    int ownLostBalls = 0;
+    int opponentLostBalls = 0;
+    if (player == myPlayer1) {
+      ownLostBalls = GetLostBallsPlayer1();
+      opponentLostBalls = GetLostBallsPlayer2();
+    }
+    else {
+      ownLostBalls = GetLostBallsPlayer2();
+      opponentLostBalls = GetLostBallsPlayer1();
+    }
+
+    if (opponentLostBalls == 6) {
+      return 1000000;
+    }
+    else if (ownLostBalls == 6) {
+      return -1000000;
+    }
+    else {
+      ret += opponentLostBalls * 1000;
+      ret -= ownLostBalls * 1000;
+    }
+
+    // Center Distance ========================================================
+    // 20 is the best value to achieve with all 14 marbles
+    // 56 is the worst value: every marble is on the game board's border
+    int centerDistance = CalcCenterDistance(player);
+    if (centerDistance < 24) {
+      ret += 400;
+    }
+    else if (centerDistance < 30) {
+      ret += 300;
+    }
+    else if (centerDistance < 35) {
+      ret += 200;
+    }
+    else if (centerDistance < 40) {
+      ret += 100;
+    }
+
+    // Marbles Grouping =======================================================
+    int grouping = CalcGrouping(player);
+    // 58 : all marbles are in a huge single group
+    //  0 : no marble has any neighboring fellow marbles
+    // below 40 is already not very good
+    if (grouping > 55) {
+      ret += 1000;
+    }
+    else if (grouping > 50) {
+      ret += 800;
+    }
+    else if (grouping > 45) {
+      ret += 600;
+    }
+    else if (grouping > 40) {
+      ret += 400;
+    }
+
+    // Attacking Power ========================================================
+    // TODO: Output of power
+    ret += 40 * CalcAttackingPowerOnOpponent(player);
+
+    // Defending Power ========================================================
+    ret -= 40 * CalcAttackedByOpponent(player);
+  }
   else if (evaluation == 101) {
     // use only the final outcome which is win, draw or defeat
     // Lost Marbles ===========================================================
