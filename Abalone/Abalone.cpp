@@ -392,9 +392,6 @@ Player::PlayerType CAbaloneApp::GetPlayerType(const CString& playerType)
   else if (playerType == "RM") {
     ret = Player::PLAYER_TYPE_COMPUTER_RANDOM_MOVES;
   }
-  else if (playerType == "ENM") {
-    ret = Player::PLAYER_TYPE_COMPUTER_EVALUATE_NEXT_MOVE;
-  }
 
   ASSERT(ret != Player::PLAYER_TYPE_NONE);
   return ret;

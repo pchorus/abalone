@@ -198,10 +198,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ComputerPlayerEvaluateNextMove.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ComputerPlayerMonteCarlo.cpp"
 				>
 			</File>
@@ -269,10 +265,6 @@
 			</File>
 			<File
 				RelativePath=".\ComputerPlayerAlphaBetaIterativeDeepening.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ComputerPlayerEvaluateNextMove.h"
 				>
 			</File>
 			<File
