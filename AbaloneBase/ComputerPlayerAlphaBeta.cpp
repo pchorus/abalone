@@ -178,6 +178,7 @@ BallMove ComputerPlayerAlphaBeta::CalculateNextMove()
   UnInitKillerMoves();
 
   // copy current real situation to the game board for simulation
+  mySimGameManager->ResetPlyCount();
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());

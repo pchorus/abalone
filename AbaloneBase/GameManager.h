@@ -39,6 +39,7 @@ public:
   int GetMaxNumberOfTurns() const;
   void SetMaxNumberOfTurns(int maxTurns);
   int GetPlyCount() const;
+  void ResetPlyCount();
 
   void IsPossibleDirection(Direction direction, BoardField* ball1, BoardField* ball2, BoardField* ball3, BallMove** ballMoves, int& ballMovesSize) const;
   BOOL IsPossibleDirection(Direction direction) const;
@@ -235,6 +236,11 @@ inline void GameManager::SetMaxNumberOfTurns(int maxTurns)
 inline int GameManager::GetPlyCount() const
 {
   return myPlyCount;
+}
+
+inline void GameManager::ResetPlyCount()
+{
+  myPlyCount = 0;
 }
 
 inline void GameManager::SetStartPlayer(Player::PlayerNumber startPlayer)

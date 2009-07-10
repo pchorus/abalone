@@ -111,8 +111,8 @@ BallMove ComputerPlayerMonteCarlo::CalculateNextMove()
   }
 
   CString msg;
-  msg.Format("MC\nMove: %s\nTime: %d\nRatingBestMove: %d\n\n", retMove.ToString(), time, bestRating);
-  //Output::Message(msg, false, true);
+  msg.Format("Ply: %d\nMC\nMove: %s\nTime: %d\nValueBestMove: %d\n\n", GetGameManager()->GetPlyCount()+1, retMove.ToString(), time, bestRating);
+  Output::Message(msg, false, true);
 
   return retMove;
 }
@@ -149,6 +149,7 @@ int ComputerPlayerMonteCarlo::SimulateGamesWithMove(BallMove* ballMove)
     mySimGameManager->SetStartPlayer(startPlayer);
     mySimGameManager->DoMove(ballMove);
     mySimGameManager->SetGameStarted(true);
+    mySimGameManager->ResetPlyCount();
     // with the next method call the algorithm starts
     mySimGameManager->TurnIsOver();
 

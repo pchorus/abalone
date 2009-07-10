@@ -51,6 +51,7 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
   UnInitKillerMoves();
 
   // copy current real situation to the game board for simulation
+  mySimGameManager->ResetPlyCount();
   mySimGameManager->GetGameBoard()->CopyBoardFields(GetGameManager()->GetGameBoard());
   mySimGameManager->SetLostBallsPlayer1(GetGameManager()->GetLostBallsPlayer1());
   mySimGameManager->SetLostBallsPlayer2(GetGameManager()->GetLostBallsPlayer2());
@@ -136,9 +137,9 @@ BallMove ComputerPlayerAlphaBetaIterativeDeepening::CalculateNextMove()
     myLeftMilliSecondsForGame = 0;
   }
   
-//   CString msg;
-//   msg.Format("AB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", retMove.ToString(), myTreeDepth[NORMAL]-1, GetTickCount()-myStart, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
-//  Output::Message(msg, false, true);
+  CString msg;
+  msg.Format("Ply: %d\nAB ID\nMove: %s\nDepth: %d\nTime: %d\nNodes: %d\nValueBestMove: %d\nInserts: %d\nReuses: %d\n\n", GetGameManager()->GetPlyCount()+1, retMove.ToString(), myTreeDepth[NORMAL]-1, GetTickCount()-myStart, myNodeCounter, retBestValue, myHashMap.myInserts, myHashMap.myReUseEntries);
+  Output::Message(msg, false, true);
 
   return retMove;
 }

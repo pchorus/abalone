@@ -431,9 +431,16 @@ void GameManager::MoveBallsInDirection(Direction direction)
   BallMove move(direction, false, false, mySelectedBall1, mySelectedBall2, mySelectedBall3, 0);
   DoMove(&move);
 
+  ++myPlyCount;
+
   CString msg;
-  msg.Format("Human\nMove: %s\n\n", move.ToString());
+  msg.Format("Ply: %d\nHuman\nMove: %s\n\n", myPlyCount, move.ToString());
   Output::Message(msg, false, true);
+
+//   CString str;
+//   str.Format("Ply: %d\n%s", myPlyCount, myGameBoard->ToString());
+//   Output::Message2(str, false, true);
+
   mySelectedBall1 = 0;
   mySelectedBall2 = 0;
   mySelectedBall3 = 0;
@@ -1043,13 +1050,19 @@ void GameManager::TurnIsOver(LPVOID pParam)
   mySelectedBall1 = 0;
   mySelectedBall2 = 0;
   mySelectedBall3 = 0;
-  myPlyCount = 0;
 
   while (myPlyCount < myMaxNumberOfTurns
     && myLostBallsPlayer1 < 6 && myLostBallsPlayer2 < 6 && myNextTurn->GetType() != Player::PLAYER_TYPE_HUMAN)
   {
     computerPlayer = static_cast<ComputerPlayer*>(myNextTurn);
     computerPlayer->TakeNextTurn();
+
+// TODO: maybe that is only interesting for debug,
+// but by introducing a boolean variable one can decide whether
+// this is a sim-game from Monte Carlo (no output) or it is a real game (output)
+//     CString str;
+//     str.Format("Ply: %d\n%s", myPlyCount+1, myGameBoard->ToString());
+//     Output::Message2(str, false, true);
 
     if (myNextTurn == myPlayer1) {
       myNextTurn = myPlayer2;
