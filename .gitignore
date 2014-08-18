@@ -19,3 +19,11 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio Files
+*.sdf
+*.suo
+
+# Visual Studio Output
+Debug/
+Release/
